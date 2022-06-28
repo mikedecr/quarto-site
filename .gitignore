@@ -1,2 +1,4 @@
 /.quarto/
 *.undo*
+_freeze/
+
