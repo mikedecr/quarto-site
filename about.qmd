@@ -12,20 +12,20 @@ which means I use
 
 - mathematical models
 - statistical analysis / machine learning
-- state-of-the-art computation
+- state-of-the-art computing tools
 
-to study markets, build predictive signals, and develop trading strategies that go very fast.
+to study markets, build predictive signals, and improve trading strategies that go very fast.
 
 #### **---background---**
 
 I have a Ph.D. in political science from the University of Wisconsin–Madison,
 where I was a graduate affiliate of the [Elections Research Center](https://elections.wisc.edu).
-My graduate work developed Bayesian + causal models to study U.S. elections and public opinion.
+My graduate work focused on Bayesian + causal models for studying U.S. elections and public opinion.
 
 
 #### **---lately---**
 
-Some things I have been interested in lately:
+Some things I have been interested in:
 
 - Software design, functional programming especially
 - Lua-flavored [Neovim](https://github.com/mikedecr/neovim-configs/tree/lua)
