@@ -4,3 +4,6 @@
 [submodule "blog/usable_repos"]
 	path = blog/usable_repos
 	url = https://github.com/mikedecr/usable-repos.git
+[submodule "blog/modular_blog"]
+	path = blog/modular_blog
+	url = https://github.com/mikedecr/post_blogdown-submodules.git
