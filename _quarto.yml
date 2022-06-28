@@ -1,0 +1,26 @@
+project:
+  type: website
+
+website:
+  title: "michael decrescenzo"
+  repo-url: https://github.com/mikedecr/quarto-site
+  repo-actions: [issue]
+  favicon: submodules/imgs/img/favicon_telles.png
+  navbar:
+    right:
+      - text: "About"
+        file: about.qmd
+      - text: "Blog"
+        file: blog.qmd
+      - icon: github
+        href: https://github.com/mikedecr
+      - icon: twitter
+        href: https://twitter.com/mikedecr
+  # social / sharing
+  opengraph: true
+
+format:
+  html:
+    theme: litera-tweaks.scss
+    css: styles.css
+

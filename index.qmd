@@ -1,0 +1,22 @@
+---
+title: "welcome"
+image: submodules/imgs/img/ID_telles_1452x1452.png
+about:
+  template: solana
+  # links:
+  #   - icon: twitter
+  #     text: Twitter
+  #     href: https://twitter.com/mikedecr
+  #   - icon: linkedin
+  #     text: LinkedIn
+  #     href: https://linkedin.com/in/michael-decrescenzo
+  #   - icon: github
+  #     text: Github
+  #     href: https://github.com/mikedecr
+---
+ 
+I used to be a political scientist.
+Now I do statistics and software development in high-frequency / low-latency trading.
+
+
+

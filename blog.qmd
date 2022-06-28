@@ -1,0 +1,14 @@
+---
+title: "Blog Posts"
+listing:
+  contents: blog
+  type: grid
+  sort: "date desc"
+  sort-ui: false
+  filter-ui: false
+  categories: true
+page-layout: full
+title-block-banner: false
+---
+
+

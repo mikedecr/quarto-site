@@ -1,0 +1,33 @@
+---
+title: "more about me"
+image: submodules/imgs/img/ID_telles_1452x1452.png
+about:
+  template: trestles
+---
+
+#### **---work---**
+
+I work in low-latency finance as a **quantitative researcher**,
+which means I use 
+
+- mathematical models
+- statistical analysis / machine learning
+- state-of-the-art computation
+
+to study markets, build predictive signals, and develop trading strategies that go very fast.
+
+#### **---background---**
+
+I have a Ph.D. in political science from the University of Wisconsin–Madison,
+where I was a graduate affiliate of the [Elections Research Center](https://elections.wisc.edu).
+My graduate work developed Bayesian + causal models to study U.S. elections and public opinion.
+
+
+#### **---lately---**
+
+Some things I have been interested in lately:
+
+- Software design, functional programming especially
+- Lua-flavored [Neovim](https://github.com/mikedecr/neovim-configs/tree/lua)
+- Frequentist statistics
+
