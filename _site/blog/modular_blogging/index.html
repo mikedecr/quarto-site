@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+  <meta charset="utf-8">
+  <meta name="generator" content="quarto-99.9.9">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="author" content="Michael DeCrescenzo">
+  <meta name="dcterms.date" content="2021-11-06">
+  <title>michael decrescenzo - Highly modular blogging with Blogdown</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+
+  <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+  <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+  <script src="../../site_libs/clipboard/clipboard.min.js"></script>
+  <meta name="quarto:offset" content="../../">
+  <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+  <script src="../../site_libs/quarto-search/fuse.min.js"></script>
+  <script src="../../site_libs/quarto-search/quarto-search.js"></script>
+  <link href="../../submodules/imgs_self/img/favicon_telles.png" rel="icon" type="image/png">
+  <script src="../../site_libs/quarto-html/quarto.js"></script>
+  <script src="../../site_libs/quarto-html/popper.min.js"></script>
+  <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+  <script src="../../site_libs/quarto-html/anchor.min.js"></script>
+  <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+  <link id="quarto-text-highlighting-styles" href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
+  <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+  <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <script id="quarto-search-options" type="application/json">{
+    "location": "navbar",
+    "copy-button": false,
+    "collapse-after": 3,
+    "panel-placement": "end",
+    "type": "overlay",
+    "limit": 20,
+    "language": {
+      "search-no-results-text": "No results",
+      "search-matching-documents-text": "matching documents",
+      "search-copy-link-title": "Copy link to search",
+      "search-hide-matches-text": "Hide additional matches",
+      "search-more-match-text": "more match in this document",
+      "search-more-matches-text": "more matches in this document",
+      "search-clear-button-title": "Clear",
+      "search-detached-cancel-button-title": "Cancel",
+      "search-submit-button-title": "Submit"
+    }
+  }</script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="nav-fixed fullcontent">
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">michael decrescenzo</span>
+  </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">About</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html">Blog</a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/mikedecr"><i class="bi bi-github" role="img">
+</i> 
+ </a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/mikedecr"><i class="bi bi-twitter" role="img">
+</i> 
+ </a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+
+
+
+<div class="quarto-title-banner color-navbar page-columns page-full"><div class="quarto-title column-body"><h1 class="title display-7">Highly modular blogging with Blogdown</h1><div class="quarto-categories"><div class="quarto-category">git</div><div class="quarto-category">code</div></div></div></div><div class="quarto-title-meta"><div><div class="quarto-title-meta-heading">Author</div><div class="quarto-title-meta-contents"><div class="quarto-title-authors"><div><div>
+<p>Michael DeCrescenzo</p>
+</div></div></div></div></div><div><div class="quarto-title-meta-heading">Published</div><div class="quarto-title-meta-contents"><p class="date">November 6, 2021</p></div></div></div></header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+<p data-sidebar-align="true">When I finished graduate school, I tore down my website.</p>
+<p>For a handful of reasons. I no longer needed a website that cried out, “Help me, I’m finishing my PhD and I need to escape.” I didn’t need to showcase unpublished papers, teaching resources, or old blog posts that I had grown detached from. It was time for a clean reset.</p>
+<p>But if you work with Blogdown, you know that starting over is laborious. Not that Blogdown isn’t great, because it is. It’s that, when you’re a finicky person like me, setting up a website with the right balance of capable features, pleasant aesthetics, and a principled codebase is legitimately challenging. I was encountering the same familiar challenges over and over.</p>
+<p><strong>For example, the site’s Hugo theme.</strong> I would take a lot of Hugo themes for test-drives. Hugo advertizes themes as if they were completely modular with respect to your <code>/content/</code> folder. For most themes, this is a lie. Themes usually want too many bespoke variables or file structures in your website <code>content</code>. Some amount of this is okay, but it comes at a cost. If you really want to take a theme for a spin, I would find it easier to create an entirely new <code>blogdown::new_site()</code> than to change my theme in an existing site.</p>
+<p><strong>Except now you’re dragging the same files around your computer all over again.</strong> Ugh, this new website directory needs your blog source files, your website-level <code>.Rprofile</code> that controls Blogdown’s build behaviors, the jpg/png image files that you use to brand yourself online, etc… And maybe these files need to go in different folders or be given different file names from the previous theme. After a while, these files no longer have a single authoritative “home” on your computer, and you may have multiple conflicting(!) versions of these files across your various experimental website folders.</p>
+<p><strong>And then there’s reproducibility.</strong> Even after lugging around all the same files to the new site, good luck getting your blog posts to render if your package library has changed since they were written, which it probably has. Danielle Navarro <a href="https://blog.djnavarro.net/posts/2021-09-30_on-blogging-reproducibly/">wrote about reproducibility in Rmarkdown blogging</a>, and argues convincingly that the best way to protect your <code>.Rmarkdown</code> posts from this rebuilding risk is to create a <em>dedicated package library for each separate blog post</em> using <code>renv</code>. This sounds intense at first, but the underlying principle is simple, which makes it a good solution to a difficult problem.</p>
+<p>This post will continue that pattern: intense at first, but well-founded, solutions for difficult problems.</p>
+<section id="what-this-post-is-about-modularity" class="level2">
+<h2 class="anchored" data-anchor-id="what-this-post-is-about-modularity">What this post is about: modularity</h2>
+<p>What we want is a principled and robust approach for managing the many interlocking components of your website. Specifically, we explore the <strong><em>modularity</em> of the elements in your website.</strong> I take the view that your website is a collection of modular components that are better managed independently, <strong>with different Git repositories for the different site components.</strong> Yes, managing your website with multiple repositories. Stay with me.</p>
+<p>The modules that compose your website include your theme, your blog posts, your Blogdown build preferences (implemented in your <code>.Rprofile</code>), and maybe more. These modular components <em>come together</em> at the nexus of the website, but as I will argue, these components should not <em>belong to</em> the website. Why not? Because these components can be re-used across different websites or substituted with other similar components. Hugo already flirts with this idea in its core design by separating the <code>/theme/</code> directory from the <code>/content/</code> directory, as if to say, “these components can be combined but do not depend on one another.” This post takes an opinionated stance that <strong>such modularity is a good idea</strong> and should be assertively extended to other components of your Blogdown site. That said, I make no assertion that this stance is objectively correct—only that it has been useful enough for me that I wanted to share some thoughts about the principles and processes at work. (You should do what works for you!)</p>
+<p>Modularity as a software philosophy is one thing, but implementing it in code requires technical solutions. This post will discuss how to achieve this using <strong>Git submodules,</strong> an intermediate-level Git construct that, if you’re like me, is somewhat familiar but somewhat intimidating. In short, a Git submodule is a repository-within-a-repository. It has its own version history that is distinct from the “parent” repository. In this post, I provide a simple tour of submodules and how they can be used to structure your website workflow. We will recast our website as the “primary” repository, and we import other modular site components (like our blog posts) as Git submodules. In case you host your blog on Netlify, I will also discuss how to ensure that Netlify can build your site successfully.</p>
+<section id="aside-some-terminology" class="level3">
+<h3 class="anchored" data-anchor-id="aside-some-terminology">Aside: some terminology</h3>
+<p>This discussion will involve plenty of concepts that sound similar to one another but should be understood as distinct things. I want to flag these concepts so that we understand each other better.</p>
+<p><strong>Directory vs.&nbsp;repository.</strong> A directory is a folder on your computer that holds files. A (Git) repository tracks changes to files. For many projects, the project’s root directory is entirely managed by one repository, so the distinction between the two may be blurred. When Git submodules are involved, this is no longer true. Your website directory will be managed by one repository, and sub-directories below your website will be managed by other repositories.</p>
+<p><strong>Website vs.&nbsp;module.</strong> The <em>website</em> is the entire project that puts your website online. Your website will contain various <em>modules</em> that combine to build the entire project. Your blog posts will be considered a module (or several modules, depending on your implementation). Your theme is another module. Think of modules as building blocks for your website that can be stacked, swapped out, and so on.</p>
+<p><strong>Parent repository (for the website) vs.&nbsp;child repository (for the module), a.k.a. “submodule”.</strong> The website and the module will be versioned by separate repositories. We can refer to the over-arching project repo (the website) as the “parent” repo and the module repo as the “child” repo. A “Git submodule” is a Git construct that is overlaid onto this relationship between repositories. A repository, in isolation, is simply a repository. But if you import a repository into another project as a dependency, Git designates the dependency as a “submodule” to the parent repository, and this affects our Git workflow as a result. I explain all of that below.</p>
+</section>
+</section>
+<section id="websites-are-a-collection-of-modules" class="level2">
+<h2 class="anchored" data-anchor-id="websites-are-a-collection-of-modules">Websites are a collection of modules</h2>
+<p>Modules are like little building blocks, and your website has plenty of them. Setting aside any formal definition of what would mathematically be considered a “module”, let’s crudely define them as structures in your website that are agnostic to the content of other structures. We may be able to replace modules with other modules, or remove modules entirely, without affecting the core function of other modules.</p>
+<p>Here are some examples from my own workflow. I consider my blog posts, Hugo theme, and blogdown build settings (in my site-level <code>.Rprofile</code>) as modular components within the website as a whole, and I version each component with its own separate repository. Here is how I justify this view for each component:</p>
+<ul>
+<li><p><strong>Blog posts</strong>: The content of a blog post is completely separable from the website repo. We can take a blog post and locate it in a different website, and the blog post should still be meaningful (and reproducible) unto itself. Many blogdown users remake their websites and carry their old blog posts to the new sites, which shows that the blog content doesn’t functionally depend on the website.</p>
+<p>It turns out that, for blog posts, modularity and reproducibility are pretty closely related. In her discussion of blog reproducibility, Danielle Navarro touched on the principle that a blog should be <a href="https://blog.djnavarro.net/posts/2021-09-30_on-blogging-reproducibly/">“encapsulated” or “isolated”</a> away from the broader website to robustify the blog against other dependencies. By insisting that blog posts also be modular, not only is the blog protected from the website’s computational environment, we can control each post independently of one another, move posts around across contexts, and remove posts entirely without side-effects.</p>
+<p>This also affects how we treat the blog post’s dependencies. Suppose that your post includes an analysis on a data file that you read from disk. This file should belong to your blog post—and be versioned by that blog post’s Git repository—not your website. This means you should keep all of these files in the blog post directory, and forget about the website’s <code>/static/</code> folder except for files that rightfully belong <em>to the website</em>.</p></li>
+<li><p><strong>Hugo theme</strong>: Hugo is designed such that the <code>/content/</code> of a website (specified in markdown files) is more-or-less independent of its <code>/theme/</code>. The same theme can be used for multiple websites, and a single website can (in theory<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>) swap out one theme for another. Because themes are managed with Git repositories already, you can pull theme updates from their remote repositories without overwriting any bespoke theme customizations specified in your <code>/layouts/</code> folder.</p>
+<p>Blogdown complicates this somewhat. When you install a theme with <code>blogdown::install_theme()</code>, Blogdown actually deletes the theme’s <code>.git</code> directory. (At least, this was my experience.) This is probably for ease-of-use among users who would not appreciate having to manage the theme as a submodule. But we are enthusiastic seekers of modularity, so we want to keep that upstream remote connection alive. As such, I installed my site’s Hugo theme using Git submodule operations instead of installing it with <code>blogdown::install_theme()</code>.</p></li>
+</ul>
+<ul>
+<li><strong>The website <code>.Rprofile</code> file</strong>: You may have a global .Rprofile file, but it is an increasingly common Blogdown workflow staple to set up a website-specific .Rprofile to control <a href="https://bookdown.org/yihui/blogdown/global-options.html">Blogdown’s build behavior</a>. How is this a module? Your blogdown build preferences are probably not specific to this website repository. Instead, it is likely that your preferences reflect your workflow for blogging <em>in general</em> and could be equally applicable to any other website repo you create or manage. If you change your blogdown workflow in a way that bears on this .Rprofile file, that change may affect all of your blogdown websites equally! Managing these .Rprofiles separately for each website would be inefficient and error-prone, so instead we manage the .Rprofile in one repository that we import to our website as a submodule.</li>
+</ul>
+</section>
+<section id="how-to-accomplish-this-git-submodules" class="level2">
+<h2 class="anchored" data-anchor-id="how-to-accomplish-this-git-submodules">How to accomplish this: Git submodules</h2>
+<p>Git submodules are repositories-within-repositories. Suppose you are working on a project repository (like your website), and there are external tools or resources that you want to import from another project. You have a strong project-based workflow, so you want all of the code that creates your website to be <em>contained within the website directory</em> on your computer. At the same time, the external dependency is clearly its own entity, and there is no reason why its code should be owned by the website repository. Git submodules allow you to clone this dependency repo into your website directory so you can use this code without versioning it redundantly.</p>
+<section id="basics" class="level3">
+<h3 class="anchored" data-anchor-id="basics">Submodule basics</h3>
+<p>If you have never worked with submodules before, here is how they work in broad strokes. (This is not an exhaustive intro.)</p>
+<p><strong>When you add a submodule to a parent repository, the parent repository tracks the <em>presence</em> of the submodule, but it does not track the content.</strong> Your website repo tracks the presence of submodules to ensure that your project can be reproduced (read: cloned) with all necessary dependencies in place.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> However, your website repo is ignorant of the actual content of the submodule because the submodule code is versioned by its own separate repo. There is no need to duplicate that effort.</p>
+<p><strong>Upstream changes to the submodule repo can be pulled into your website repo.</strong> This is standard workflow for Git. If you want to pin your dependency to a particular commit of the submodule, you can <code>git checkout</code> that commit. If you want your dependency to stay dynamically up to date with the submodule’s remote repo, checkout the desired branch and pull changes as they arise on the upstream remote.</p>
+<p><strong>Local changes to the submodule content can be pushed to remote.</strong> If you have write access to the submodule’s remote repository—either you own the repo, or it’s your fork of some other repo—you can make changes to the submodule contents <em>from within the submodule</em> and push those changes back upstream.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> This is just like a Git workflow where multiple users are pushing to the same remote repository, except instead of multiple users, it’s only you, editing the repo and committing/pushing changes from different endpoints. This allows you to keep the submodule content updated on all of its local and remote copies without duplicating any effort.</p>
+</section>
+<section id="how-to-add-your-website-components-as-submodules" class="level3">
+<h3 class="anchored" data-anchor-id="how-to-add-your-website-components-as-submodules">How to add your website components as submodules</h3>
+<p>In the spirit of modularity, there is actually nothing Blogdown-specific about including submodules within a project repository. All the same, I will discuss a Blogdown-specific example: the <code>.Rprofile</code> module, which I keep in <a href="https://github.com/mikedecr/dots_blogdown">its own repository here</a>. I discuss how I manage <em>blog posts</em> with submodules <a href="#blog">later on</a>, because that conversation is a little more involved.</p>
+<p>You can add a submodule to your (already initialized) website repo with <code>git submodule add [my-url] [my-destination-folder]</code>. You will want to be strategic about where you add the repo, since it will effectively behave like a cloned repository. I often create a <code>/submodules/</code> folder under my project root and clone submodules to that location.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from /path/to/site</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> submodules</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> submodules</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> submodule add git@github.com:mikedecr/dots_blogdown.git</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Adding the submodule <em>does not</em> clone its contents. It simply registers the submodule with the repository, creating an entry in the website repo’s <code>.gitmodules</code> file. You have to run a separate command to actually clone the submodule repo’s contents:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> submodule update <span class="at">--init</span> <span class="at">--recursive</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The output will look like you did a <code>git clone</code>. At this point, there should exist a folder called <code>/dots_blogdown/</code> that contains the repo contents.</p>
+<p>From there, your next step depends on how you want to use the contents of the submodule. For this particular example, we want this <code>.Rprofile</code> to live at the top of our website root. This ensures that the file’s code is executed when we open R to manage our website. I achieve this by linking the file to the website root (and, bonus, removing write permissions<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>).</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># exit /submodules/</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ..</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -s = symlink, -f = force</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-f</span> ./submodules/dots_blogdown/.Rprofile ./.Rprofile</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># bonus: remove write-permissions (make read-only)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> <span class="at">-w</span> ./.Rprofile</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>It is smart to automate any post-Git processes, such as linking files to other destinations, by putting these commands and other pre-build operations in your website’s <code>/R/build.R</code> file. This ensures that these operations are done each time your website is built, ensuring that your website can be safely reproduced if your submodule content should ever change. With that automation in place, if I ever changed my .Rprofile repo, I never have to worry about manually re-linking my updates to the right destination. The build script does it for me.</p>
+</section>
+<section id="developing-within-the-submodule-repo" class="level3">
+<h3 class="anchored" data-anchor-id="developing-within-the-submodule-repo">Developing within the submodule repo</h3>
+<p>The above instructions describe how to simply employ submodule files in your website. But suppose you wanted to change the content of the submodule files and push those changes back upstream. What would you do?</p>
+<p><strong>Before making any changes to the submodule files, make sure the submodule isn’t in detached HEAD state.</strong> A detached HEAD state is basically what happens when you have checked out a commit <em>in isolation of the branch on which that commit lives</em>. When you are in detached HEAD state, you are basically looking at a copy of the project, but you cannot alter the project tree itself. Any files you change cannot be committed to a persistent branch. To make permanent changes, you have to checkout the branch that you want to track and commit changes to, which is probably <code>main</code>.</p>
+<p><strong>Make your changes.</strong> Even though you are editing a file within a submodule repository, Blogdown doesn’t know or care, so it shouldn’t behave any differently. It will knit/render blog posts and serve your website locally like nothing is wrong. That’s because nothing <em>is</em> wrong.</p>
+<p><strong>Commit changes to submdodule files to the submodule repository.</strong> From the command line, this means you probably should <code>cd</code> into the submodule repo before adding any files to the index. If you do Git stuff inside of a GUI, you should be able to make the submodule appear as its own repo that you can do add/commit/push actions to. (I don’t use Rstudio, so unfortunately I don’t know if Rstudio makes this easy.) After committing to your local copy of the submodule repo, you should notice that your parent repository detects an updated commit in the submodule! You should commit that change to the parent repository as well. This simply tells the parent repo that it should consult this new submodule to reproduce the project correctly. This is important because anyone else who clones your website repository (ahem, Netlify!) will need to import the submodule at the correct commit.</p>
+<p><strong>Both submodule and parent repos can be pushed.</strong> If this is your first time pushing any submodule-related commits to Netlify, you will want to read the <a href="#netlify-setup">section about Netlify below</a>.</p>
+<p>As you get more familiar with Git, you won’t need to follow a checklist. You will simply be familiar enough with how Git works to know exactly what to do!</p>
+</section>
+</section>
+<section id="blog" class="level2">
+<h2 class="anchored" data-anchor-id="blog">What to do about your blog?</h2>
+<p>Should your blog be one submodule repository, or several? My current setup is to treat every blog post as its own, separate module with its own, separate repository. This keeps each post and all of its dependencies isolated from other posts, which is cleanest for me from a reproducibility and modularity standpoint.</p>
+<p>However, you may find many blog post repositories to be overkill, and would instead want a single repository containing all of your blog posts. Would that be fine?</p>
+<p>In short, the single-blog-module setup may be possible, but it will likely require even more advanced Git magic than just submodules. If you really want to know the nasty technical details, you can read about the <a href="#problem">problem</a> and one <a href="#fix">potential solution</a>, with the caveat that I haven’t tested that workflow out. If you trust me that the single-repo workflow is pretty complicated except for people looking to increase their Git dexterity stats, you can skip ahead to read about <a href="#every-post">separate repositories for each post</a>.</p>
+<section id="problem" class="level3">
+<h3 class="anchored" data-anchor-id="problem">One submodule for all posts: the problem</h3>
+<p>To explain, consider the <a href="#basics">submodule workflow</a> mentioned earlier. If we wanted to use a “single submodule” approach to blogging, we would</p>
+<ul>
+<li>Move our blog posts to another repository and push it to the web.</li>
+<li>Add this repository as a submodule located in your <code>content/blog</code> or analogous subdirectory.</li>
+<li>The changes in the <code>content/blog</code> folder are now owned by the submodule repository. The parent repo will no longer see what’s happening in those files—only if you have made new commits.</li>
+</ul>
+<p>Unfortunately, this may be a critical problem for your website! This is because many themes ask you to put other important files under your <code>content/blog</code> directory, in addition to the posts. Many popular themes ask for a <code>content/blog/_index.md</code> file to manage the blog’s “listings” page. Many themes also will accept image files in that directory to use for headers and sidebars on the listings page. These files are problems for the single-repo workflow. If we let our blog submodule own the <code>content/blog</code> directory, those files can no longer be tracked by the parent (website) repository. Adding the files to the submodule’s <code>.gitignore</code> does not fix it either. So, what can be done?</p>
+</section>
+<section id="fix" class="level3">
+<h3 class="anchored" data-anchor-id="fix">One submodule for all posts: there might be a way</h3>
+<p>I haven’t tested this, but there might be a way to save the unified-blog-repository workflow: you could make your blog repository a <strong>bare repository</strong>.</p>
+<p>A bare repository is a repository with no root directory. Now, if you have only used Git on a per-project basis, the idea of a repo with no root directory sounds unthinkable, but it is actually a common way to <a href="https://dev.to/bowmanjd/store-home-directory-config-files-dotfiles-in-git-using-bash-zsh-or-powershell-the-bare-repo-approach-35l3">version your “dotfiles”</a>. Here’s why: your dotfiles usually live at your <code>/home/username/</code> or <code>~/</code> directory. Many folks want to track these files to keep certain preferences synchronized on different machines, but as you can foresee, making a Git repository track your entire <code>~/</code> folder would be a horrible and terrifying idea. Instead, people create <em>bare</em> repositories that only track the contents that are explicitly added to the repository, regardless of their relative location to the repo’s <code>.git</code> folder.</p>
+<p>How might this ameliorate our workflow problem? If we want one submodule repo to track all of the posts in <code>/content/blog</code>, but we don’t want that repo to own the other files in that directory, we might be able to achieve that effect with a bare submodule repo. Such a repo shouldn’t be aware of the other files under <code>content/blog</code>, because the repo <em>doesn’t know that it is the same folder</em> as those files.</p>
+<p>Again, try it if you want, but you have no assurances from me that it will work.</p>
+</section>
+<section id="every-post" class="level3">
+<h3 class="anchored" data-anchor-id="every-post">My choice: every post gets its own repository</h3>
+<p>In lieu of the “advanced solution”, we opt for peak modularity: every blog post gets its own repository.</p>
+<p>This workflow sounds tedious but is actually easier than you would think, and most of the steps are identical to what I have already covered above. Here’s a quick rundown of what I do:</p>
+<ol type="1">
+<li><strong>Start on Github</strong> or whichever remote service you prefer. Make a remote-first repository for a new post (give it a meaningful title) and copy its cloning link.</li>
+<li><strong>Add the new repo as a submodule to a new folder for that post inside of <code>/content/blog</code>.</strong> I assume you use a “page bundle” model for organizing your blog code: separate folders for each post that contain respective <code>index.[R]markdown</code> files. It’s advisable to blog with page bundles even if you don’t want to implement hyper-modular blog versioning. Learn more about page bundles from Alison Hill <a href="https://www.apreshill.com/blog/2019-02-spoonful-bundles/">here</a>.</li>
+<li><strong>Your <code>.gitmodules</code> file will automatically update to reflect the new submodule.</strong> You will eventually want to commit that change, but it doesn’t have to be now. If necessary, initialize/update the submodule to clone its contents into the new post directory.</li>
+<li><strong>Checkout your desired submodule branch</strong> (e.g.&nbsp;<code>main</code>) so you can commit changes to your blog repo.</li>
+<li><strong>Edit your post as you normally would</strong> by creating an <code>index.Rmarkdown</code> and typing away. This is where you would use <code>renv</code> to take a snapshot of your R package library in order to reproduce the post. Hugo will trip over the files created by <code>renv</code>, however, so if you want to use it (again, you should), add <code>"renv"</code> to the <code>ignoreFiles</code> field in your website’s <code>config.toml</code> (which you only have to do once per site).</li>
+<li><strong>Commit changes to the blog module repository and push to remote.</strong></li>
+<li><strong>You should notice that your parent repository detects an updated commit</strong> in the submodule. Commit that change to the parent repository as well. Pushing this <em>website commit</em> to remote will kick off a new Netlify build if you use continuous integration. Speaking of that…</li>
+</ol>
+</section>
+</section>
+<section id="netlify-setup" class="level2">
+<h2 class="anchored" data-anchor-id="netlify-setup">Getting it working with Netlify</h2>
+<p>Once you are done getting your site looking the way you want, and all of your files are committed to the parent and child repositories, you can push your website repo to the remote that Netlify is tracking.</p>
+<p>Except, whoops, your site may fail to build on Netlify. Why? Netlify works by cloning your website repository to their servers and building it with Hugo on their end. This process fails if Netlify can’t successfully reproduce your website repo with all of the submodules declared in your <code>.gitmodules</code> file. Such failure can happen for two benign and fixable reasons: (1) the submodule is a private repository, or (2) the submodule was added using the repo’s <code>ssh</code> URL instead of the <code>https</code> URL.</p>
+<p>In either case, all you have to do is add ssh-keys to grant Netlify access to these repositories. It sounds complicated and jargony, but Netlify describes the whole process <a href="https://docs.netlify.com/configure-builds/repo-permissions-linking/#git-submodules">right here</a>.</p>
+<p>Once Netlify has access to the repositories, it can build its own copy of your website. This is because your parent Git repository spells out all of the instructions for cloning the required submodules at their requested commits.</p>
+</section>
+<section id="closing-note" class="level2">
+<h2 class="anchored" data-anchor-id="closing-note">Closing note</h2>
+<p>This post presents an opinionated view of a Blogdown website as a collection of modules and a corresponding workflow for managing them. If you find it helpful, awesome! But as always, you should do what works for you. It happened to be the case that I had a particular set of problems and a desire to strengthen some skills could help me solve them.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1" role="doc-endnote"><p>The system isn’t perfect. Some themes define special fields whose values are specified in your content files, but the main idea is there.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>This is how Netlify builds your site, in fact. Netlify clones your website’s Git repository and builds it on their servers, so this is actually super important.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p>Just be sure you have checked out a branch (not in detached <code>HEAD</code> state) before you commit changes to the submodule files. More <a href="https://git-scm.com/book/en/v2/Git-Tools-Submodules#_working_on_a_submodule">here</a>.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4" role="doc-endnote"><p>Because I forcefully link the .Rprofile file from the submodule to the website root, any changes I make to the copy at the root would be overwritten if I ever re-linked the file. This is why I make the file read-only: to prevent myself from editing the wrong copy of the file. Just a little trick to guard against bugs :)<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    setTimeout(function() {
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+</body></html>
