@@ -1,3 +1,6 @@
 [submodule "submodules/imgs"]
 	path = submodules/imgs
 	url = https://github.com/mikedecr/imgs_self.git
+[submodule "blog/usable_repos"]
+	path = blog/usable_repos
+	url = https://github.com/mikedecr/usable-repos.git
