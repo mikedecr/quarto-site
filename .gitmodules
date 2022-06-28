@@ -1,0 +1,3 @@
+[submodule "submodules/imgs"]
+	path = submodules/imgs
+	url = git@github.com:mikedecr/imgs_self.git
