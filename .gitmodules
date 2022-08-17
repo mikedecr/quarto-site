@@ -7,3 +7,6 @@
 [submodule "blog/modular_blog"]
 	path = blog/modular_blog
 	url = https://github.com/mikedecr/post_blogdown-submodules.git
+[submodule "blog/fp_basics"]
+	path = blog/fp_basics
+	url = git@github.com:mikedecr/post_fp_basics.git
