@@ -410,7 +410,7 @@ w = (j \circ g \circ u)
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># examine the object to convince yourself of this</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>n_unique</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## function(...) f(g(...))</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x122366c50&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x135af2c50&gt;</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># apply the function on some data</span></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>)</span>
@@ -526,7 +526,7 @@ w = (j \circ g \circ u)
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># examine, it's a function</span></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>lengths</span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="do">## function(x) apply_on_elements(x, f)</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x121c36ba8&gt;</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x1353c2ba8&gt;</span></span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">lengths</span>(x)</span>
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="do">## [[1]]</span></span>
@@ -548,8 +548,8 @@ w = (j \circ g \circ u)
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">partial_apply</span>(means)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="do">## function(x) apply_on_elements(x, f)</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;bytecode: 0x12221da88&gt;</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x12214eeb8&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;bytecode: 0x1359a9a88&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x1358daeb8&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="apply-our-partial-function-to-data." class="level3">
@@ -592,7 +592,7 @@ w = (j \circ g \circ u)
 <span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. interface layer</span></span>
 <span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>means_by <span class="ot">=</span> <span class="fu">compose</span>(<span class="fu">c</span>(dplyr<span class="sc">::</span>bind_rows, <span class="fu">partial_apply</span>(means), split))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Again, given that step (2) is rebuilding the wheel, it’s pretty impressive how little code goes into steps (1) and (3) to achieve the end results. It certainly isn’t as succinct as <code>dplyr::summarize</code>, but remember, functional programming hasn’t been invented yet. But moreover, you can start to imagine how tools like partials can be stacked to create tools that are essentially as powerful as <code>dplyr</code>, even if their interfaces are different (more functional).</p>
+<p>Again, given that step (2) is rebuilding the wheel, it’s pretty impressive how little code goes into steps (1) and (3) to achieve the end results. The final API in this iteration certainly isn’t as succinct as <code>dplyr</code> grouping and summarizing, but remember, functional programming hasn’t been invented yet. But moreover, you can start to imagine how tools like partials can be stacked to create tools that are essentially as powerful as <code>dplyr</code>, even if their interfaces are different (more functional).</p>
 <p>Let’s apply the ultimate function, <code>means_by</code>, to various groups in <code>mtcars</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">means_by</span>(mtcars, mtcars<span class="sc">$</span>cyl)</span>
