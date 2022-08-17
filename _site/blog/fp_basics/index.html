@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Michael DeCrescenzo">
+<meta name="dcterms.date" content="2022-08-17">
+
+<title>michael decrescenzo - More than lapply: functional programming adventures in R</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../submodules/imgs/img/favicon_telles.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">michael decrescenzo</span>
+  </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">About</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html">Blog</a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/mikedecr"><i class="bi bi-github" role="img">
+</i> 
+ </a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/mikedecr"><i class="bi bi-twitter" role="img">
+</i> 
+ </a>
+  </li>  
+</ul>
+              <div class="quarto-toggle-container">
+                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+              </div>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title"><p>More than <code>lapply</code>: functional programming adventures in R</p></h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">code</div>
+                <div class="quarto-category">r</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Michael DeCrescenzo </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 17, 2022</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>When people talk about “functional programming” in R, they usually mean two things.</p>
+<ol type="1">
+<li>Many intermediate R users have a <em>thing</em> against for-loops because for-loops have a reputation for being slow in R,<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> instead advocating for <code>apply</code> functions or <code>purrr::map</code> in a nested-data-frame context. (I will explain <code>apply</code> and <code>map</code> below.) This is popularly referred to in these circles as “functional programming” because, rather than procedurally manipulating data explicitly, the approach takes a pre-defined function and merely applies it to data.</li>
+<li>More advanced R discussions (see the book literally titled <a href="https://adv-r.hadley.nz/fp.html">Advanced R</a>) refer to the fact that functions are first-class objects in R, meaning that you can look at their properties or do operations on them, just like you can do to other data structures.</li>
+</ol>
+<p>By the numbers, most R users are more probably familiar with the meaning of [1] than [2], which is a shame because functional paradigms outside of R go way deeper, and get <em>way</em> weirder, than <code>apply(function, data)</code>. This post will be an attempt to explain a little of this weirdness and implement it in R.</p>
+<p>Readers who are experienced with functional programming will recognize that this post doesn’t get <em>so</em> detailed. They may also realize that underneath the tidyverse interface are a <em>lot</em> of functional ideas, notably tidy evaluation. This post keeps the material pretty light, and we won’t get into tidy evaluation. Maybe some other time.</p>
+<section id="what-is-functional-programming" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-functional-programming">What is functional programming?</h2>
+<p>Let’s do the Wikipedia thing. From the <a href="https://en.wikipedia.org/wiki/Functional_programming">functional programming</a> article:</p>
+<blockquote class="blockquote">
+<p>In computer science, functional programming is a programming paradigm where programs are constructed by applying and composing functions.</p>
+</blockquote>
+<p>You may be thinking, “That sounds pretty unremarkable. I already know that I write functions and apply them. Why do we need a name for this?”</p>
+<p>Well… read on:</p>
+<blockquote class="blockquote">
+<p>It is a declarative programming paradigm in which function definitions are trees of expressions that map values to other values, rather than a sequence of imperative statements which update the running state of the program.</p>
+</blockquote>
+<p>There are a lot of information-dense parts of that sentence that may be difficult to appreciate without knowing more of the theory. But let’s try to break it apart. Starting in the middle.</p>
+<section id="functions-map-values-to-other-values" class="level3">
+<h3 class="anchored" data-anchor-id="functions-map-values-to-other-values">“Functions map values to other values”</h3>
+<p>You have probably seen function definition written like this,</p>
+<p><span class="math display">\[
+y = a + bx
+\]</span></p>
+<p>and we say that <span class="math inline">\(y\)</span> is a function of <span class="math inline">\(x\)</span>. We can label the transformation of <span class="math inline">\(x\)</span> as <span class="math inline">\(f\)</span> and say <span class="math inline">\(y = f(x)\)</span>. Easy!</p>
+<p>But there is another way to write statements like this that you may have seen in papers that have high opinions of their own notation:</p>
+<p><span id="eq-map"><span class="math display">\[
+f : X \mapsto Y
+\tag{1}\]</span></span></p>
+<p>which reads, “<span class="math inline">\(f\)</span> is a <em>map</em> from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>”, where capital-<span class="math inline">\(X\)</span> and capital-<span class="math inline">\(Y\)</span> are <em>sets</em> of values from which the single values <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are drawn. Which is to say: <span class="math inline">\(f\)</span> is simply a thing that eats a value from <span class="math inline">\(X\)</span> and spits out a value from <span class="math inline">\(Y\)</span>. In this example, the value of <span class="math inline">\(y\)</span> that it returns is <span class="math inline">\(a + (b \times x)\)</span>.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+</section>
+<section id="function-definitions-are-trees-of-expressions" class="level3">
+<h3 class="anchored" data-anchor-id="function-definitions-are-trees-of-expressions">“Function definitions are <em>trees</em> of expressions …”</h3>
+<p>Referring to functions as “trees” won’t make sense until we talk about <strong>function composition</strong> and <strong>associativity</strong>.</p>
+<p>First, composition. If the notation in <a href="#eq-map">Equation&nbsp;1</a> is new to you, your mental picture of function composition probably looks like this. We can take two functions <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span>… <span class="math display">\[\begin{align}
+    y &amp;= f(x) \\
+    z &amp;= g(y)
+\end{align}\]</span> and put them together…</p>
+<p><span id="eq-nested"><span class="math display">\[ \begin{align} z &amp;= g(f(x)) \end{align}  \tag{2}\]</span></span> and then we can represent that composition with a different symbol <span class="math inline">\(h\)</span>, so that that <span class="math inline">\(h(x)\)</span> is equivalent to <span class="math inline">\(g(f(x))\)</span>.</p>
+<p>There’s nothing incorrect about that approach, but it is verbose. We actually don’t have to refer to any function arguments or values—<span class="math inline">\(x\)</span>, <span class="math inline">\(y\)</span>, or <span class="math inline">\(z\)</span>—to introduce <span class="math inline">\(h\)</span>. Instead we can define <span class="math inline">\(h\)</span> “point-free”: <span id="eq-composition"><span class="math display">\[ h = g \circ f  \tag{3}\]</span></span></p>
+<p>where the symbol <span class="math inline">\(\circ\)</span> refers to function composition (in a leftward direction). The expression <span class="math inline">\(g \circ f\)</span> is a new function, which we can speak aloud as “<span class="math inline">\(g\)</span> compose <span class="math inline">\(f\)</span>” or “<span class="math inline">\(g\)</span> after <span class="math inline">\(f\)</span>”. Because the composition is itself a function, we can pass it an argument: <span class="math inline">\((g \circ f)(x)\)</span> would spit out the value <span class="math inline">\(z\)</span>, just like in <a href="#eq-nested">Equation&nbsp;2</a>.</p>
+<p>Okay, next point. Associativity. Function composition is associative, which means compositions can be “grouped” in whatever way you want as long as you don’t rearrange the ordering of the base functions.</p>
+<p>To demonstrate, let’s write some functions out in “map” notation, and for the sake of simplicity let’s say that each is a map from a real number to a real number. <span class="math display">\[\begin{align}
+    \newcommand{\R}{\mathbb{R}}
+    f &amp;: \R \mapsto \R \\
+    g &amp;: \R \mapsto \R \\
+    j &amp;: \R \mapsto \R
+\end{align}\]</span> Now we want to compose these functions. Because composition is associative, we could write the composition many ways:</p>
+<ul>
+<li>As one single chained composition: <span class="math inline">\(j \circ g \circ f\)</span>, which if applied to <span class="math inline">\(x\)</span> would be equivalent to <span class="math inline">\(j(g(f(x)))\)</span>.</li>
+<li>Introduce <span class="math inline">\(h = g \circ f\)</span> as above, and rewrite as <span class="math inline">\(j \circ h\)</span>. This is the same as <span class="math inline">\(j \circ (g \circ f)\)</span> or <span class="math inline">\(j(h(x))\)</span>.</li>
+<li>Compose <span class="math inline">\(j\)</span> and <span class="math inline">\(g\)</span> into some <span class="math inline">\(d\)</span> and say <span class="math inline">\(d \circ f\)</span>, which is the same as <span class="math inline">\((j \circ g) \circ f\)</span> or <span class="math inline">\(d(f(x))\)</span>.</li>
+</ul>
+<p>All of these expressions are equivalent.</p>
+<p>Okay, recap. As long as the output of one map is <em>the same “type”</em> as the input to the some other map, we can compose those two functions. And we can take a series of compositions and group them in whatever way we want, as long as the input and output types conform.</p>
+<p><strong>But how is this a “tree”?</strong> I will make a little graph with nodes and edges that shows the basic idea. Caveats up front that this will be pretty informal, but let’s say the functions are nodes, and the edges point in the direction of composition. Here is an example showing <span class="math inline">\(a = j \circ g \circ f\)</span> as a tree.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<p>
+<svg width="206pt" height="116pt" viewbox="0.00 0.00 206.00 116.00" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 112)">
+<title>
+F
+</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-112 202,-112 202,4 -4,4"></polygon> <!-- j --> <g id="node1" class="node">
+<title>
+j
+</title>
+<ellipse fill="none" stroke="black" cx="27" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="27" y="-85.8" font-family="Times,serif" font-size="14.00">j</text> </g> <!-- a --> <g id="node2" class="node">
+<title>
+a
+</title>
+<ellipse fill="none" stroke="black" cx="99" cy="-18" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="99" y="-13.8" font-family="Times,serif" font-size="14.00">a</text> </g> <!-- j&#45;&gt;a --> <g id="edge1" class="edge">
+<title>
+j-&gt;a
+</title>
+<path fill="none" stroke="black" d="M41.57,-74.83C51.75,-64.94 65.52,-51.55 77.03,-40.36"></path> <polygon fill="black" stroke="black" points="79.47,-42.87 84.2,-33.38 74.59,-37.85 79.47,-42.87"></polygon> </g> <!-- g --> <g id="node3" class="node">
+<title>
+g
+</title>
+<ellipse fill="none" stroke="black" cx="99" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="99" y="-85.8" font-family="Times,serif" font-size="14.00">g</text> </g> <!-- g&#45;&gt;a --> <g id="edge2" class="edge">
+<title>
+g-&gt;a
+</title>
+<path fill="none" stroke="black" d="M99,-71.7C99,-63.98 99,-54.71 99,-46.11"></path> <polygon fill="black" stroke="black" points="102.5,-46.1 99,-36.1 95.5,-46.1 102.5,-46.1"></polygon> </g> <!-- f --> <g id="node4" class="node">
+<title>
+f
+</title>
+<ellipse fill="none" stroke="black" cx="171" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="171" y="-85.8" font-family="Times,serif" font-size="14.00">f</text> </g> <!-- f&#45;&gt;a --> <g id="edge3" class="edge">
+<title>
+f-&gt;a
+</title>
+<path fill="none" stroke="black" d="M156.43,-74.83C146.25,-64.94 132.48,-51.55 120.97,-40.36"></path> <polygon fill="black" stroke="black" points="123.41,-37.85 113.8,-33.38 118.53,-42.87 123.41,-37.85"></polygon> </g> </g>
+</svg>
+</p>
+</div>
+</div>
+</div>
+<p>The tree lets us express associativity in a different way: we can pre-compose any two functions by creating another node from them.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<p>
+<svg width="170pt" height="188pt" viewbox="0.00 0.00 170.00 188.00" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 184)">
+<title>
+F
+</title>
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-184 166,-184 166,4 -4,4"></polygon> <!-- j --> <g id="node1" class="node">
+<title>
+j
+</title>
+<ellipse fill="none" stroke="black" cx="27" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="27" y="-85.8" font-family="Times,serif" font-size="14.00">j</text> </g> <!-- a --> <g id="node2" class="node">
+<title>
+a
+</title>
+<ellipse fill="none" stroke="black" cx="63" cy="-18" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="63" y="-13.8" font-family="Times,serif" font-size="14.00">a</text> </g> <!-- j&#45;&gt;a --> <g id="edge1" class="edge">
+<title>
+j-&gt;a
+</title>
+<path fill="none" stroke="black" d="M35.35,-72.76C39.71,-64.28 45.15,-53.71 50.04,-44.2"></path> <polygon fill="black" stroke="black" points="53.23,-45.64 54.7,-35.15 47.01,-42.44 53.23,-45.64"></polygon> </g> <!-- h --> <g id="node3" class="node">
+<title>
+h
+</title>
+<ellipse fill="none" stroke="black" cx="99" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="99" y="-85.8" font-family="Times,serif" font-size="14.00">h</text> </g> <!-- h&#45;&gt;a --> <g id="edge2" class="edge">
+<title>
+h-&gt;a
+</title>
+<path fill="none" stroke="black" d="M90.65,-72.76C86.29,-64.28 80.85,-53.71 75.96,-44.2"></path> <polygon fill="black" stroke="black" points="78.99,-42.44 71.3,-35.15 72.77,-45.64 78.99,-42.44"></polygon> </g> <!-- g --> <g id="node4" class="node">
+<title>
+g
+</title>
+<ellipse fill="none" stroke="black" cx="63" cy="-162" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="63" y="-157.8" font-family="Times,serif" font-size="14.00">g</text> </g> <!-- g&#45;&gt;h --> <g id="edge3" class="edge">
+<title>
+g-&gt;h
+</title>
+<path fill="none" stroke="black" d="M71.35,-144.76C75.71,-136.28 81.15,-125.71 86.04,-116.2"></path> <polygon fill="black" stroke="black" points="89.23,-117.64 90.7,-107.15 83.01,-114.44 89.23,-117.64"></polygon> </g> <!-- f --> <g id="node5" class="node">
+<title>
+f
+</title>
+<ellipse fill="none" stroke="black" cx="135" cy="-162" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="135" y="-157.8" font-family="Times,serif" font-size="14.00">f</text> </g> <!-- f&#45;&gt;h --> <g id="edge4" class="edge">
+<title>
+f-&gt;h
+</title>
+<path fill="none" stroke="black" d="M126.65,-144.76C122.29,-136.28 116.85,-125.71 111.96,-116.2"></path> <polygon fill="black" stroke="black" points="114.99,-114.44 107.3,-107.15 108.77,-117.64 114.99,-114.44"></polygon> </g> </g>
+</svg>
+</p>
+</div>
+</div>
+</div>
+<p>We can see that the composition is associative because the composition of <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span> into <span class="math inline">\(h\)</span> doesn’t change the order in which functions are applied to form <span class="math inline">\(a\)</span>. We can “pre-group” functions in the tree however we want, but we can’t change their ordering except in special circumstances. Composition is associative, but not all functions are commutative.</p>
+</section>
+<section id="rather-than-a-sequence-of-imperative-statements-that-update-the-running-state." class="level3">
+<h3 class="anchored" data-anchor-id="rather-than-a-sequence-of-imperative-statements-that-update-the-running-state.">“…Rather than a sequence of imperative statements that update the running state.”</h3>
+<p>Most of the time when we do data analysis, we write code that updates the <em>state</em> of some data. Say I start with some <span class="math inline">\(x\)</span>, and then I do functions <span class="math inline">\(f\)</span>, <span class="math inline">\(g\)</span>, and <span class="math inline">\(j\)</span> to it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> <span class="fu">f</span>(x)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>z <span class="ot">=</span> <span class="fu">g</span>(y)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>w <span class="ot">=</span> <span class="fu">j</span>(z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There is some data <code>x</code> that we alter, in steps, by doing things to it, each time saving some data at some intermediate state.</p>
+<p>Functional framework would be different. Instead of doing most of our typing passing data around, we create functions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>h <span class="ot">=</span> <span class="fu">compose</span>(g, f)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>a <span class="ot">=</span> <span class="fu">compose</span>(j, h)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And only later (say, in some <code>main()</code> routine) do we apply our ultimately-composed functions to data. The data have to get acted on eventually, but we do it only after we compose a map from the data to some endpoint.</p>
+<p>Stated a different way, when we do more imperative programming, the present state of <code>x</code> is always our concern. Our path from beginning to end requires us to leave <code>x</code> in some intermediate state at many different steps, and the statefulness of <code>x</code> causes a lot of problems for us as we try to plot our way to our destination. When we do functional programming, however, we simply write the recipe for what we will do to <code>x</code> before we touch <code>x</code> at all. We prefer not to let the intermediate state become visible. The intermediate state is, after all, not that useful.</p>
+<p>This might be hard to envision because we haven’t invented functional programming yet, so let’s invent it.</p>
+</section>
+</section>
+<section id="functional-fundamentals-with-r" class="level2">
+<h2 class="anchored" data-anchor-id="functional-fundamentals-with-r">Functional fundamentals, with R</h2>
+<p>We saw a notational approach to function composition above that looked like this: <span class="math display">\[\begin{align}
+w = (j \circ g \circ u)
+\end{align}\]</span> If we could do that in a computer, it might look like this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>w <span class="ot">=</span> <span class="fu">compose</span>(j, g, f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There are two important things to remember about this.</p>
+<ol type="1">
+<li>Function composition creates a <em>new function</em>. It does not immediately create data. In the example, <code>w</code> is the composition, which is only evaluated on data when it is necessary. It may not be evaluated on data at all directly—we will likely compose <code>w</code> with another function before we even think about data. If you have heard of <em>delayed evaluation</em>, this is probably why. You were doing something that created new functionality instead of new data.</li>
+<li>Function compositions are themselves composable, so we want a framework to compose a lot of functions all at once with whatever associative groupings we want. We saw above (with math) that we could compose an arbitrary sequence of functions and the result should be well-behaved (as long as their input and output types conform—more on that in a bit). We would like to achieve that behavior in the code as well.</li>
+</ol>
+<p>We start with a primitive operation to compose just two functions. We call it <code>compose_once</code>—it implements only one composition of a left-hand and a right-hand function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># returns the new function: f . g</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>compose_once <span class="ot">=</span> <span class="cf">function</span>(f, g) {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(...) <span class="fu">f</span>(<span class="fu">g</span>(...))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Read this closely. <code>compose_once</code> takes two arguments, and those arguments are <em>functions</em>. We do not know or care what those functions are. We also return a new function, rather than some value. That new function defines a recipe for evaluating the functions <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span> in sequence on some unknown data <code>x</code>, whever it happens to come across such data—we didn’t pass any <code>x</code> yet. This is also on purpose. Composition does not care what the data are. It only knows how to evaluate functions in order.</p>
+<p>This might feel weird at first, but it will give us legible behavior right from the start. For example, we often want to know how many unique elements are in some data object. In base R, we might ask <code>length(unique(x))</code>. The <code>dplyr</code> package provides a combined function <code>n_unique(x)</code>, but we haven’t invented <code>dplyr</code> yet, so we have to make <code>n_unique</code> ourselves:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we save the function returned by compose_once</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># no computation on data is done yet.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>n_unique <span class="ot">=</span> <span class="fu">compose_once</span>(length, unique)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># examine the object to convince yourself of this</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>n_unique</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## function(...) f(g(...))</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x112a7e6a0&gt;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># apply the function on some data</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">n_unique</span>(x)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>compose_once</code> lets us compose two functions, but we already know that function composition lets us compose however many functions we want (as long as the output type from one function conforms with the input type of next function). So we extend this to an arbitrary series of functions by performing a <em>reduce</em> across an array of functions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pass vector fns = c(f1, f2, ..., fn)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>compose <span class="ot">=</span> <span class="cf">function</span>(fns) {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Reduce</span>(compose_once, fns, <span class="at">init=</span>identity)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>If you aren’t familiar with reductions, they are an efficient trick to collapse an array (loosely speaking) of input values into one output value, accumulating at each step the results of some binary operation. If you want to learn more about reduction, follow this footnote.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> We also supply an argument to <code>init</code>, which isn’t strictly necessary in this R example but is interesting (IMO) in the mathematical context of function composition, which I explain in this other footnote.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
+<p>Let’s see it in action. Let’s do an additional step to convert <code>n_unique</code> into an English word.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># same as n_unique but convert to a word</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>english_n_unique <span class="ot">=</span> <span class="fu">compose</span>(<span class="fu">c</span>(english<span class="sc">::</span>english, length, unique))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># apply to our vector x</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">english_n_unique</span>(x)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] three</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And just to underscore your confidence in the associativity of composition, we can exhaustively group these compositions without affecting the results.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compose</span>(<span class="fu">c</span>(english<span class="sc">::</span>english, <span class="fu">compose</span>(<span class="fu">c</span>(length, unique))))(x)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] three</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">compose</span>(<span class="fu">c</span>(<span class="fu">compose</span>(<span class="fu">c</span>(english<span class="sc">::</span>english, length)), unique))(x)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] three</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="types-are-our-guide." class="level3">
+<h3 class="anchored" data-anchor-id="types-are-our-guide.">Types are our guide.</h3>
+<p>You may have seen online flame wars about “strong typing”. Types are representations of data in the computer. We have basic data types like short integers, long integers, characters, and strings. Languages implement other data structures like lists, dictionaries, arrays, tuples, etc. that we can also call types for our purposes.</p>
+<p>You may have seen some people discuss the “type flexibility” of R or Python as advantages. Well…sorry! Functional programming approaches like types because types provide structure to function composition at scale: functions can be composed if the output type of one function is the input type of the next function. This lets us build really big, abstract structures out of function composition, maybe even structures that are so big and complicated that we struggle to keep track of it all in our minds. But these structures are <em>virtually guaranteed to work</em> as long as it is composed of functions with conforming input and output types.</p>
+<p>Not coincidentally, the associativity of function composition is additionally helpful for API design. If we have to build a big, abstract structure that, we can, at any point that we like, group some of the operations together if they form a coherent, reusable composition. Intermediate functions are more useful than intermediate state because at least an intermediate function is legible and potentially reusable. Chances are your intermediate data are not that legible or useful.</p>
+<p>Let’s apply this to the <code>english_n_unique</code> example. We started with a vector type and mapped to an <code>english</code> type. How did we know it would work? We can diagram the types.</p>
+<p><span class="math display">\[
+\begin{align}
+   \mathtt{unique} &amp;: \mathtt{many} \mapsto \mathtt{vector} \\
+   \mathtt{length} &amp;: \mathtt{.any} \mapsto \mathtt{integer} \\
+   \mathtt{english::english} &amp;: \mathtt{many} \mapsto \mathtt{vector}
+\end{align}
+\]</span></p>
+<p>We know that <code>unique</code> takes objects of various types (which I represent as <code>many</code> to say “this function has many methods for different data types”) and returns a vector of unique elements. We know that length takes <code>many</code> and returns its length, however that method is defined. And <code>engligh::english</code> turns <code>many</code> objects into <code>english</code> type. But we know that these operations should compose because we can know that we can pass a vector to <code>unique</code>, a vector to <code>length</code>, and an integer to <code>english::english</code>. As long as I know the type behavior of each function, I can anticipate the type behavior of the compositions.</p>
+</section>
+</section>
+<section id="something-bigger-means-within-groups" class="level2">
+<h2 class="anchored" data-anchor-id="something-bigger-means-within-groups">Something bigger: means within groups</h2>
+<p>This is where we really start to see the difference between functional programming “trees” and more typical “sequences of imperative statements.” Let’s take something we commonly do in R, calculate means within groups of data, and do it with our functional tools. Let’s take the <code>mtcars</code> data frame…</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mtcars, <span class="dv">5</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="do">##                    mpg cyl disp  hp drat    wt  qsec vs am gear carb</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>…and calculate the mean of each variable as a new data frame.</p>
+<p>We want to chart a course through this problem that composes small, re-usable steps on well-defined types. Here is my plan:</p>
+<ol type="1">
+<li>define a function that maps a data frame of raw data to a data frame of column means.</li>
+<li>define a function to apply this routine to groups of data</li>
+<li>compose a function that implements a split-apply-combine which is the composition of the above steps.</li>
+</ol>
+<section id="means-for-a-data-frame." class="level3">
+<h3 class="anchored" data-anchor-id="means-for-a-data-frame.">1. Means for a data frame.</h3>
+<p>We create a function by composing the following functions that map the following types:</p>
+<ul>
+<li><code>colMeans</code>: data frame <span class="math inline">\(\mapsto\)</span> vector</li>
+<li><code>as.list</code>: vector <span class="math inline">\(\mapsto\)</span> list</li>
+<li><code>tibble::as_tibble</code>: list <span class="math inline">\(\mapsto\)</span> data_frame</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>means <span class="ot">=</span> <span class="fu">compose</span>(<span class="fu">c</span>(tibble<span class="sc">::</span>as_tibble, as.list, colMeans))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>…which works when we call it with <code>mtcars</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">means</span>(mtcars)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 1 × 11</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="do">##     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 1  20.1  6.19  231.  147.  3.60  3.22  17.8 0.438 0.406  3.69  2.81</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="apply-a-function-over-groups" class="level3">
+<h3 class="anchored" data-anchor-id="apply-a-function-over-groups">2. Apply a function over groups</h3>
+<p>Remember, functional programming hasn’t been invented yet, so we can’t simply do his with <code>lapply</code>. We can, however, reimplement <code>lapply</code> knowing what we know about functional programming.</p>
+<p>Let’s create an function that takes any function <code>f</code> and an iterable object <code>l</code>, and returns a list.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>apply_on_elements <span class="ot">=</span> <span class="cf">function</span>(l, f) {</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># initialize an empty list</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    v <span class="ot">=</span> <span class="fu">vector</span>(<span class="at">mode =</span> <span class="st">"list"</span>, <span class="at">length =</span> <span class="fu">length</span>(l))</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># assign f(x) for each x in l</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (x <span class="cf">in</span> <span class="fu">seq_along</span>(l)) {</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        v[[x]] <span class="ot">=</span> <span class="fu">f</span>(l[[x]])</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(v)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Notice, this function takes two objects and returns one object. In order to nicely compose it with other functions that take and return only one object, I want a way to reduce the arguments supplied. This is a little weird, but I am going to do something that is evocative of a python tool called a <code>partial</code>, which takes a function <code>f</code> and returns a new function <code>f*</code>, which is just like <code>f</code> but with some of the arguments pre-filled. Let’s define it before I explain further:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>partial_apply <span class="ot">=</span> <span class="cf">function</span>(f) {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(x) <span class="fu">apply_on_elements</span>(x, f)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>So <code>partial_apply</code> takes a function <code>f</code> and returns a <em>new</em> function. That new function applies <code>f</code> to some iterable object <code>x</code> to return a list. But the function isn’t evaluated; it is only created. The user has to evaluate it later.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>make_chars <span class="ot">=</span> <span class="fu">partial_apply</span>(as.character)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># examine, it's a function</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>make_chars</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="do">## function(x) apply_on_elements(x, f)</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x112341e08&gt;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">make_chars</span>(x)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="do">## [[1]]</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] "0"</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="do">## [[2]]</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] "0"</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="do">## [[3]]</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] "0"</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="do">## [[4]]</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] "1"</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="do">## [[5]]</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] "2"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We see more of that delayed evaluation behavior. This is helpful to let us create a function that applies our earlier <code>means</code> to groups of data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">partial_apply</span>(means)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="do">## function(x) apply_on_elements(x, f)</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;bytecode: 0x112924b38&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x11285be40&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="apply-our-partial-function-to-data." class="level3">
+<h3 class="anchored" data-anchor-id="apply-our-partial-function-to-data.">3. Apply our partial function to data.</h3>
+<p>Rather, create a function that <em>would</em> do that, if it were evaluated.</p>
+<p>We want to split a data frame into a list, apply <code>means</code> to each element of that list, and return a final data frame. Here’s how we map these steps from type to type.</p>
+<ul>
+<li><code>split</code>: pair of (data frame, vector) <span class="math inline">\(\mapsto\)</span> list</li>
+<li><code>partial_apply(means)</code>: list <span class="math inline">\(\mapsto\)</span> list</li>
+<li><code>dplyr::bind_rows</code>: list <span class="math inline">\(\mapsto\)</span> data frame</li>
+</ul>
+<p>The composition of all these steps creates a function that eats a data frame and returns a data frame.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compose steps to cre</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>means_by <span class="ot">=</span> <span class="fu">compose</span>(<span class="fu">c</span>(dplyr<span class="sc">::</span>bind_rows, <span class="fu">partial_apply</span>(group_means), split))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="put-it-all-together." class="level3">
+<h3 class="anchored" data-anchor-id="put-it-all-together.">Put it all together.</h3>
+<p>The code below retraces our steps. Step (1) creates our <code>means</code> function. Step (2) creates some functional infrastructure to apply functions over iterable objects, which isn’t the kind of thing we would ordinarily have to mess with as end-users. And step (3) composes our <code>means</code> function with the iteration tools to make our eventual result.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. small function to be applied</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>means <span class="ot">=</span> <span class="fu">compose</span>(<span class="fu">c</span>(tibble<span class="sc">::</span>as_tibble, as.list, colMeans))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. infrastructure layer:</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># you can see why these would be generally useful for many problems</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2a. reimplement *-apply()</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>apply_on_elements <span class="ot">=</span> <span class="cf">function</span>(l, f) {</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    v <span class="ot">=</span> <span class="fu">vector</span>(<span class="at">mode =</span> <span class="st">"list"</span>, <span class="at">length =</span> <span class="fu">length</span>(l))</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (x <span class="cf">in</span> <span class="fu">seq_along</span>(l)) {</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        v[[x]] <span class="ot">=</span> <span class="fu">f</span>(l[[x]])</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(v)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co"># partial apply</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>partial_apply <span class="ot">=</span> <span class="cf">function</span>(f) {</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(x) <span class="fu">apply_on_elements</span>(x, f)</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. interface layer</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>means_by <span class="ot">=</span> <span class="fu">compose</span>(<span class="fu">c</span>(dplyr<span class="sc">::</span>bind_rows, <span class="fu">partial_apply</span>(means), split))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s apply the ultimate function, <code>means_by</code>, to various groups in <code>mtcars</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">means_by</span>(mtcars, mtcars<span class="sc">$</span>cyl)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 3 × 11</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="do">##     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 1  26.7     4  105.  82.6  4.07  2.29  19.1 0.909 0.727  4.09  1.55</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 2  19.7     6  183. 122.   3.59  3.12  18.0 0.571 0.429  3.86  3.43</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 3  15.1     8  353. 209.   3.23  4.00  16.8 0     0.143  3.29  3.5</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="fu">means_by</span>(mtcars, mtcars<span class="sc">$</span>vs)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 2 × 11</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="do">##     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 1  16.6  7.44  307. 190.   3.39  3.69  16.7     0 0.333  3.56  3.61</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 2  24.6  4.57  132.  91.4  3.86  2.61  19.3     1 0.5    3.86  1.79</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="fu">means_by</span>(mtcars, mtcars<span class="sc">$</span>am)</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 2 × 11</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="do">##     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 1  17.1  6.95  290.  160.  3.29  3.77  18.2 0.368     0  3.21  2.74</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 2  24.4  5.08  144.  127.  4.05  2.41  17.4 0.538     1  4.38  2.92</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="fu">means_by</span>(mtcars, mtcars<span class="sc">$</span>gear)</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 3 × 11</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="do">##     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="do">## 1  16.1  7.47  326. 176.   3.13  3.89  17.7 0.2   0         3  2.67</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="do">## 2  24.5  4.67  123.  89.5  4.04  2.62  19.0 0.833 0.667     4  2.33</span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="do">## 3  21.4  6     202. 196.   3.92  2.63  15.6 0.2   1         5  4.4</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a><span class="fu">means_by</span>(mtcars, mtcars<span class="sc">$</span>carb)</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 6 × 11</span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a><span class="do">##     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a><span class="do">## 1  25.3  4.57  134.   86   3.68  2.49  19.5   1   0.571  3.57     1</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a><span class="do">## 2  22.4  5.6   208.  117.  3.70  2.86  18.2   0.5 0.4    3.8      2</span></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a><span class="do">## 3  16.3  8     276.  180   3.07  3.86  17.7   0   0      3        3</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a><span class="do">## 4  15.8  7.2   309.  187   3.60  3.90  17.0   0.2 0.3    3.6      4</span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a><span class="do">## 5  19.7  6     145   175   3.62  2.77  15.5   0   1      5        6</span></span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a><span class="do">## 6  15    8     301   335   3.54  3.57  14.6   0   1      5        8</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="notes-on-the-tidyverse" class="level3">
+<h3 class="anchored" data-anchor-id="notes-on-the-tidyverse">Notes on the tidyverse</h3>
+<p>Now that we have invented functional programming, we can better appreciate how tidyverse tools leverage functional infrastructure to make nice APIs, even if those APIs feel way less hardcore-functional than the example we just created.</p>
+<p><strong>The pipe operator</strong>. You may have thought to yourself, composing “left” sure is harder to read than composing “right” like the pipe operator. First, functional programming hadn’t been invented yet, so you can’t blame me for not knowing about the pipe operator. Second, creating a composition function that reads more “linearly” is easy with one extra step: reversing the direction of the <code>Reduce</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>pipe <span class="ot">=</span> <span class="cf">function</span>(fns) {</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># reverse the order of fns before composing</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">compose</span>(<span class="fu">rev</span>(fns))</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we can write our <code>means_by</code> function with more linear recipe that reminds us more of tidyverse code.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>means_by <span class="ot">=</span> <span class="fu">pipe</span>(<span class="fu">c</span>(split, <span class="fu">partial_apply</span>(means), dplyr<span class="sc">::</span>bind_rows))</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">means_by</span>(mtcars, mtcars<span class="sc">$</span>cyl)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 3 × 11</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="do">##     mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 1  26.7     4  105.  82.6  4.07  2.29  19.1 0.909 0.727  4.09  1.55</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 2  19.7     6  183. 122.   3.59  3.12  18.0 0.571 0.429  3.86  3.43</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 3  15.1     8  353. 209.   3.23  4.00  16.8 0     0.143  3.29  3.5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Partial functions</strong>. The <code>partial_apply</code> function might have been the weirdest-feeling step in the earlier example. But if you squint at it, you realize that this is sort of what the tidyverse does with tidy evaluation. Whenever you pipe a data frame to <code>mutate</code> or <code>filter</code> and so on, and you write expressions on unquoted variables, those arguments are (in a way) creating a new “partial” mutate function. There is also delayed evaluation of that function: the unquoted expressions are not evaluated on the spot, but instead are translated to create the partial function you actually want. It is that translated/partial function that actually is evaluated when you pass it your data frame.</p>
+
+
+</section>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1" role="doc-endnote"><p>This reputation may be unfair. Most of the time, loops are slow because people are using them to do unwise things, like growing the size of an array in each iteration. This causes R to make a lot of copies of data that would be avoided if the user were more careful. Using <code>apply</code> functions solves this problem for them either way.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>You may have assumed that <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are real (that is, <span class="math inline">\(\mathbb{R}\)</span>) numbers and that the operations <span class="math inline">\(+\)</span> and <span class="math inline">\(\times\)</span> refer to the sum and product operations that we conventionally apply to real numbers. It’s fine if you made those assumptions, but it wasn’t necessary. One cool thing about this family of math is that you can let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be other kinds of sets containing god-knows-what, and as long as <span class="math inline">\(+\)</span> and <span class="math inline">\(\times\)</span> refer to operations on values from those sets that maintain certain properties, the <span class="math inline">\(f\)</span> map remains perfectly coherent. <a href="https://www.youtube.com/watch?v=I8LbkfSSR58&amp;list=PLbgaMIhjbmEnaH_LTkxLI7FMa2HsnawM_&amp;index=1">Category theory</a> tells us about which properties must be maintained for this expression to hold generally.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p>You may have seen a reduction in an operation like <code>max()</code>—for an array of numbers, recursively check to see if <code>left</code> is greater than <code>right</code>, passing the winner to the next iteration as <code>left</code>. In this case, however, the array we are collapsing is full of functions rather than, say, numbers. And the operation we apply as we accumulate is <code>compose_once(left, right)</code> rather than <code>left &gt; right</code>. The result of the reduction is a function that encodes the composition of all functions in <code>fns</code> from left to right.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4" role="doc-endnote"><p>The role of an initialization in a reduction is to handle an identity condition: how do we handle “empty” values along the reduction without affecting the output. Stated differently, what value can we pass to ensure a “no-op” when the reduction is applied, which can be used as an initial value to <code>left</code>. For example, if we reduce an array of numbers by <em>addition</em>, the initialization would be the value <code>0</code>, because applying <code>+ 0</code> to any number gives you the original number. Same with multiplication and the value <code>1</code>. When we are reducing <em>functions</em> by <em>composing</em> them, we use the identity function. Not surprisingly, the identity function simply returns the function arguments unaffected: <code>identity(x)</code> gives you <code>x</code>. For function composition, <code>compose(f, identity)</code> is equal to <code>compose(identity, f)</code> is equal to <code>f</code>. Now you’re programmin with powerful abstractions!<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } 
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
