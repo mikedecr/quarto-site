@@ -21,6 +21,10 @@ website:
 
 format:
   html:
-    theme: litera-tweaks.scss
-    css: styles.css
+    theme: 
+      light: [litera-tweaks.scss, fonts.scss]
+      dark: [vapor, fonts.scss]
+      # light: [litera, fonts.scss]
+      # dark: [vapor, fonts.scss]
+    # css: styles.css
 
