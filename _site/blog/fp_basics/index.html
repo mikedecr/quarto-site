@@ -370,7 +370,7 @@ f-&gt;h
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>w <span class="ot">=</span> <span class="fu">j</span>(z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>There is some data <code>x</code> that we alter, in steps, by doing things to it, each time saving some data at some intermediate state.</p>
-<p>Functional framework would be different. Instead of doing most of our typing passing data around, we create functions.</p>
+<p>The functional approach would be different. Instead of doing most of our typing passing data around, we create functions.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>h <span class="ot">=</span> <span class="fu">compose</span>(g, f)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>a <span class="ot">=</span> <span class="fu">compose</span>(j, h)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -400,7 +400,7 @@ w = (j \circ g \circ u)
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(...) <span class="fu">f</span>(<span class="fu">g</span>(...))</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Read this closely. <code>compose_once</code> takes two arguments, and those arguments are <em>functions</em>. We do not know or care what those functions are. We also return a new function, rather than some value. That new function defines a recipe for evaluating the functions <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span> in sequence on some unknown data <code>x</code>, whever it happens to come across such data—we didn’t pass any <code>x</code> yet. This is also on purpose. Composition does not care what the data are. It only knows how to evaluate functions in order.</p>
+<p>Read this closely. <code>compose_once</code> takes two arguments, and those arguments are <em>functions</em>. We do not know or care what those functions are. We also return a new function, rather than some value. That new function defines a recipe for evaluating the functions <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span> in sequence on some unknown inputs <code>...</code>, whever it happens to come across those inputs—we didn’t pass any <code>...</code> yet. This is also on purpose. Composition does not care what the data are. It only knows how to evaluate functions in order.</p>
 <p>This might feel weird at first, but it will give us legible behavior right from the start. For example, we often want to know how many unique elements are in some data object. In base R, we might ask <code>length(unique(x))</code>. The <code>dplyr</code> package provides a combined function <code>n_unique(x)</code>, but we haven’t invented <code>dplyr</code> yet, so we have to make <code>n_unique</code> ourselves:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we save the function returned by compose_once</span></span>
@@ -410,7 +410,7 @@ w = (j \circ g \circ u)
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># examine the object to convince yourself of this</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>n_unique</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## function(...) f(g(...))</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x12fb9c828&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x122366c50&gt;</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># apply the function on some data</span></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>)</span>
@@ -443,23 +443,23 @@ w = (j \circ g \circ u)
 </div>
 <section id="types-are-our-guide." class="level3">
 <h3 class="anchored" data-anchor-id="types-are-our-guide.">Types are our guide.</h3>
-<p>You may have seen online flame wars about “strong typing”. Types are representations of data in the computer. We have basic data types like short integers, long integers, characters, and strings. Languages implement other data structures like lists, dictionaries, arrays, tuples, etc. that we can also call types for our purposes.</p>
-<p>You may have seen some people discuss the “type flexibility” of R or Python as advantages. Well…sorry! Functional programming approaches like types because types provide structure to function composition at scale: functions can be composed if the output type of one function is the input type of the next function. This lets us build really big, abstract structures out of function composition, maybe even structures that are so big and complicated that we struggle to keep track of it all in our minds. But these structures are <em>virtually guaranteed to work</em> as long as it is composed of functions with conforming input and output types.</p>
-<p>Not coincidentally, the associativity of function composition is additionally helpful for API design. If we have to build a big, abstract structure that, we can, at any point that we like, group some of the operations together if they form a coherent, reusable composition. Intermediate functions are more useful than intermediate state because at least an intermediate function is legible and potentially reusable. Chances are your intermediate data are not that legible or useful.</p>
-<p>Let’s apply this to the <code>english_n_unique</code> example. We started with a vector type and mapped to an <code>english</code> type. How did we know it would work? We can diagram the types.</p>
+<p>You may have seen online discussions about “strong typing”. Types are representations of data in the computer. We have basic data types like short integers, long integers, characters, and strings. Languages implement other data structures like lists, dictionaries, arrays, tuples, etc. that we can also call types for our purposes.</p>
+<p>You may have seen some people discuss the “type flexibility” of R or Python as advantages. Well…sorry! Functional programming like strong types because strong types provide structure to function composition at scale. Functions can be composed if the output type of one function is the input type of the next function. If we can trust this fact, we can build really big, abstract creations out of function composition, maybe even creations that are so big and complicated that we struggle to keep track of it all in our brains. But these creations are <em>virtually guaranteed to work</em> as long as they are composed of functions with conforming input and output types.</p>
+<p>Not coincidentally, the associativity of function composition is additionally helpful for API design. If we have to build a big, abstract structure, we always have the option to group some of the operations together if they perform a coherent and useful operation. Intermediate functions are more useful than intermediate state because at least an intermediate function is legible and potentially reusable. Chances are your intermediate data are not that legible or useful.</p>
+<p>Let’s look at the “type roadmap” for the <code>english_n_unique</code> example. We started with a vector type and mapped to an <code>english</code> type. How did we know it would work? We can diagram the types.</p>
 <p><span class="math display">\[
 \begin{align}
    \mathtt{unique} &amp;: \mathtt{many} \mapsto \mathtt{vector} \\
-   \mathtt{length} &amp;: \mathtt{.any} \mapsto \mathtt{integer} \\
+   \mathtt{length} &amp;: \mathtt{many} \mapsto \mathtt{integer} \\
    \mathtt{english::english} &amp;: \mathtt{many} \mapsto \mathtt{vector}
 \end{align}
 \]</span></p>
-<p>We know that <code>unique</code> takes objects of various types (which I represent as <code>many</code> to say “this function has many methods for different data types”) and returns a vector of unique elements. We know that length takes <code>many</code> and returns its length, however that method is defined. And <code>engligh::english</code> turns <code>many</code> objects into <code>english</code> type. But we know that these operations should compose because we can know that we can pass a vector to <code>unique</code>, a vector to <code>length</code>, and an integer to <code>english::english</code>. As long as I know the type behavior of each function, I can anticipate the type behavior of the compositions.</p>
+<p>We know that <code>unique</code> takes objects of various types (which I represent as <code>many</code> to say “this function has many methods for different data types”) and returns a vector of unique elements. We know that length takes <code>many</code> and returns its integer length, and that should work for a vector input. And <code>engligh::english</code> turns <code>many</code> objects into <code>english</code> type, which ought to work for an integer input. But we know that these operations should compose because we can know that we can pass a vector to <code>unique</code>, a vector to <code>length</code>, and an integer to <code>english::english</code>. Stated differently, if I know the type behavior of each function, I know the type behavior of the compositions. That is an extremely useful and powerful foundation for building big things.</p>
 </section>
 </section>
 <section id="something-bigger-means-within-groups" class="level2">
 <h2 class="anchored" data-anchor-id="something-bigger-means-within-groups">Something bigger: means within groups</h2>
-<p>This is where we really start to see the difference between functional programming “trees” and more typical “sequences of imperative statements.” Let’s take something we commonly do in R, calculate means within groups of data, and do it with our functional tools. Let’s take the <code>mtcars</code> data frame…</p>
+<p>This is where we really start to see the difference between typical “imperative” programming and functional programming “trees”. Let’s take something we commonly do in R, calculate means within groups of data, and do it with our functional tools. Let’s take the <code>mtcars</code> data frame…</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mtcars, <span class="dv">5</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="do">##                    mpg cyl disp  hp drat    wt  qsec vs am gear carb</span></span>
@@ -469,11 +469,11 @@ w = (j \circ g \circ u)
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1</span></span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Hornet Sportabout 18.7   8  360 175 3.15 3.440 17.02  0  0    3    2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>…and calculate the mean of each variable as a new data frame.</p>
+<p>…and calculate the mean of each variable as a new data frame with one row per group. We want to be able to specify the group on the fly.</p>
 <p>We want to chart a course through this problem that composes small, re-usable steps on well-defined types. Here is my plan:</p>
 <ol type="1">
 <li>define a function that maps a data frame of raw data to a data frame of column means.</li>
-<li>define a function to apply this routine to groups of data</li>
+<li>define a function to <em>any</em> function to groups of data</li>
 <li>compose a function that implements a split-apply-combine which is the composition of the above steps.</li>
 </ol>
 <section id="means-for-a-data-frame." class="level3">
@@ -484,10 +484,11 @@ w = (j \circ g \circ u)
 <li><code>as.list</code>: vector <span class="math inline">\(\mapsto\)</span> list</li>
 <li><code>tibble::as_tibble</code>: list <span class="math inline">\(\mapsto\)</span> data_frame</li>
 </ul>
+<p>You can see how these functions take us incrementally from data frame, to vector, to list, back to data frame. So we these operations should compose nicely.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>means <span class="ot">=</span> <span class="fu">compose</span>(<span class="fu">c</span>(tibble<span class="sc">::</span>as_tibble, as.list, colMeans))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>…which works when we call it with <code>mtcars</code>.</p>
+<p>Testing it on the full data:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">means</span>(mtcars)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 1 × 11</span></span>
@@ -511,44 +512,44 @@ w = (j \circ g \circ u)
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(v)</span>
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Notice, this function takes two objects and returns one object. In order to nicely compose it with other functions that take and return only one object, I want a way to reduce the arguments supplied. This is a little weird, but I am going to do something that is evocative of a python tool called a <code>partial</code>, which takes a function <code>f</code> and returns a new function <code>f*</code>, which is just like <code>f</code> but with some of the arguments pre-filled. Let’s define it before I explain further:</p>
+<p>Notice, this function takes <em>two</em> objects as arguments and returns one object. In order to nicely compose it with other functions that take and return only <em>one</em> object, I want a way to reduce the arguments required when I call it. This is a little weird, but I am going to create something like a Python tool called a <code>partial</code>, which takes a function <code>f</code> and returns a new function <code>f*</code>, which is just like <code>f</code> but with some of the arguments pre-filled. Let’s define it before I explain further:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>partial_apply <span class="ot">=</span> <span class="cf">function</span>(f) {</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(x) <span class="fu">apply_on_elements</span>(x, f)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>So <code>partial_apply</code> takes a function <code>f</code> and returns a <em>new</em> function. That new function applies <code>f</code> to some iterable object <code>x</code> to return a list. But the function isn’t evaluated; it is only created. The user has to evaluate it later.</p>
-<p>Here we use this tool to create a partial <code>as.character</code>, which we apply to some <code>x</code>.</p>
+<p>So <code>partial_apply</code> takes a function <code>f</code> and returns a <em>new</em> function. That new function applies <code>f</code> to some iterable object <code>x</code> to return a list. But the function isn’t evaluated; it is only created, because I never provide an <code>x</code> in the outer function. The user has to pass <code>x</code> to evaluate the partial at a later time.</p>
+<p>Here we use this tool to create a partial <code>length</code>, which we apply to some <code>x</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>make_chars <span class="ot">=</span> <span class="fu">partial_apply</span>(as.character)</span>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>lengths <span class="ot">=</span> <span class="fu">partial_apply</span>(length)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># examine, it's a function</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>make_chars</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>lengths</span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="do">## function(x) apply_on_elements(x, f)</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x12f467ac0&gt;</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x121c36ba8&gt;</span></span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">make_chars</span>(x)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">lengths</span>(x)</span>
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="do">## [[1]]</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] "0"</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 1</span></span>
 <span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="do">## [[2]]</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] "0"</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 1</span></span>
 <span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="do">## [[3]]</span></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] "0"</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 1</span></span>
 <span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="do">## [[4]]</span></span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] "1"</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 1</span></span>
 <span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="do">## [[5]]</span></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] "2"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We see more of that delayed evaluation behavior. This is helpful to let us create a function that applies our earlier <code>means</code> to groups of data.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">partial_apply</span>(means)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="do">## function(x) apply_on_elements(x, f)</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;bytecode: 0x12fa4a7b8&gt;</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x12f981af8&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;bytecode: 0x12221da88&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x12214eeb8&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="apply-our-partial-function-to-data." class="level3">
