@@ -1,33 +1,29 @@
 ---
-title: "more about me"
+title: ""
 image: submodules/imgs/img/ID_telles_1452x1452.png
 about:
-  template: trestles
+  template: solana
 ---
 
-#### **---work---**
+#### **--- work ---**
 
-I work in low-latency finance as a **quantitative researcher**,
-which means I use 
+I work in low-latency ("high-frequency") trading as a **quantitative researcher**,
+which means I use math, statistics, and computers to study financial markets, build predictive signals, and improve trading strategies that go super fast.
 
-- mathematical models
-- statistical analysis / machine learning
-- state-of-the-art computing tools
 
-to study markets, build predictive signals, and improve trading strategies that go very fast.
-
-#### **---background---**
+#### **--- background ---**
 
 I have a Ph.D. in political science from the University of Wisconsin–Madison,
 where I was a graduate affiliate of the [Elections Research Center](https://elections.wisc.edu).
-My graduate work focused on Bayesian + causal models for studying U.S. elections and public opinion.
+My graduate work focused on Bayesian + causal methods for studying U.S. elections and public opinion.
 
 
-#### **---lately---**
+#### **--- lately ---**
 
 Some things I have been interested in:
 
-- Software design, functional programming especially
-- Lua-flavored [Neovim](https://github.com/mikedecr/neovim-configs/tree/lua)
-- Frequentist statistics
+- Software design, especially functional programming
+- Category theory, in service of functional programming
+- Frequentist statistics, which isn't how I usually do things
+- Neovim and [lua-based configuration](https://github.com/mikedecr/neovim-configs)
 
