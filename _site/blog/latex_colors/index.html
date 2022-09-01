@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Michael DeCrescenzo">
+<meta name="dcterms.date" content="2022-07-31">
+
+<title>michael decrescenzo - Treating \(\mathrm{\LaTeX}\) like a programming language: the case of color-coded equations</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../submodules/imgs/img/favicon_telles.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">michael decrescenzo</span>
+  </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html">About</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html">Blog</a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/mikedecr"><i class="bi bi-github" role="img">
+</i> 
+ </a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/mikedecr"><i class="bi bi-twitter" role="img">
+</i> 
+ </a>
+  </li>  
+</ul>
+              <div class="quarto-toggle-container">
+                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+              </div>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title"><p>Treating <span class="math inline">\(\mathrm{\LaTeX}\)</span> like a programming language: the case of color-coded equations</p></h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">code</div>
+                <div class="quarto-category">latex</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Michael DeCrescenzo </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 31, 2022</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p><span class="math inline">\(\newcommand{latex}{\mathrm{\LaTeX}}\)</span></p>
+<p><span class="math inline">\(\latex\)</span> can be a headache. The syntax is clunky. Normal usage leads us to engage with a lot of frustrating patterns. I see academics and other researchers <a href="https://twitter.com/RexDouglass/status/1551464194527989760">complain about it</a>, and I usually agree with where these complaints are coming from.</p>
+<p>But I also feel like many researchers don’t get the most out of <span class="math inline">\(\latex\)</span>. When I used to write more <span class="math inline">\(\latex\)</span> in graduate school, I knew I didn’t. Sure, I was good at algorithmically injecting my output into papers, managing references, and so on. But the shoeleather work of <span class="math inline">\(\latex\)</span>—itemizing and enumerating, managing the boilerplate code—wasn’t something I was equipped to criticize with the same eye. I would repeat myself a lot in my code, get trapped inside of irritating design patterns, and felt the <em>age</em> of the language all of the time.</p>
+<p>But you get older, you (hopefully) get better at programming, and you realize what you were being silly about.</p>
+<p>This blog post is about how <em><span class="math inline">\(\mathit{\LaTeX}\)</span> is a programming language</em> that you can do ordinary programming language things with. You can save variables and write functions. You can turn these tools into interfaces that let you work with greater efficiency. And you can design them in such a way that makes your work more joyful.</p>
+<p>We use as an example: color-coding an equation.</p>
+<section id="the-uncomfortable-color-fundamentals-in-latex" class="level2">
+<h2 class="anchored" data-anchor-id="the-uncomfortable-color-fundamentals-in-latex">The uncomfortable color fundamentals in <span class="math inline">\(\latex\)</span></h2>
+<p>Like many things in <span class="math inline">\(\latex\)</span>, the built-in experience of color-control is pretty bad. You change your text color with <code>\color{}</code>, and naturally you pass some color argument. The language provides a few basic builtin color keywords like <code>red</code> and <code>blue</code>, which are pretty harsh, but others like <code>violent</code>, <code>teal</code>, and <code>maroon</code> are okay. The color options aren’t the bad part though. You can load in extra colors, whatever, who cares. The bad part is the <em>interface</em>, which works like this. Any time you change a color, you change it basically <em>indefinitely</em>, at least up until <span class="math inline">\(\latex\)</span> encounters some scope change that causes the color to reset to normal.</p>
+<p>Here’s some example <span class="math inline">\(\latex\)</span> code.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>We start with some normal text.</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">\color</span>{red} And now the text is red indefinitely.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can render this in the browser:<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p><span class="math display">\[
+\text{
+    We start with some normal text.
+    \color{red} And now the text is red indefinitely.
+}
+\]</span></p>
+<p>You may have seen similar behavior messing with text <em>size</em>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>We start with some normal text.</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">\huge</span> And now the text is huge indefinitely.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><span class="math display">\[
+\text{
+    We start with some normal text.
+    \huge And now the text is huge indefinitely.
+}
+\]</span></p>
+<p>Now, we can extert some control over the meaning of “indefinitely” by providing some scope, for instance with curly braces.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>We start with some normal text. </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>{<span class="fu">\color</span>{red} But the} redness is {<span class="fu">\color</span>{red} contained}.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><span class="math display">\[
+\text{
+    We start with some normal text.
+    {\color{red} But the} redness is {\color{red} contained}.
+}
+\]</span></p>
+<p>This isn’t <em>the worst</em> but it doesn’t feel too comfortable. It would be better if I could have written the last bit so it felt more like this.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">\red</span>{But the} redness is <span class="fu">\red</span>{contained}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>which would save keystrokes and make the whole experience more declarative.</p>
+</section>
+<section id="doing-better-with-an-equation-example" class="level2">
+<h2 class="anchored" data-anchor-id="doing-better-with-an-equation-example">Doing better, with an equation example</h2>
+<p>Let’s say we have an example where we want to color-code different components of the equation. To be more specific, I want to <em>map</em> certain semantic features of my document to specific colors in a consistent way. We would like the interface to be minimally burdensome, so I don’t want to type (or <em>think</em>) a lot to get good effects. And we would also like it to be easy to modify at scale, so I can change the aesthetic mapping in the entire document without modifying a hundred individual instances in the code. Another way to say this is that the mapping should be reasonably <em>parameterized</em>.</p>
+<p>Let’s introduce our equation and our “semantics”. Let’s say that we measure data on some individuals subscripted <span class="math inline">\(i\)</span>, who are located within groups <span class="math inline">\(g\)</span>, and measured across time units <span class="math inline">\(t\)</span>. We measure some outcome <span class="math inline">\(y_{it}\)</span> which varies by individuals over groups and over time, <span class="math display">\[\begin{align}
+    y_{it} &amp;= \alpha + \mu_{i} + \gamma_{g[i]} + \tau_{t} + \varepsilon_{it}
+\end{align}\]</span> where <span class="math inline">\(\alpha\)</span> is a constant or intercept, <span class="math inline">\(\mu_{i}\)</span> is a term that is fixed for an individual <span class="math inline">\(i\)</span> across repeated observations, <span class="math inline">\(\gamma_{g[i]}\)</span> is a group-specific that is fixed across time for all <span class="math inline">\(i\)</span> in group <span class="math inline">\(g\)</span>, <span class="math inline">\(\tau_{t}\)</span> is a time-unit effect that is fixed for all individuals, and <span class="math inline">\(\varepsilon_{it}\)</span> is random error. These units of measurement—units, groups, time periods—are the “semantics” that we want to map to colors.</p>
+<p>We have already identified one problem: we don’t want colors to apply indefinitely. This means that in order to turn “off” a color, I either have to explicitly call <code>\color{black}</code> again, or I have to wrap some expression in curly braces. Using the curly braces is definitely <em>safer</em> (I don’t want to assume that we always want to return to <code>black</code>), but managing the scope yourself is still fairly unpleasant if nothing else because it isn’t how we write <span class="math inline">\(\latex\)</span> most of the time. I don’t want to burden myself with patterns that feel unnatural.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">% back to black</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>y_{it} &amp;= <span class="fu">\alpha</span> + <span class="fu">\color</span>{violet} <span class="fu">\mu</span>_{i} <span class="fu">\color</span>{black} </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>          + <span class="fu">\gamma</span>_{g[i]} + <span class="fu">\tau</span>_{t} + <span class="fu">\varepsilon</span>_{it} <span class="fu">\\</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">% use scope</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>y_{it} &amp;= <span class="fu">\alpha</span> + {<span class="fu">\color</span>{violet} <span class="fu">\mu</span>_{i}} </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>          + <span class="fu">\gamma</span>_{g[i]} + <span class="fu">\tau</span>_{t} + <span class="fu">\varepsilon</span>_{it}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><span class="math display">\[\begin{align}
+    y_{it} &amp;= \alpha + \color{violet} \mu_{i} \color{black} + \gamma_{g[i]} + \tau_{t} + \varepsilon_{it} \\
+    y_{it} &amp;= \alpha + {\color{violet} \mu_{i}} + \gamma_{g[i]} + \tau_{t} + \varepsilon_{it}
+\end{align}\]</span></p>
+<p>So to improve things, we will introduce a function that, at first, will not feel like much of an improvement. But we discuss it to highlight both <em>how</em> we can modify interfaces with pretty simple tools and <em>why</em> we may want to do that. So, consider a function called <code>setcolor</code>, which takes two arguments: a color code and the text you want apply the color to locally.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">% notice the extra {} braces</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">\setcolor</span>}[2]{ {<span class="fu">\color</span>{#1} {#2}} } </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">% apply function to the equation</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>y_{it} &amp;= <span class="fu">\alpha</span> + <span class="fu">\setcolor</span>{violet}{<span class="fu">\mu</span>_{i}} </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>          + <span class="fu">\tau</span>_{t} + <span class="fu">\varepsilon</span>_{it}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><span class="math display">\[\begin{align}
+    \newcommand{\setcolor}[2]{ {\color{#1} {#2}} }
+    y_{it} &amp;= \alpha + \setcolor{violet}{\mu_{i}} + \gamma_{g[i]} + \tau_{t} + \varepsilon_{it}
+\end{align}\]</span></p>
+<p>Why do I say that this function may not feel like much of an improvement? It has <em>some</em> drawback: it really isn’t any <em>“faster”</em> to type <code>\setcolor{violent}{\mu_{i}}</code> than it is to type <code>{\color{violent} \mu_{i}}</code>. It actually has <em>more</em> characters and just as many curly braces. But it is <em>better</em> in at least two important respects that we should care about when we write code. One, we made the problem of locally scoping the color <em>inherent to the function</em> instead of being procedurally managed <em>ad hoc</em> outside of the function. This is good because it makes the whole thing more bug-proof. The other related upside is that the interface feels more naturally function-like: it is idiomatically friendly and familiar to achieve a result by calling a function with a predictable interface instead of managing special characters in the language as a separate concern. It is easier to remember one thing (use a function) than it is to remember two things (use a function <em>oh and also manage the weird scope</em>). So we get a friendlier interface that is also safer. Not bad!</p>
+<p>But we aren’t done there. We make complete the interface by using this function to map semantics to colors directly.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">unitfx</span>}[1]{<span class="fu">\setcolor</span>{violet}{#1}}</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">groupfx</span>}[1]{<span class="fu">\setcolor</span>{green}{#1}}</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">timefx</span>}[1]{<span class="fu">\setcolor</span>{lightblue}{#1}}</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">param</span>}[1]{<span class="fu">\setcolor</span>{maroon}{#1}}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And as long as we do that in one place, all the hard work is done. Any downstream call to these functions is simple. Just wrap an expression in the equation inside of the function corresponding to its semantic.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>y_{it} &amp;= <span class="fu">\param</span>{<span class="fu">\alpha</span>} + <span class="fu">\unitfx</span>{<span class="fu">\mu</span>_{i}}</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>          + <span class="fu">\groupfx</span>{<span class="fu">\gamma</span>_{g[i]}} + <span class="fu">\timefx</span>{<span class="fu">\tau</span>_{t}}</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>          + <span class="fu">\param</span>{<span class="fu">\varepsilon</span>_{it}}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><span class="math display">\[\begin{align}
+    \newcommand{unitfx}[1]{\setcolor{violet}{#1}}
+    \newcommand{groupfx}[1]{\setcolor{green}{#1}}
+    \newcommand{timefx}[1]{\setcolor{orange}{#1}}
+    \newcommand{param}[1]{\setcolor{maroon}{#1}}
+    y_{it} &amp;= \param{\alpha} + \unitfx{\mu_{i}} + \groupfx{\gamma_{g[i]}} + \timefx{\tau_{t}} + \param{\varepsilon_{it}}
+\end{align}\]</span></p>
+</section>
+<section id="closing-notes" class="level2">
+<h2 class="anchored" data-anchor-id="closing-notes">Closing notes</h2>
+<p>So that’s it. Our solution meaningfully improves the color experience in <span class="math inline">\(\latex\)</span> using just 5 lines of code to create a helper function and a few color mappings. The helper function let us change the <em>interface</em> to color control in the general case. And the color mappings let us apply the interface change to create simple key-value pairs from semantics to color-mappings.</p>
+<p>The interface is also safer because managing the scope of a color modification is more programmatic.</p>
+<p>We also do this without introducing any dependencies. We could still load outside packages to access more color values, but that choice doesn’t bear on our interface or vice-versa. That’s a good thing!</p>
+<p>And all because we treated a <span class="math inline">\(\latex\)</span> problem like a <em>programming</em> problem.</p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1" role="doc-endnote"><p>This is done by calling a <code>\text{}</code> environment within the math environment provided by MathJax or KaTeX or whichever I am running on this website…<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } 
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

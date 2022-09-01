@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/blog/latex_colors/index.html",
       "/blog/fp_basics/index.html",
       "/blog/usable_repos/index.html",
       "/blog/modular_blog/index.html"

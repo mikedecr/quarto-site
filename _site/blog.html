@@ -68,9 +68,9 @@ ul.task-list{list-style: none;}
     }
 
     const options = {
-      valueNames: ['listing-title','listing-author','listing-date','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-date','listing-title',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
       
-      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description","listing-categories"],
+      searchColumns: ["listing-date","listing-title","listing-author"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -137,7 +137,7 @@ ul.task-list{list-style: none;}
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(3)</span></div><div class="category" data-category="code">code <span class="quarto-category-count">(3)</span></div><div class="category" data-category="git">git <span class="quarto-category-count">(1)</span></div><div class="category" data-category="r">r <span class="quarto-category-count">(1)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-unnumbered"><div class="category" data-category="code">code</div><div class="category" data-category="git">git</div><div class="category" data-category="latex">latex</div><div class="category" data-category="r">r</div></div></div>
 <!-- main -->
 <main class="content column-page-left" id="quarto-document-content">
 
@@ -161,105 +161,56 @@ ul.task-list{list-style: none;}
 
 
 
-<div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
-<div class="list grid quarto-listing-cols-3">
-<div class="g-col-1" data-index="0" data-categories="code,r" data-listing-date-sort="1660712400000" data-listing-file-modified-sort="1660741126786" data-listing-reading-time-sort="19.8">
-<a href="./blog/fp_basics/index.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<div class="card-img-bg" style="height: 150px;">
-&nbsp;
-</div>
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-More than <code>lapply</code>: functional programming adventures in R
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('code'); return false;">
-code
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('r'); return false;">
-r
-</div>
-</div>
-<div class="card-text listing-description">
-When people talk about “functional programming” in R, they usually mean two things.
-</div>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Michael DeCrescenzo
-</div>
-<div class="listing-date">
+<div class="quarto-listing quarto-listing-container-table" id="listing-listing">
+
+<table class="quarto-listing-table table">
+<thead>
+<tr>
+<th>
+Date
+</th>
+<th>
+Title
+</th>
+</tr>
+</thead>
+<tbody class="list">
+<tr data-index="0" data-categories="code,latex" data-listing-date-sort="1661922000000" data-listing-file-modified-sort="1662005040408" data-listing-reading-time-sort="7.075" data-listing-title-sort="Treating $\mathrm{\LaTeX}$ like a programming language:
+the case of color-coded equations" data-listing-filename-sort="index.qmd">
+<td class="listing-date">
+Aug 31, 2022
+</td>
+<td class="listing-title">
+<a href="./blog/latex_colors/index.html" class="title">Treating <span class="math inline">\(\mathrm{\LaTeX}\)</span> like a programming language: the case of color-coded equations</a>
+</td>
+</tr>
+<tr data-index="1" data-categories="code,r" data-listing-date-sort="1660712400000" data-listing-file-modified-sort="1660741126786" data-listing-reading-time-sort="19.8" data-listing-title-sort="More than `lapply`: functional programming adventures in R" data-listing-filename-sort="index.qmd">
+<td class="listing-date">
 Aug 17, 2022
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="1" data-categories="code" data-listing-date-sort="1652590800000" data-listing-file-modified-sort="1658901378254" data-listing-reading-time-sort="20.91">
-<a href="./blog/usable_repos/index.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<p class="card-img-top">
-<img src="./blog/usable_repos/featured.png" class="thumbnail-image card-img" style="height: 150px;">
-</p>
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Replication code should be more usable.
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('code'); return false;">
-code
-</div>
-</div>
-<div class="card-text listing-description">
-My mind has been on <strong>replication archives</strong> lately. I often go digging in other peoples’ projects for data to practice some new statistical skill or another. And I have been digging in <em>my own</em> projects lately to refactor some code for a dormant academic project. In both of these situations I am interfacing with some else’s code (me today ≠ me in the past), and in both situations I am having a bad time.
-</div>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Michael DeCrescenzo
-</div>
-<div class="listing-date">
+</td>
+<td class="listing-title">
+<a href="./blog/fp_basics/index.html" class="title">More than <code>lapply</code>: functional programming adventures in R</a>
+</td>
+</tr>
+<tr data-index="2" data-categories="code" data-listing-date-sort="1652590800000" data-listing-file-modified-sort="1658901378254" data-listing-reading-time-sort="20.91" data-listing-title-sort="Replication code should be more usable." data-listing-filename-sort="index.qmd">
+<td class="listing-date">
 May 15, 2022
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-<div class="g-col-1" data-index="2" data-categories="code,git" data-listing-date-sort="1636174800000" data-listing-file-modified-sort="1656392566386" data-listing-reading-time-sort="20.53">
-<a href="./blog/modular_blog/index.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<p class="card-img-top">
-<img src="./blog/modular_blog/git_featured.png" class="thumbnail-image card-img" style="height: 150px;">
-</p>
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Highly modular blogging with Blogdown
-</h5>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('code'); return false;">
-code
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('git'); return false;">
-git
-</div>
-</div>
-<div class="card-text listing-description">
-When I finished graduate school, I tore down my website.
-</div>
-<div class="card-attribution card-text-small justify">
-<div class="listing-author">
-Michael DeCrescenzo
-</div>
-<div class="listing-date">
+</td>
+<td class="listing-title">
+<a href="./blog/usable_repos/index.html" class="title">Replication code should be more usable.</a>
+</td>
+</tr>
+<tr data-index="3" data-categories="code,git" data-listing-date-sort="1636174800000" data-listing-file-modified-sort="1656392566386" data-listing-reading-time-sort="20.53" data-listing-title-sort="Highly modular blogging with Blogdown" data-listing-filename-sort="index.qmd">
+<td class="listing-date">
 Nov 6, 2021
-</div>
-</div>
-</div>
-</div>
-</a>
-</div>
-</div>
+</td>
+<td class="listing-title">
+<a href="./blog/modular_blog/index.html" class="title">Highly modular blogging with Blogdown</a>
+</td>
+</tr>
+</tbody>
+
+</table>
 <div class="listing-no-matching d-none">
 No matching items
 </div>
