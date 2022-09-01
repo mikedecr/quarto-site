@@ -2,11 +2,12 @@
 title: "Blog Posts"
 listing:
   contents: blog
-  type: grid
+  type: table # default, grid, table
+  categories: unnumbered
+  fields: [date, title]
   sort: "date desc"
   sort-ui: false
   filter-ui: false
-  categories: true
 page-layout: full
 title-block-banner: false
 ---
