@@ -10,3 +10,6 @@
 [submodule "blog/fp_basics"]
 	path = blog/fp_basics
 	url = git@github.com:mikedecr/post_fp_basics.git
+[submodule "blog/latex_colors"]
+	path = blog/latex_colors
+	url = git@github.com:mikedecr/post_latex-colors.git
