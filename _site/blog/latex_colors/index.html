@@ -124,6 +124,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
+<meta property="og:title" content="michael decrescenzo - Treating \(\mathrm{\LaTeX}\) like a programming language: the case of color-coded equations">
+<meta property="og:description" content="\(\newcommand{latex}{\mathrm{\LaTeX}}\)">
+<meta property="og:image" content="eq.png">
+<meta property="og:site-name" content="michael decrescenzo">
 </head>
 
 <body class="nav-fixed fullcontent">
@@ -208,15 +212,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 <p><span class="math inline">\(\newcommand{latex}{\mathrm{\LaTeX}}\)</span></p>
-<p><span class="math inline">\(\latex\)</span> can be a headache. The syntax is clunky. Normal usage leads us to engage with a lot of frustrating patterns. I see academics and other researchers <a href="https://twitter.com/RexDouglass/status/1551464194527989760">complain about it</a>, and I usually agree with where these complaints are coming from.</p>
-<p>But I also feel like many researchers don’t get the most out of <span class="math inline">\(\latex\)</span>. When I used to write more <span class="math inline">\(\latex\)</span> in graduate school, I knew I didn’t. Sure, I was good at algorithmically injecting my output into papers, managing references, and so on. But the shoeleather work of <span class="math inline">\(\latex\)</span>—itemizing and enumerating, managing the boilerplate code—wasn’t something I was equipped to criticize with the same eye. I would repeat myself a lot in my code, get trapped inside of irritating design patterns, and felt the <em>age</em> of the language all of the time.</p>
+<p><span class="math inline">\(\latex\)</span> can be a headache. The syntax is clunky. Normal usage leads us to engage with a lot of frustrating patterns. I see academics and other researchers complain about it, and I usually agree with where these complaints are coming from.</p>
+<p>But I also feel like many researchers don’t get the most out of <span class="math inline">\(\latex\)</span>. When I used to write more <span class="math inline">\(\latex\)</span> in graduate school, I knew I didn’t. I mean, I was <em>good</em> at algorithmically injecting my statistical results into documents, managing citations and cross-references, and so on. But the shoeleather work of <span class="math inline">\(\latex\)</span>—writing the boilerplate code to itemize and enumerate, control environments, typeset math—wasn’t something I was equipped to criticize very confidently. I would end up repeating myself a lot in my code, getting trapped inside of irritating design patterns, and feeling the <em>age</em> of the language constantly.</p>
 <p>But you get older, you (hopefully) get better at programming, and you realize what you were being silly about.</p>
-<p>This blog post is about how <em><span class="math inline">\(\mathit{\LaTeX}\)</span> is a programming language</em> that you can do ordinary programming language things with. You can save variables and write functions. You can turn these tools into interfaces that let you work with greater efficiency. And you can design them in such a way that makes your work more joyful. This has been <a href="https://twitter.com/mikedecr/status/1559721156130881536">on my mind</a> for a little while, but I worked up a quick exercise when <a href="https://twitter.com/adamjnafa/status/1565164364981620737">Jordan Nafa was talking about color-coding different parts of some equations</a>.</p>
-<p>So we will the broader problem of <strong>color-coding an equation</strong> as an example.</p>
-<section id="the-uncomfortable-color-fundamentals-in-latex" class="level2">
-<h2 class="anchored" data-anchor-id="the-uncomfortable-color-fundamentals-in-latex">The uncomfortable color fundamentals in <span class="math inline">\(\latex\)</span></h2>
-<p>Like many things in <span class="math inline">\(\latex\)</span>, the built-in experience of color-control is a little clunky. You change your text color with <code>\color{}</code>, and naturally you pass some color argument. The language provides a few basic builtin color keywords like <code>red</code> and <code>blue</code>, which are pretty harsh, but others like <code>violent</code>, <code>teal</code>, and <code>maroon</code> are okay. The color options aren’t the real frustration though (you can load in extra colors, whatever, who cares). The real frustration is the <em>interface</em>, which works like this.</p>
-<p>Any time you change a color, you change it basically <em>indefinitely</em>, at least up until <span class="math inline">\(\latex\)</span> encounters some scope change that causes the color to reset to normal. Here’s some example <span class="math inline">\(\latex\)</span> code.</p>
+<p>This blog post is about how <em><span class="math inline">\(\mathit{\LaTeX}\)</span> is a programming language</em>. You can do ordinary programming language things with it, like save variables and write functions. And then you can turn those variables and functions into interfaces that let you work with greater efficiency. And you can design those interfaces to make your work more joyful.</p>
+<p>Thinking about programming challenges in <span class="math inline">\(\latex\)</span> has been <a href="https://twitter.com/mikedecr/status/1559721156130881536">on my mind</a> for a little while, but I worked up a quick example when <a href="https://twitter.com/adamjnafa/status/1565164364981620737">Jordan Nafa was talking about color-coding different parts of some equations</a>. So that will be our example for this post: <strong>color-coding an equation</strong>. This will not require deep <span class="math inline">\(\latex\)</span> expertise, knowledge of external packages, or other complicated tricks. We only have to a little ordinary programming thinking to turn <span class="math inline">\(\latex\)</span>’s built-in color tools into something more practical and friendly.</p>
+<section id="color-fundamentals-in-latex" class="level2">
+<h2 class="anchored" data-anchor-id="color-fundamentals-in-latex">Color fundamentals in <span class="math inline">\(\latex\)</span></h2>
+<p>Like many things in <span class="math inline">\(\latex\)</span>, the built-in experience of color-control is a little clunky. You change your text color with <code>\color{}</code>, and naturally you pass some color argument. The language provides a few builtin keywords like <code>red</code> and <code>blue</code>, which are harsh, but others like <code>violet</code>, <code>teal</code>, and <code>maroon</code> are fine. But the color options aren’t the problem. The problem is the interface, which works like this.</p>
+<p>Any time you change a color, you change it <em>indefinitely</em>, at least up until there is a scope change that bounds the application of the new color. Here is an example:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>We start with some normal text.</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">\color</span>{red} And now the text is red indefinitely.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -228,7 +232,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     \color{red} And now the text is red indefinitely.
 }
 \]</span></p>
-<p>You may have seen similar behavior messing with text <em>size</em>.</p>
+<p>You may have encountered similar behavior with altering text <em>size</em>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>We start with some normal text.</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">\huge</span> And now the text is huge indefinitely.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -239,10 +243,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     \huge And now the text is huge indefinitely.
 }
 \]</span></p>
-<p>Now, we can extert some control over the meaning of “indefinitely” by providing some scope, for instance with curly braces.</p>
+<p>We can extert some control over the “indefinite” application of these settings by introducing some scope, for instance with curly braces.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>We start with some normal text. </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>{<span class="fu">\color</span>{red} But the} redness is {<span class="fu">\color</span>{red} contained}.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>{ <span class="fu">\color</span>{red} But the } redness is { <span class="fu">\color</span>{red} contained }.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><span class="math display">\[
 \text{
@@ -252,15 +256,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 \]</span></p>
 <p>This isn’t <em>the worst</em> but it doesn’t feel too comfortable. It would feel better to control colors more like this:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">\red</span>{But the} redness is <span class="fu">\red</span>{contained}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>which would save keystrokes and make the whole experience more declarative.</p>
+<p>which not only saves keystrokes but makes the whole experience feel more function-oriented and declarative. We will work toward something that feels similar (not identical) to this.</p>
 </section>
 <section id="doing-better-with-an-equation-example" class="level2">
 <h2 class="anchored" data-anchor-id="doing-better-with-an-equation-example">Doing better, with an equation example</h2>
-<p>Let’s say we have an example where we want to color-code different components of the equation. To be more specific, I want to <em>map</em> certain semantic features of my document’s content to specific colors in a consistent way. We would like the interface to be minimally burdensome, so I don’t want to type (or <em>think</em>) a lot to get good effects.</p>
-<p>Here are our equation and our “semantics”. We collect data on some individuals subscripted <span class="math inline">\(i\)</span>, who are located within groups <span class="math inline">\(g\)</span>, and measured across time units <span class="math inline">\(t\)</span>. We model some outcome <span class="math inline">\(y_{it}\)</span> as varying across individuals within groups and over time, <span class="math display">\[\begin{align}
+<p>Let’s say we have an equation that has certain terms that we want to apply colors to. More specifically, we want to <em>map</em> certain semantic features of the equation’s meaning to specific colors in a consistent way. We would like the interface to be minimally burdensome. I don’t want to have to type (or <em>think</em>) too much to get good effects.</p>
+<p>Let’s meet our equation and its “semantics”. We collect data on some individuals subscripted <span class="math inline">\(i\)</span>, who are located within groups <span class="math inline">\(g\)</span>, and measured across time units <span class="math inline">\(t\)</span>. We model some outcome <span class="math inline">\(y_{it}\)</span> as varying across individuals within groups and over time, <span class="math display">\[\begin{align}
     y_{it} &amp;= \alpha + \mu_{i} + \gamma_{g[i]} + \tau_{t} + \varepsilon_{it}
 \end{align}\]</span> where <span class="math inline">\(\alpha\)</span> is a constant term, <span class="math inline">\(\mu_{i}\)</span> is a term that is fixed for an individual <span class="math inline">\(i\)</span> across repeated observations, <span class="math inline">\(\gamma_{g[i]}\)</span> is a group-specific that is fixed across time for all <span class="math inline">\(i\)</span> in group <span class="math inline">\(g\)</span>, <span class="math inline">\(\tau_{t}\)</span> is a time-unit effect that is fixed for all individuals, and <span class="math inline">\(\varepsilon_{it}\)</span> is random error. These units of measurement—units, groups, time periods—are the “semantics” that we want to map to colors.</p>
-<p>We have already identified one problem: we don’t want colors to apply indefinitely. This means that in order to turn “off” a color, I either have to explicitly call <code>\color{black}</code> again, or I have to wrap some expression in curly braces. Using the curly braces is definitely <em>safer</em> (I don’t want to assume that we always want to return to <code>black</code>), but managing the scope yourself is still fairly unpleasant if nothing else because it isn’t how we write <span class="math inline">\(\latex\)</span> most of the time. I don’t want to burden myself with patterns that feel unnatural.</p>
+<p>We have already identified one problem: we don’t want colors to apply indefinitely. This means that in order to turn “off” a color, I either have to explicitly call <code>\color{black}</code> again, or I have to scope the color e.g.&nbsp;with curly braces.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">% back to black</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>y_{it} &amp;= <span class="fu">\alpha</span> + <span class="fu">\color</span>{violet} <span class="fu">\mu</span>_{i} <span class="fu">\color</span>{black} </span>
@@ -274,9 +278,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     y_{it} &amp;= \alpha + \color{violet} \mu_{i} \color{black} + \gamma_{g[i]} + \tau_{t} + \varepsilon_{it} \\
     y_{it} &amp;= \alpha + {\color{violet} \mu_{i}} + \gamma_{g[i]} + \tau_{t} + \varepsilon_{it}
 \end{align}\]</span></p>
+<p>Using the curly braces is definitely <em>safer</em> than <code>\color{black}</code>; I don’t want to assume that we always want to return to <code>black</code>. But managing the curly braces yourself can be cumbersome if you aren’t used to writing <span class="math inline">\(\latex\)</span> that way already. I don’t write with that style, so I don’t want to burden myself with unusual patterns.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 <p>So to improve things, we will introduce a function that, at first, will not feel like much of an improvement. But we discuss it to highlight both <em>how</em> we can modify interfaces with pretty simple tools and <em>why</em> we may want to do that. So, consider a function called <code>setcolor</code>, which takes two arguments: a color code and the text you want apply the color to locally.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">% notice the extra {} braces</span></span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">% notice the extra {} braces in the definition</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">\setcolor</span>}[2]{ {<span class="fu">\color</span>{#1} {#2}} } </span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">% apply function to the equation</span></span>
@@ -287,15 +292,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     \newcommand{\setcolor}[2]{ {\color{#1} {#2}} }
     y_{it} &amp;= \alpha + \setcolor{violet}{\mu_{i}} + \gamma_{g[i]} + \tau_{t} + \varepsilon_{it}
 \end{align}\]</span></p>
-<p>Why do I say that this function may not feel like much of an improvement? It has <em>some</em> drawback: it really isn’t any <em>“faster”</em> to type <code>\setcolor{violent}{\mu_{i}}</code> than it is to type <code>{\color{violent} \mu_{i}}</code>. It actually has <em>more</em> characters and just as many curly braces. But it is <em>better</em> in at least two important respects that we should care about when we write code. One, we made the problem of locally scoping the color <em>inherent to the function</em> instead of being procedurally managed <em>ad hoc</em> outside of the function. This is good because it makes the whole thing more bug-proof. The other related upside is that the interface feels more naturally function-like: it is idiomatically friendly and familiar to achieve a result by calling a function with a predictable interface instead of managing special characters in the language as a separate concern. It is easier to remember one thing (use a function) than it is to remember two things (use a function <em>oh and also manage the weird scope</em>). So we get a friendlier interface that is also safer. Not bad!</p>
-<p>But we aren’t done there. We make complete the interface by using this function to map semantics to colors directly.</p>
+<p>Why do I say that this function may not feel like much of an improvement? It has <em>some</em> drawbacks: it really isn’t any “faster” to type <code>\setcolor{violet}{\mu_{i}}</code> than it is to type <code>{\color{violet} \mu_{i}}</code>. It actually has more characters and just as many curly braces. But it is <em>better</em> in at least two important respects that we should care about when we write code. One, we made the problem of locally scoping the color <em>inherent to the function</em> instead of being procedurally managed <em>ad hoc</em> outside of the function. This is good because it makes the whole thing more bug-proof. It also makes the interface feel more naturally function-like: we achieve a coherent result by calling a function with a predictable interface, then our work is done. No managing other special characters in the language as a side concern. It is easier to remember one thing (use a function) than it is to remember two things (use a function <em>oh and also manage the weird scope</em>). So we get a safer function with a more recognizable interface. Not so bad!</p>
+<p>But we aren’t done there. We complete the interface by using this function to map semantics to colors directly. We create a function called <code>\unitfx{}</code> which applies the same color to any term in the equation that semantically refers to unit-level effects. Same for a functions called <code>groupfx{}</code>, <code>\timefx{}</code>, and so on. We also throw in a generic <code>\param{}</code> function for other terms.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">unitfx</span>}[1]{<span class="fu">\setcolor</span>{violet}{#1}}</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">groupfx</span>}[1]{<span class="fu">\setcolor</span>{green}{#1}}</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">timefx</span>}[1]{<span class="fu">\setcolor</span>{lightblue}{#1}}</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">\newcommand</span>{<span class="ex">param</span>}[1]{<span class="fu">\setcolor</span>{maroon}{#1}}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>And as long as we do that in one place, all the hard work is done. Any downstream call to these functions is simple. Just wrap an expression in the equation inside of the function corresponding to its semantic.</p>
+<p>So as long as we define these color commands in one place, all the hard work is done. All downstream calls to these functions are simple. Just wrap a term in the equation inside of the function corresponding to its semantic.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode latex code-with-copy"><code class="sourceCode latex"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>y_{it} &amp;= <span class="fu">\param</span>{<span class="fu">\alpha</span>} + <span class="fu">\unitfx</span>{<span class="fu">\mu</span>_{i}}</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>          + <span class="fu">\groupfx</span>{<span class="fu">\gamma</span>_{g[i]}} + <span class="fu">\timefx</span>{<span class="fu">\tau</span>_{t}}</span>
@@ -309,12 +314,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     y_{it} &amp;= \param{\alpha} + \unitfx{\mu_{i}} + \groupfx{\gamma_{g[i]}} + \timefx{\tau_{t}} + \param{\varepsilon_{it}}
 \end{align}\]</span></p>
 </section>
-<section id="closing-notes" class="level2">
-<h2 class="anchored" data-anchor-id="closing-notes">Closing notes</h2>
-<p>So that’s it. Our solution meaningfully improves the color experience in <span class="math inline">\(\latex\)</span> using just 5 lines of code to create a helper function and a few color mappings. The helper function let us change the <em>interface</em> to color control in the general case. And the color mappings let us apply the interface change to create simple key-value pairs from semantics to color-mappings.</p>
-<p>The interface is also safer because managing the scope of a color modification is more programmatic.</p>
-<p>We also do this without introducing any dependencies. We could still load outside packages to access more color values, but that choice doesn’t bear on our interface or vice-versa. That’s a good thing!</p>
-<p>And all because we treated a <span class="math inline">\(\latex\)</span> problem like a <em>programming</em> problem.</p>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>So that’s it. Our solution meaningfully improves the color experience in <span class="math inline">\(\latex\)</span> using just five lines of code: one to create a helper function and four more to create some color mappings. The helper function let us change the interface to color control in the <em>general case</em>. And the color mappings let us apply the new interface to create simple key-value pairs that map a semantic to a color. And bonus: the interface is also safer because managing the scope of a color modification requires no more work for the user.</p>
+<p>We also do this without introducing any dependencies. We could still load outside packages to access more color values, but that choice doesn’t bear on the general interface or vice-versa. That modularity is a good design feature.</p>
+<p>And all because we thought about a <span class="math inline">\(\latex\)</span> problem like a programming problem.</p>
 
 
 </section>
@@ -324,6 +328,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <ol>
 <li id="fn1" role="doc-endnote"><p>This is done by calling a <code>\text{}</code> environment within the math environment provided by MathJax or KaTeX or whichever I am running on this website…<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>Although I could totally see, for example, Lisp users feeling quite comfortable with that style. It feels more like the <code>(function arg1 arg2)</code> syntax.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
