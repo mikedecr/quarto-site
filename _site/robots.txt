@@ -1,0 +1,1 @@
+Sitemap: https://mikedecr.netlify.app/sitemap.xml

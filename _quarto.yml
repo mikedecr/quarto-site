@@ -3,6 +3,7 @@ project:
 
 website:
   title: "michael decrescenzo"
+  site-url: "https://mikedecr.netlify.app"
   repo-url: https://github.com/mikedecr/quarto-site
   repo-actions: [issue]
   favicon: submodules/imgs/img/favicon_telles.png
@@ -17,7 +18,12 @@ website:
       - icon: twitter
         href: https://twitter.com/mikedecr
   # social / sharing
-  open-graph: true
+  twitter-card:
+    creator: "@mikedecr"
+    card-style: summary_large_image
+    image: submodules/imgs/img/ID_telles_1452x1452.png
+  open-graph:
+    image: submodules/imgs/img/ID_telles_1452x1452.png
 
 format:
   html:
