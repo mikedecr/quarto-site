@@ -2,14 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mikedecr.netlify.app/index.html</loc>
-    <lastmod>2022-09-02T00:23:56.873Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mikedecr.netlify.app/blog.html</loc>
-    <lastmod>2022-09-02T00:22:32.414Z</lastmod>
+    <lastmod>2022-09-02T00:28:03.600Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/latex_colors/index.html</loc>
-    <lastmod>2022-09-02T00:22:34.748Z</lastmod>
+    <lastmod>2022-09-02T00:28:07.082Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mikedecr.netlify.app/blog/usable_repos/index.html</loc>
+    <lastmod>2022-09-02T00:28:07.835Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mikedecr.netlify.app/blog/modular_blog/index.html</loc>
+    <lastmod>2022-09-02T00:28:08.596Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mikedecr.netlify.app/blog/fp_basics/index.html</loc>
+    <lastmod>2022-09-02T00:28:09.740Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mikedecr.netlify.app/about.html</loc>
+    <lastmod>2022-09-02T00:28:11.176Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mikedecr.netlify.app/blog.html</loc>
+    <lastmod>2022-09-02T00:28:11.524Z</lastmod>
   </url>
 </urlset>
