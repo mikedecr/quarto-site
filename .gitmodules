@@ -13,3 +13,6 @@
 [submodule "blog/latex_colors"]
 	path = blog/latex_colors
 	url = git@github.com:mikedecr/post_latex-colors.git
+[submodule "blog/nonflat_implied_priors"]
+	path = blog/nonflat_implied_priors
+	url = git@github.com:mikedecr/post_nonflat-priors.git
