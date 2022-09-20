@@ -8,22 +8,30 @@ about:
 #### **--- work ---**
 
 I work in low-latency ("high-frequency") trading as a **quantitative researcher**,
-which means I use math, statistics, and computers to study financial markets, build predictive signals, and improve trading strategies that go super fast.
+which means I use statistical modeling and novel computational tools to study financial markets, build predictive signals, and improve trading strategies that go super fast.
 
+I am most interested in what we call "market microstructure", which in plain English means, financial markets have to be implemented as computational/physical systems
+whose design and capabilities have real consequences for effective trading strategies.
+
+#### **--- code + stats ---**
+
+I write Python professionally, both as an applied researcher and as a developer of proprietary research software.
+I maintain a private interest in R, which I learned in graduate school and come to appreciate more as I work in other languages.
+I have budding interests in Lua (thanks to my Neovim [configuration adventures](https://github.com/mikedecr/neovim-configs)) and Julia.
+My curiosities about functional programming and category theory have me interested in Haskell but wondering what to do with it.
+
+On the statistics front, I am especially interested in Bayesian methods, causal inference, and where they can overlap.
 
 #### **--- background ---**
 
 I have a Ph.D. in political science from the University of Wisconsin–Madison,
 where I was a graduate affiliate of the [Elections Research Center](https://elections.wisc.edu).
-My graduate work focused on Bayesian + causal methods for studying U.S. elections and public opinion.
+My graduate work focused on Bayesian and causal methods for studying U.S. elections and public opinion.
+My dissertation built new Bayesian models to measure latent political ideology in congressional districts.
 
 
-#### **--- lately ---**
+#### **--- this site ---**
 
-Some things I have been interested in:
-
-- Software design, especially functional programming
-- Category theory, in service of functional programming
-- Frequentist statistics, which isn't how I usually do things
-- Neovim and [lua-based configuration](https://github.com/mikedecr/neovim-configs)
+This site is generated with [Quarto](https://github.com/mikedecr/quarto-site), a multilingual publishing system built atop Pandoc.
+The source code for the site is [on Github](https://github.com/mikedecr/quarto-site), and the blog posts are submodules located [here specifically](https://github.com/mikedecr/quarto-site/tree/main/blog).
 
