@@ -32,6 +32,7 @@ My dissertation built new Bayesian models to measure latent political ideology i
 
 #### **--- this site ---**
 
-This site is generated with [Quarto](https://github.com/mikedecr/quarto-site), a multilingual publishing system built atop Pandoc.
-The source code for the site is [on Github](https://github.com/mikedecr/quarto-site), and the blog posts are submodules located [here specifically](https://github.com/mikedecr/quarto-site/tree/main/blog).
+The source code for the site is [on Github](https://github.com/mikedecr/quarto-site).
+The blog posts are all separate, forkable/cloneable modules located [here specifically](https://github.com/mikedecr/quarto-site/tree/main/blog).
+The site is generated with [Quarto](https://github.com/mikedecr/quarto-site), a multilingual publishing system backed by Pandoc, and hosted on Netlify.
 
