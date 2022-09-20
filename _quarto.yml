@@ -18,10 +18,10 @@ website:
       - icon: twitter
         href: https://twitter.com/mikedecr
   # social / sharing
-  twitter-card: true
+  twitter-card:
+    image: "/submodules/imgs/img/ID_telles_1452x1452.png"
     # creator: "@mikedecr"
     # card-style: summary_large_image
-    # image: submodules/imgs/img/ID_telles_1452x1452.png
   open-graph: true
     # image: submodules/imgs/img/ID_telles_1452x1452.png
 
