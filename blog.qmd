@@ -9,7 +9,9 @@ listing:
   sort-ui: false
   filter-ui: false
 page-layout: full
-title-block-banner: false
+title-block-banner: true
 ---
 
+Posts are timestamped with an approximate "first-published" date,
+but I tend to revise them after the fact.
 
