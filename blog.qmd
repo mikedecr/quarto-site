@@ -8,6 +8,7 @@ listing:
   sort: "date desc"
   sort-ui: false
   filter-ui: false
+  feed: true # RSS activated
 page-layout: full
 title-block-banner: true
 ---

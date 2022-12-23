@@ -4,6 +4,8 @@ project:
 website:
   title: "michael decrescenzo"
   site-url: "https://mikedecr.netlify.app"
+  # seen by RSS
+  description: "political scientist turned high-frequency tradist"
   repo-url: https://github.com/mikedecr/quarto-site
   repo-actions: [issue]
   favicon: submodules/imgs/img/favicon_telles.png
@@ -17,13 +19,16 @@ website:
         href: https://github.com/mikedecr
       - icon: twitter
         href: https://twitter.com/mikedecr
+      # gets the listings content in blog.qmd (feed: true)
+      - text: "RSS"
+        href: blog.xml
   # social / sharing
   twitter-card:
     image: "/submodules/imgs/img/ID_telles_1452x1452.png"
     # creator: "@mikedecr"
     # card-style: summary_large_image
-  open-graph: true
-    # image: submodules/imgs/img/ID_telles_1452x1452.png
+  open-graph:
+    image: submodules/imgs/img/ID_telles_1452x1452.png
 
 format:
   html:
