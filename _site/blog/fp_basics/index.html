@@ -9,7 +9,7 @@
 <meta name="author" content="Michael DeCrescenzo">
 <meta name="dcterms.date" content="2022-08-17">
 
-<title>michael decrescenzo - More than lapply: functional programming adventures in R</title>
+<title>michael decrescenzo - Obnoxious functional programming in R</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -124,14 +124,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<meta property="og:title" content="michael decrescenzo - More than lapply: functional programming adventures in R">
-<meta property="og:description" content="When people talk about “functional programming” in R, they usually mean two things.">
+<meta property="og:title" content="michael decrescenzo - Obnoxious functional programming in R">
+<meta property="og:description" content="Functional programming is much weirder than lapply">
 <meta property="og:image" content="https://mikedecr.netlify.app/submodules/imgs/img/ID_telles_1452x1452.png">
 <meta property="og:site-name" content="michael decrescenzo">
 <meta property="og:image:height" content="1452">
 <meta property="og:image:width" content="1452">
-<meta name="twitter:title" content="michael decrescenzo - More than lapply: functional programming adventures in R">
-<meta name="twitter:description" content="When people talk about “functional programming” in R, they usually mean two things.">
+<meta name="twitter:title" content="michael decrescenzo - Obnoxious functional programming in R">
+<meta name="twitter:description" content="Functional programming is much weirder than lapply">
 <meta name="twitter:image" content="https://mikedecr.netlify.app/submodules/imgs/img/ID_telles_1452x1452.png">
 <meta name="twitter:image-height" content="1452">
 <meta name="twitter:image-width" content="1452">
@@ -184,7 +184,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title"><p>More than <code>lapply</code>: functional programming adventures in R</p></h1>
+      <h1 class="title"><p>Obnoxious functional programming in R</p></h1>
+            <p class="subtitle lead"></p><p>Functional programming is much weirder than <code>lapply</code></p><p></p>
                                 <div class="quarto-categories">
                 <div class="quarto-category">code</div>
                 <div class="quarto-category">r</div>
@@ -224,11 +225,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <p>When people talk about “functional programming” in R, they usually mean two things.</p>
 <ol type="1">
-<li>Many intermediate R users have a <em>thing</em> against for-loops because for-loops have a reputation for being slow in R,<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> instead advocating for <code>apply</code> functions or <code>purrr::map</code> in a nested-data-frame context. This is referred to in these circles as “functional programming” because, rather than procedurally manipulating data explicitly, you are taking a pre-defined function and merely applies it to data.</li>
-<li>More <a href="https://adv-r.hadley.nz/fp.html">advanced</a> R discussions refer to the fact that functions are first-class objects in R, meaning that you can look at their properties or do operations on them, just like you can do to other data structures.</li>
+<li>Many intermediate R users have a <em>thing</em> against for-loops in R. This is because for-loops have a reputation<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> for being slow in R. Instead, these users advocate for <code>*apply</code> functions or <code>purrr::map</code>. This is called “functional programming” because we are applying a function to the data in some container instead of procedurally manipulating the data explicitly.</li>
+<li>More <a href="https://adv-r.hadley.nz/fp.html">advanced</a> R discussions refer to the fact that functions are first-class objects in R, meaning you can look at their properties and do operations on functions themselves, just like you could with other objects.</li>
 </ol>
-<p>By the numbers, most R users are probably more familiar with the meaning of [1] than [2], which is a shame because functional paradigms outside of R go way deeper, and get <em>way</em> weirder, than <code>apply(function, data)</code>. This post will be an attempt to explain a little of this weirdness and implement it in R.</p>
-<p>Readers who are experienced with functional programming will recognize that this post doesn’t get <em>so</em> detailed. They may also realize that underneath R’s interfaces are a lot of functional ideas, especially the tidyverse’s “tidy evaluation”. But this post keeps the material fairly light.</p>
+<p>Most R users are probably more familiar with the meaning of [1] than [2], which is a shame because functional programming outside of R goes way deeper, and get <em>way</em> weirder, than <code>apply(function, data)</code>. This post is an attempt to explain a little of that weirdness and implement it in R with some obnoxious examples.</p>
+<p>Readers who are experienced with functional programming will recognize that this post isn’t the most rigorous explanation ever. They may also realize that R’s interfaces already contain a lot of functional ideas even if most users may not know how to recognize and articulate those ideas. But this post keeps the material fairly light.</p>
 <section id="what-is-functional-programming" class="level2">
 <h2 class="anchored" data-anchor-id="what-is-functional-programming">What is functional programming?</h2>
 <p>Let’s do the Wikipedia thing. From the <a href="https://en.wikipedia.org/wiki/Functional_programming">functional programming</a> article:</p>
@@ -250,9 +251,9 @@ y = a + bx
 <p>and we say that <span class="math inline">\(y\)</span> is a function of <span class="math inline">\(x\)</span>. We can label the transformation of <span class="math inline">\(x\)</span> as <span class="math inline">\(f\)</span> and say <span class="math inline">\(y = f(x)\)</span>. Easy!</p>
 <p>But there is another way to write statements like this that you may have seen in papers that have high opinions of their own notation:</p>
 <p><span id="eq-map"><span class="math display">\[
-f : X \mapsto Y
+f : X \to Y
 \tag{1}\]</span></span></p>
-<p>which reads, “<span class="math inline">\(f\)</span> is a <em>map</em> from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>”, where capital-<span class="math inline">\(X\)</span> and capital-<span class="math inline">\(Y\)</span> are <em>sets</em> of values from which the single values <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are drawn. Which is to say: <span class="math inline">\(f\)</span> is simply a thing that eats a value from <span class="math inline">\(X\)</span> and spits out a value from <span class="math inline">\(Y\)</span>. In this example, the value of <span class="math inline">\(y\)</span> that it returns is <span class="math inline">\(a + (b \times x)\)</span>.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p>which reads, “<span class="math inline">\(f\)</span> is a <em>map</em> from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>”, where capital-<span class="math inline">\(X\)</span> and capital-<span class="math inline">\(Y\)</span> are <em>sets</em> of values from which the single values <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are drawn. Which is to say: <span class="math inline">\(f\)</span> is like a lookup table then outputs a value from <span class="math inline">\(Y\)</span> when it sees an input from <span class="math inline">\(X\)</span>. In this example, the value of <span class="math inline">\(y\)</span> that it returns is <span class="math inline">\(a + (b \times x)\)</span>.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 </section>
 <section id="function-definitions-are-trees-of-expressions" class="level3">
 <h3 class="anchored" data-anchor-id="function-definitions-are-trees-of-expressions">“Function definitions are <em>trees</em> of expressions …”</h3>
@@ -267,9 +268,9 @@ f : X \mapsto Y
 <p>Okay, next point. Associativity. Function composition is associative, which means compositions can be “grouped” in whatever way you want as long as you don’t rearrange the ordering of the base functions.</p>
 <p>To demonstrate, let’s write some functions out in “map” notation, and for the sake of simplicity let’s say that each is a map from a real number to a real number. <span class="math display">\[\begin{align}
     \newcommand{\R}{\mathbb{R}}
-    f &amp;: \R \mapsto \R \\
-    g &amp;: \R \mapsto \R \\
-    j &amp;: \R \mapsto \R
+    f &amp;: \R \to \R \\
+    g &amp;: \R \to \R \\
+    j &amp;: \R \to \R
 \end{align}\]</span> Now we want to compose these functions. Because composition is associative, we could write the composition many ways:</p>
 <ul>
 <li>As one single chained composition: <span class="math inline">\(j \circ g \circ f\)</span>, which if applied to <span class="math inline">\(x\)</span> would be equivalent to <span class="math inline">\(j(g(f(x)))\)</span>.</li>
@@ -278,7 +279,7 @@ f : X \mapsto Y
 </ul>
 <p>All of these expressions are equivalent.</p>
 <p>Okay, recap. As long as the output of one map is <em>the same “type”</em> as the input to the some other map, we can compose those two functions. And we can take a series of compositions and group them in whatever way we want, as long as the input and output types conform.</p>
-<p><strong>But how is this a “tree”?</strong> I will make a little graph with nodes and edges that shows the basic idea. Caveats up front that this will be pretty informal, but let’s say the functions are nodes, and the edges point in the direction of composition. Here is an example showing <span class="math inline">\(a = j \circ g \circ f\)</span> as a tree.</p>
+<p><strong>But how is this a “tree”?</strong> I will make a little graph with nodes and edges that shows the basic idea. Caveats up front that this will be pretty informal, but let’s say the functions are nodes, and the edges point in the direction of composition. Here is an example showing <span class="math inline">\(a = (j \circ g \circ f)(x)\)</span> as a tree.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -392,8 +393,8 @@ f-&gt;h
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>a <span class="ot">=</span> <span class="fu">compose</span>(j, h)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>And only later (say, in some <code>main()</code> routine) do we apply our ultimately-composed functions to data. The data have to be acted on eventually, but we do it only after we compose a map from the data to some endpoint.</p>
-<p>Stated a different way, when we do more imperative programming, the present state of <code>x</code> is always our concern. Our path from beginning to end requires us to leave <code>x</code> in some intermediate state at many different steps, and the present state of <code>x</code> can causes a lot of problems for us as we try to plot our way to our destination. When we do functional programming, however, we simply write the recipe for what we will do to <code>x</code> before we touch <code>x</code> at all. We prefer not to let the intermediate state become visible. The intermediate state is, after all, not that useful.</p>
-<p>This might be hard to envision because we haven’t invented functional programming yet, so let’s invent it.</p>
+<p>Stated a different way, when we do more imperative programming, the present state of <code>x</code> is always our concern. Our path from beginning to end requires us to leave <code>x</code> in some intermediate state at many different steps, and if the state of <code>x</code> is exposed along the way, there can be problems that mutate <code>x</code> into something you don’t want it to be. When we do functional programming, however, we simply write the recipe for what we will do to <code>x</code> before <code>x</code> is ever instantiated. The roadmap is set ahead of time, so the intermediate state of <code>x</code> is ideally always obscured to other runtime interventions. This is okay because the intermediate state isn’t what we want out of this program.</p>
+<p>This might be hard to envision because we haven’t talked tangibly about functional programming interfaces in R yet, so let’s do that.</p>
 </section>
 </section>
 <section id="functional-fundamentals-with-r" class="level2">
@@ -406,7 +407,7 @@ a = (j \circ g \circ u)
 </div>
 <p>There are two important things to remember about this.</p>
 <ol type="1">
-<li>Function composition creates a <em>new function</em>. It does not immediately create data. In the example, <code>a</code> is the composition, which is only evaluated on data when it is necessary. It may not be evaluated on data at all directly—we will likely compose <code>a</code> with another function before we even think about data. If you have heard of <em>delayed evaluation</em>, this is probably why. You were doing something that created new functionality instead of new data.</li>
+<li>Function composition creates a <em>new function</em>. It does not immediately evaluate the function on data. In the example, <code>a</code> is the composition, and it is entirely ignorant of the data you may pass to it. It may not be evaluated on data at all directly—we will likely compose <code>a</code> with another function before we even think about data. If you have ever heard of <em>delayed evaluation</em>, this is probably why. You were probably doing something that implicitly created new functions instead of evaluating the literal command on the data. Tidy evaluation does this all the time, which is why you can pass unquoted variable names to <code>dplyr</code> verbs, for instance.</li>
 <li>Function compositions are themselves composable, so we want a framework to compose a lot of functions all at once with whatever associative groupings we want. We saw above (with math) that we could compose an arbitrary sequence of functions and the result should be well-behaved (as long as their input and output types conform—more on that in a bit). We would like to achieve that behavior in the code as well.</li>
 </ol>
 <p>We start with a primitive operation to compose just two functions. We call it <code>compose_once</code>—it implements only one composition of a left-hand and a right-hand function.</p>
@@ -416,7 +417,7 @@ a = (j \circ g \circ u)
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(...) <span class="fu">f</span>(<span class="fu">g</span>(...))</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Read this closely. <code>compose_once</code> takes two arguments, and those arguments are <em>functions</em>. We do not know or care what those functions are. We also return a new function, rather than some value. That new function defines a recipe for evaluating the functions <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span> in sequence on some unknown inputs <code>...</code>, whever it happens to come across those inputs—we didn’t pass any <code>...</code> yet. This is also on purpose. Composition does not care what the data are. It only knows how to evaluate functions in order.</p>
+<p>Read this closely. <code>compose_once</code> takes two arguments, and those arguments are <em>functions</em>. We do not know or care what those functions are. We also return a new function, rather than some data value. That new function defines a recipe for evaluating the functions <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span> in sequence on some unknown inputs <code>...</code>, whever it happens to come across those inputs—we didn’t pass any <code>...</code> yet. This is also intentional: composition does not care what the data are. It only knows how to evaluate functions in order.</p>
 <p>This might feel weird at first, but it will give us legible behavior right from the start. For example, we often want to know how many unique elements are in some data object. In base R, we might ask <code>length(unique(x))</code>. The <code>dplyr</code> package provides a combined function <code>n_unique(x)</code>, but we haven’t invented <code>dplyr</code> yet, so we have to make <code>n_unique</code> ourselves:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we save the function returned by compose_once</span></span>
@@ -426,14 +427,14 @@ a = (j \circ g \circ u)
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># examine the object to convince yourself of this</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>n_unique</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## function(...) f(g(...))</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x131ad8390&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x1384423e8&gt;</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># apply the function on some data</span></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>)</span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">n_unique</span>(x)</span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><code>compose_once</code> lets us compose two functions, but we already know that function composition lets us compose however many functions we want (as long as the output type from one function conforms with the input type of next function). So we extend this to an arbitrary series of functions by performing a <em>reduce</em> across an array of functions.</p>
+<p><code>compose_once</code> lets us compose two functions, but we want to compose an arbitary sequence of functions into one composition. So we extend this interface by performing a <em>reduction</em> across an array of functions.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pass vector fns = c(f1, f2, ..., fn)</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>compose <span class="ot">=</span> <span class="cf">function</span>(fns) {</span>
@@ -450,7 +451,7 @@ a = (j \circ g \circ u)
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">english_n_unique</span>(x)</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] three</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>And just to underscore your confidence in the associativity of composition, we can exhaustively group these compositions without affecting the results.</p>
+<p>And just to underscore your confidence in the associativity of composition, we can exhaustively regroup these compositions without affecting the results.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compose</span>(<span class="fu">c</span>(english<span class="sc">::</span>english, <span class="fu">compose</span>(<span class="fu">c</span>(length, unique))))(x)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] three</span></span>
@@ -459,15 +460,15 @@ a = (j \circ g \circ u)
 </div>
 <section id="types-are-our-guide." class="level3">
 <h3 class="anchored" data-anchor-id="types-are-our-guide.">Types are our guide.</h3>
-<p>You may have seen online discussions about “strong typing”. Types are representations of data in the computer. We have basic data types like short integers, long integers, characters, and strings. Languages implement other data structures like lists, dictionaries, arrays, tuples, etc. that we can also call types for our purposes.</p>
-<p>You may have seen some people discuss the “type flexibility” of R or Python as advantages. Well…sorry! Functional programming like strong types because strong types provide structure to function composition at scale. Functions can be composed if the output type of one function is the input type of the next function. If we can trust this fact, we can build really big, abstract creations out of function composition, maybe even creations that are so big and complicated that we struggle to keep track of it all in our brains. But these creations are <em>virtually guaranteed to work</em> as long as they are composed of functions with conforming input and output types.</p>
+<p>You may have seen online discussions about “strong typing”. Types are like representations of data in the computer. We have basic data types like short integers, long integers, characters, and strings. Types encode abstract features of some data that without caring about the data values themselves. Languages implement other data structures like lists, dictionaries, arrays, tuples, etc. that we can also call types for our purposes.</p>
+<p>You may have seen some people discuss the “type flexibility” of R or Python as advantages. Well…sorry! Functional programming like strong types because strong types provide structure to function composition at scale. More specifically, two functions can be composed if the output type of one function matches the input type of the next function. If we can trust this fact, we can build really big, abstract creations out of function composition, maybe even creations that are so big and complicated that we struggle to keep track of it all in our brains. But these creations are <em>virtually guaranteed to work</em> as long as they are composed of functions with conforming input and output types.</p>
 <p>Not coincidentally, the associativity of function composition is additionally helpful for API design. If we have to build a big, abstract structure, we always have the option to group some of the operations together if they perform a coherent and useful operation. Intermediate functions are more useful than intermediate state because at least an intermediate function is legible and potentially reusable. Chances are your intermediate data are not that legible or useful.</p>
 <p>Let’s look at the “type roadmap” for the <code>english_n_unique</code> example. We started with a vector type and mapped to an <code>english</code> type. How did we know it would work? We can diagram the types.</p>
 <p><span class="math display">\[
 \begin{align}
-   \mathtt{unique} &amp;: \mathtt{many} \mapsto \mathtt{vector} \\
-   \mathtt{length} &amp;: \mathtt{many} \mapsto \mathtt{integer} \\
-   \mathtt{english::english} &amp;: \mathtt{many} \mapsto \mathtt{vector}
+   \mathtt{unique} &amp;: \mathtt{many} \to \mathtt{vector} \\
+   \mathtt{length} &amp;: \mathtt{many} \to \mathtt{integer} \\
+   \mathtt{english::english} &amp;: \mathtt{many} \to \mathtt{vector}
 \end{align}
 \]</span></p>
 <p>We know that <code>unique</code> takes objects of various types (which I represent as <code>many</code> to say “this function has many methods for different data types”) and returns a vector of unique elements. We know that length takes <code>many</code> and returns its integer length, and that should work for a vector input. And <code>engligh::english</code> turns <code>many</code> objects into <code>english</code> type, which ought to work for an integer input. But we know that these operations should compose because we can know that we can pass a vector to <code>unique</code>, a vector to <code>length</code>, and an integer to <code>english::english</code>. Stated differently, if I know the type behavior of each function, I know the type behavior of the compositions. That is an extremely useful and powerful foundation for building big things.</p>
@@ -489,18 +490,18 @@ a = (j \circ g \circ u)
 <p>We want to chart a course through this problem that composes small, re-usable steps on well-defined types. Here is my plan:</p>
 <ol type="1">
 <li>define a function that maps a data frame of raw data to a data frame of column means.</li>
-<li>define a function to <em>any</em> function to groups of data</li>
+<li>define a function that applies <em>any other function</em> to grouped data.</li>
 <li>compose a function that implements a split-apply-combine which is the composition of the above steps.</li>
 </ol>
 <section id="means-for-a-data-frame." class="level3">
 <h3 class="anchored" data-anchor-id="means-for-a-data-frame.">1. Means for a data frame.</h3>
 <p>We create a function by composing the following functions that map the following types:</p>
 <ul>
-<li><code>colMeans</code>: data frame <span class="math inline">\(\mapsto\)</span> vector</li>
-<li><code>as.list</code>: vector <span class="math inline">\(\mapsto\)</span> list</li>
-<li><code>tibble::as_tibble</code>: list <span class="math inline">\(\mapsto\)</span> data_frame</li>
+<li><code>colMeans</code>: data frame <span class="math inline">\(\to\)</span> vector</li>
+<li><code>as.list</code>: vector <span class="math inline">\(\to\)</span> list</li>
+<li><code>tibble::as_tibble</code>: list <span class="math inline">\(\to\)</span> data_frame</li>
 </ul>
-<p>You can see how these functions take us incrementally from data frame, to vector, to list, back to data frame. So we these operations should compose nicely.</p>
+<p>You can see how these functions take us incrementally from data frame, to vector, to list, back to data frame. So we know that this composition should work before we ever test it on data.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>means <span class="ot">=</span> <span class="fu">compose</span>(<span class="fu">c</span>(tibble<span class="sc">::</span>as_tibble, as.list, colMeans))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -528,7 +529,7 @@ a = (j \circ g \circ u)
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(v)</span>
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Notice, this function takes <em>two</em> objects as arguments and returns one object. In order to nicely compose it with other functions that take and return only <em>one</em> object, I want a way to reduce the arguments required when I call it. This is a little weird, but I am going to create something like a Python tool called a <code>partial</code>, which takes a function <code>f</code> and returns a new function <code>f*</code>, which is just like <code>f</code> but with some of the arguments pre-filled. Let’s define it before I explain further:</p>
+<p>Notice, this function takes <em>two</em> objects as arguments and returns one object. In order to nicely compose it with other functions that take and return only <em>one</em> object, I want a way to reduce the arguments required when I call it. This will look a little weird, but I am going to create a common object in functional programming called a <em>partial function</em> or <em>curried function</em>. A partial function is a function that has some of its arguments fixed ahead of time. Let’s define it before I explain further:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>partial_apply <span class="ot">=</span> <span class="cf">function</span>(f) {</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(x) <span class="fu">apply_on_elements</span>(x, f)</span>
@@ -542,7 +543,7 @@ a = (j \circ g \circ u)
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># examine, it's a function</span></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>lens</span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="do">## function(x) apply_on_elements(x, f)</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x1313aa000&gt;</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x12fa95cc0&gt;</span></span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">lens</span>(x)</span>
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="do">## [[1]]</span></span>
@@ -564,18 +565,18 @@ a = (j \circ g \circ u)
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">partial_apply</span>(means)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="do">## function(x) apply_on_elements(x, f)</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;bytecode: 0x13198cfd0&gt;</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x1318be400&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;bytecode: 0x12ffd14f8&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x12fefae08&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="apply-our-partial-function-to-data." class="level3">
 <h3 class="anchored" data-anchor-id="apply-our-partial-function-to-data.">3. Apply our partial function to data.</h3>
 <p>Rather, create a function that <em>would</em> do that, if it were evaluated.</p>
-<p>This function should a data frame into an iterable collection of groups (like a list), apply <code>means</code> to each element of that collection, and return a final data frame that re-merges the collection. Here’s how we map these steps from type to type.</p>
+<p>This function should turn a data frame into an iterable collection of groups (like a list), apply <code>means</code> to each element of that collection, and return a final data frame that re-merges the collection. Here’s how we map these steps from type to type.</p>
 <ul>
-<li><code>split</code>: pair of (data frame, vector) <span class="math inline">\(\mapsto\)</span> list</li>
-<li><code>partial_apply(means)</code>: list <span class="math inline">\(\mapsto\)</span> list</li>
-<li><code>dplyr::bind_rows</code>: list <span class="math inline">\(\mapsto\)</span> data frame</li>
+<li><code>split</code>: pair of (data frame, vector) <span class="math inline">\(\to\)</span> list</li>
+<li><code>partial_apply(means)</code>: list <span class="math inline">\(\to\)</span> list</li>
+<li><code>dplyr::bind_rows</code>: list <span class="math inline">\(\to\)</span> data frame</li>
 </ul>
 <p>The composition of all these steps creates a function that eats a data frame and returns a data frame.</p>
 <div class="cell">
@@ -649,8 +650,8 @@ a = (j \circ g \circ u)
 <span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a><span class="do">## 6  15    8     301   335   3.54  3.57  14.6   0   1      5        8</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="notes-on-the-tidyverse" class="level3">
-<h3 class="anchored" data-anchor-id="notes-on-the-tidyverse">Notes on the tidyverse</h3>
+<section id="ending-notes-on-the-tidyverse" class="level3">
+<h3 class="anchored" data-anchor-id="ending-notes-on-the-tidyverse">Ending notes on the tidyverse</h3>
 <p>Now that we have invented functional programming, we can better appreciate how tidyverse tools leverage functional infrastructure to make nice APIs, even if those APIs feel way less hardcore-functional than the example we just created.</p>
 <p><strong>The pipe operator</strong>. You may have thought to yourself, composing “left” sure is harder to read than composing “right” like the pipe operator. First, functional programming hadn’t been invented yet, so you can’t blame me for not knowing about the pipe operator. Second, creating a composition function that reads more “linearly” is easy with one extra step: reversing the direction of the <code>Reduce</code>.</p>
 <div class="cell">
@@ -680,10 +681,10 @@ a = (j \circ g \circ u)
 <div id="quarto-appendix" class="default"><section class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1" role="doc-endnote"><p>This reputation may be unfair. Most of the time, loops are slow because people are using them to do unwise things, like growing the size of an array in each iteration. This causes R to make a lot of copies of data that would be avoided if the user were more careful. Using <code>apply</code> functions solves this problem for them either way.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p>You may have assumed that <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are real (that is, <span class="math inline">\(\mathbb{R}\)</span>) numbers and that the operations <span class="math inline">\(+\)</span> and <span class="math inline">\(\times\)</span> refer to the sum and product operations that we conventionally apply to real numbers. It’s fine if you made those assumptions, but it wasn’t necessary. One cool thing about this family of math is that you can let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be other kinds of sets containing god-knows-what, and as long as <span class="math inline">\(+\)</span> and <span class="math inline">\(\times\)</span> refer to operations on values from those sets that maintain certain properties, the <span class="math inline">\(f\)</span> map remains perfectly coherent. <a href="https://www.youtube.com/watch?v=I8LbkfSSR58&amp;list=PLbgaMIhjbmEnaH_LTkxLI7FMa2HsnawM_&amp;index=1">Category theory</a> tells us about which properties must be maintained for this expression to hold generally.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1" role="doc-endnote"><p>This reputation may be unfair. Most of the time, loops in R are slow because people are doing unwise things with them, like copying data or growing objects in each iteration.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>You may have assumed that <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are Real (that is, <span class="math inline">\(\mathbb{R}\)</span>) numbers and that the operations <span class="math inline">\(+\)</span> and <span class="math inline">\(\times\)</span> refer to the sum and product operations that we conventionally apply to real numbers. It’s fine if you made those assumptions, but it wasn’t necessary. One cool thing about this family of math is that you can let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be other kinds of sets containing god-knows-what, and as long as <span class="math inline">\(+\)</span> and <span class="math inline">\(\times\)</span> refer to operations on values from those sets that maintain certain properties, the <span class="math inline">\(f\)</span> map remains perfectly coherent. <a href="https://www.youtube.com/watch?v=I8LbkfSSR58&amp;list=PLbgaMIhjbmEnaH_LTkxLI7FMa2HsnawM_&amp;index=1">Category theory</a> tells us about which properties must be maintained for this expression to hold in other contexts.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn3" role="doc-endnote"><p>You may have seen a reduction in an operation like <code>max()</code>—for an array of numbers, recursively check to see if <code>left</code> is greater than <code>right</code>, passing the winner to the next iteration as <code>left</code>. In this case, however, the array we are collapsing is full of functions rather than, say, numbers. And the operation we apply as we accumulate is <code>compose_once(left, right)</code> rather than <code>left &gt; right</code>. The result of the reduction is a function that encodes the composition of all functions in <code>fns</code> from left to right.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4" role="doc-endnote"><p>The role of an initialization in a reduction is to handle an identity condition: how do we handle “empty” values along the reduction without affecting the output. Stated differently, what value can we pass to ensure a “no-op” when the reduction is applied, which can be used as an initial value to <code>left</code>. For example, if we reduce an array of numbers by <em>addition</em>, the initialization would be the value <code>0</code>, because applying <code>+ 0</code> to any number gives you the original number. Same with multiplication and the value <code>1</code>. When we are reducing <em>functions</em> by <em>composing</em> them, we use the identity function. Not surprisingly, the identity function simply returns the function arguments unaffected: <code>identity(x)</code> gives you <code>x</code>. For function composition, <code>compose(f, identity)</code> is equal to <code>compose(identity, f)</code> is equal to <code>f</code>. Now you’re programmin with powerful abstractions!<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4" role="doc-endnote"><p>The role of an initialization in a reduction is to handle an identity condition: how do we handle “empty” values along the reduction without affecting the output. Stated differently, what value can we pass to ensure a “no-op” when the reduction is applied, which can also be used as an initial value to <code>left</code>. For example, if we reduce an array of numbers by <em>addition</em>, the initialization would be the value <code>0</code>, because applying <code>+ 0</code> to any number gives you the original number. Same with multiplication and the value <code>1</code>. When we are reducing <em>functions</em> by <em>composing</em> them, we use the identity function. Not surprisingly, the identity function simply returns the function arguments unaffected: <code>identity(x)</code> gives you <code>x</code>. For function composition, <code>compose(f, identity)</code> is equal to <code>compose(identity, f)</code> is equal to <code>f</code>. Now you’re programmin with abstractions!<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
