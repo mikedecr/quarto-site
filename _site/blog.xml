@@ -10,7 +10,214 @@
 <atom:link href="https://mikedecr.netlify.app/blog.xml" rel="self" type="application/rss+xml"/>
 <description>political scientist turned high-frequency tradist</description>
 <generator>quarto-1.0.37</generator>
-<lastBuildDate>Wed, 31 Aug 2022 05:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 10 Mar 2023 06:00:00 GMT</lastBuildDate>
+<item>
+  <title>The Mandelbrot set, in R, with recursion instead of iteration</title>
+  <dc:creator>Michael DeCrescenzo</dc:creator>
+  <link>https://mikedecr.netlify.app/blog/mandelbrot_iterative_recursive/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<section id="intro-iteration-and-recursion" class="level1">
+<h1>Intro: Iteration and Recursion</h1>
+<p>One fun lessons in the <a href="https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html">Structure and Interpretation of Computer Programs</a><sup>1</sup> is the translation of functions between <em>iterative</em> and <em>recursive</em> approaches.</p>
+<p>To show the difference between iterative and recursive procedures, let’s make a quick example where we raise a number to some (positive integer) power. We could implement an iterative approach in R using a for loop. We call this iterative because each pass through the loop is an “iteration”.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="co" style="color: #5E5E5E;"># power must be an integer &gt;= 0</span></span>
+<span id="cb1-2">pow_iter <span class="ot" style="color: #003B4F;">=</span> <span class="cf" style="color: #003B4F;">function</span>(x, power) { </span>
+<span id="cb1-3">    <span class="cf" style="color: #003B4F;">if</span> (power <span class="sc" style="color: #5E5E5E;">==</span> <span class="dv" style="color: #AD0000;">0</span>) { <span class="fu" style="color: #4758AB;">return</span>(<span class="dv" style="color: #AD0000;">1</span>) }</span>
+<span id="cb1-4">    <span class="cf" style="color: #003B4F;">if</span> (power <span class="sc" style="color: #5E5E5E;">==</span> <span class="dv" style="color: #AD0000;">1</span>) { <span class="fu" style="color: #4758AB;">return</span>(x) }</span>
+<span id="cb1-5">    <span class="co" style="color: #5E5E5E;"># the iterative part:</span></span>
+<span id="cb1-6">    result <span class="ot" style="color: #003B4F;">=</span> x</span>
+<span id="cb1-7">    <span class="cf" style="color: #003B4F;">for</span> (i <span class="cf" style="color: #003B4F;">in</span> <span class="dv" style="color: #AD0000;">2</span><span class="sc" style="color: #5E5E5E;">:</span>power) {</span>
+<span id="cb1-8">       result <span class="ot" style="color: #003B4F;">=</span> result <span class="sc" style="color: #5E5E5E;">*</span> x </span>
+<span id="cb1-9">    } </span>
+<span id="cb1-10">    <span class="fu" style="color: #4758AB;">return</span>(result)</span>
+<span id="cb1-11">}</span></code></pre></div>
+</div>
+<p>Or we could do this with a recursive function. We call this function “recursive” because the function calls itself in its own implementation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">pow_rec <span class="ot" style="color: #003B4F;">=</span> <span class="cf" style="color: #003B4F;">function</span>(x, power) {</span>
+<span id="cb2-2">    <span class="cf" style="color: #003B4F;">if</span> (power <span class="sc" style="color: #5E5E5E;">==</span> <span class="dv" style="color: #AD0000;">0</span>) { <span class="fu" style="color: #4758AB;">return</span>(<span class="dv" style="color: #AD0000;">1</span>) }</span>
+<span id="cb2-3">    <span class="cf" style="color: #003B4F;">if</span> (power <span class="sc" style="color: #5E5E5E;">==</span> <span class="dv" style="color: #AD0000;">1</span>) { <span class="fu" style="color: #4758AB;">return</span>(x) }</span>
+<span id="cb2-4">    <span class="co" style="color: #5E5E5E;"># here be recursion</span></span>
+<span id="cb2-5">    x <span class="sc" style="color: #5E5E5E;">*</span> <span class="fu" style="color: #4758AB;">pow_rec</span>(x, power <span class="sc" style="color: #5E5E5E;">-</span> <span class="dv" style="color: #AD0000;">1</span>)</span>
+<span id="cb2-6">}</span></code></pre></div>
+</div>
+<p>The recursive approach uses the fact that <img src="https://latex.codecogs.com/png.latex?x%5En%20=%20x%20%5Ctimes%20x%5E%7Bn%20-%201%7D"> to decompose your query into an expression that looks like <img src="https://latex.codecogs.com/png.latex?x%20%5Ctimes%20x%20%5Ctimes%20x%20%5Cldots%20%5Ctimes%20x"> which is evaluated all at once. And, I gotta say, recursion feels way slicker. We have just one powerful line of code that accomplishes as much as the four-line iterative approach, most of which was simply boilerplate for passing data in and out of the loop. The recursive implementation may be a bit of a brain-bender at first, but the more you use recursion, the more comfortable you get with it, and the more opportunities you find to use it productively.</p>
+<p>For completeness, let’s verify that the approaches agree.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">(<span class="at" style="color: #657422;">example =</span> <span class="dv" style="color: #AD0000;">7</span><span class="sc" style="color: #5E5E5E;">^</span><span class="dv" style="color: #AD0000;">6</span>)</span>
+<span id="cb3-2"><span class="do" style="color: #5E5E5E;
+font-style: italic;">## [1] 117649</span></span>
+<span id="cb3-3"><span class="fu" style="color: #4758AB;">pow_iter</span>(<span class="dv" style="color: #AD0000;">7</span>, <span class="dv" style="color: #AD0000;">6</span>) <span class="sc" style="color: #5E5E5E;">==</span> example</span>
+<span id="cb3-4"><span class="do" style="color: #5E5E5E;
+font-style: italic;">## [1] TRUE</span></span>
+<span id="cb3-5"><span class="fu" style="color: #4758AB;">pow_rec</span>(<span class="dv" style="color: #AD0000;">7</span>, <span class="dv" style="color: #AD0000;">6</span>) <span class="sc" style="color: #5E5E5E;">==</span> example</span>
+<span id="cb3-6"><span class="do" style="color: #5E5E5E;
+font-style: italic;">## [1] TRUE</span></span></code></pre></div>
+</div>
+<p><strong>This blog post will employ this duality between recursion and iteration to create images of the <a href="https://en.wikipedia.org/wiki/Mandelbrot_set"><em>Mandelbrot set</em></a> using R.</strong> Although there are <a href="https://www.r-bloggers.com/2014/12/the-mandelbrot-set-in-r/">plenty</a> of <a href="https://www.dandelbrot.com/post/the-mandelbrot-set-in-r/">other</a> blog <a href="https://cerebralmastication.com/2009/02/mandelbrot-set-in-r/">posts</a> that visualize the Mandelbrot set in R,<sup>2</sup> I have only seen them implement an iterative approach with a loop. But the Mandelbrot set is mathematically defined with recursion! So we ought to be able to implement a recursive approach that is, hopefully, more succinct and slick.<sup>3</sup></p>
+<p>In the remainder of this post, we will quickly introduce the math behind the Mandelbrot set, define a recursive function to produce “Mandelbrot data”, and visualize the famous fractal image that the math produces.</p>
+</section>
+<section id="the-mandelbrot-set" class="level1">
+<h1>The Mandelbrot Set</h1>
+<p>If you have heard of the Mandelbrot set, it was probably because it is used to create a neat fractal image.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://mikedecr.netlify.app/blog/mandelbrot_iterative_recursive/https:/web.archive.org/web/20230302155231im_/https:/upload.wikimedia.org/wikipedia/commons/thumb/2/21/Mandel_zoom_00_mandelbrot_set.jpg/644px-Mandel_zoom_00_mandelbrot_set.jpg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">The Mandelbrot set fractal, Wikipedia via Archive.org</figcaption><p></p>
+</figure>
+</div>
+<p>But the Mandelbrot set is not an image. It is a set of complex numbers. You remember complex numbers, right? A complex number <img src="https://latex.codecogs.com/png.latex?x%20+%20yi"> has a “real” component <img src="https://latex.codecogs.com/png.latex?x"> and an “imaginary” component <img src="https://latex.codecogs.com/png.latex?yi"> where the “imaginary number” <img src="https://latex.codecogs.com/png.latex?i"> is equal to <img src="https://latex.codecogs.com/png.latex?%5Csqrt%7B-1%7D">.</p>
+<p>Formally, a complex number <img src="https://latex.codecogs.com/png.latex?c"> is a member of the Mandelbrot set if the function <img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Balign%7D%0A%20%20%20%20z_%7Bn%20+%201%7D%20&amp;=%20z_%7Bn%7D%5E%7B2%7D%20+%20c%0A%5Cend%7Balign%7D"> initialized at <img src="https://latex.codecogs.com/png.latex?z%20=%200"> <strong>does not diverge to infinity</strong> as <img src="https://latex.codecogs.com/png.latex?n"> increases.</p>
+<p>Let’s try it out with <img src="https://latex.codecogs.com/png.latex?c%20=%201">, which as a complex number is <img src="https://latex.codecogs.com/png.latex?1%20+%200i">. <img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Balign%7D%0A%20%20%20%20z_%7Bn%20+%201%7D%20&amp;=%20z_%7Bn%7D%5E%7B2%7D%20+%20c%20%5C%5C%0A%20%20%20%201%20&amp;=%200%5E2%20+%201%20%5C%5C%0A%20%20%20%202%20&amp;=%201%5E2%20+%201%20%5C%5C%0A%20%20%20%205%20&amp;=%202%5E2%20+%201%20%5C%5C%0A%20%20%20%2026%20&amp;=%205%5E2%20+%201%20%5C%5C%0A%20%20%20%20677%20&amp;=%2026%5E2%20+%201%0A%5Cend%7Balign%7D"> When <img src="https://latex.codecogs.com/png.latex?c%20=%201"> the function explodes as <img src="https://latex.codecogs.com/png.latex?n"> increases, so 1 is <em>not</em> a member of the Mandelbrot set.</p>
+<p>What about <img src="https://latex.codecogs.com/png.latex?i">, a.k.a. <img src="https://latex.codecogs.com/png.latex?0%20+%201i">? <img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Balign%7D%0A%20%20%20%20z_%7Bn%20+%201%7D%20&amp;=%20z_%7Bn%7D%5E%7B2%7D%20+%20c%20%5C%5C%0A%20%20%20%20i%20&amp;=%200%5E2%20+%20i%20%5C%5C%0A%20%20%20%20-1%20+%20i%20&amp;=%20i%5E2%20+%20i%20%5C%5C%0A%20%20%20%20-1i%20&amp;=%20(-1%20+%20i)%5E2%20+%20i%20%5C%5C%0A%20%20%20%20-1%20+%201i%20&amp;=%20(-1i)%5E2%20+%20i%20%5C%5C%0A%20%20%20%20-1i%20&amp;=%20(-1%20+%201i)%5E2%20+%201%0A%5Cend%7Balign%7D"> For <img src="https://latex.codecogs.com/png.latex?i">, the function oscillates back and forth with <img src="https://latex.codecogs.com/png.latex?n">, so <img src="https://latex.codecogs.com/png.latex?i"> is a member of the Mandelbrot set.</p>
+<p>Okay, some complex numbers diverge others don’t. Where does the fractal come from? The fractal image actually comes from sending an entire grid of complex numbers through the function, iterating the function a large number of times, and then coloring the points according to their values after <img src="https://latex.codecogs.com/png.latex?n"> iterations.</p>
+<p>We will start working on that now.</p>
+</section>
+<section id="a-recusive-mandelbrot-function" class="level1">
+<h1>A Recusive Mandelbrot Function</h1>
+<p>Like I said above, this isn’t the first post to implement some Mandelbrot code in R. But we will implement it as a recursive function, which is a bit special. If we write it well, we should only have to write the main equation, <img src="https://latex.codecogs.com/png.latex?z_%7Bn%20+%201%7D%20=%20z_%7Bn%7D%5E%7B2%7D%20+%20c">, and an initial condition. Lo and behold, here is such a function called <code>mandelbrot</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">mandelbrot <span class="ot" style="color: #003B4F;">=</span> <span class="cf" style="color: #003B4F;">function</span>(coord, iterations) {</span>
+<span id="cb4-2">    <span class="cf" style="color: #003B4F;">if</span> (iterations <span class="sc" style="color: #5E5E5E;">==</span> <span class="dv" style="color: #AD0000;">0</span>) <span class="fu" style="color: #4758AB;">return</span>(coord)  <span class="co" style="color: #5E5E5E;"># initial condition</span></span>
+<span id="cb4-3">    <span class="fu" style="color: #4758AB;">mandelbrot</span>(coord, iterations <span class="sc" style="color: #5E5E5E;">-</span> <span class="dv" style="color: #AD0000;">1</span>)<span class="sc" style="color: #5E5E5E;">^</span><span class="dv" style="color: #AD0000;">2</span> <span class="sc" style="color: #5E5E5E;">+</span> coord</span>
+<span id="cb4-4">}</span></code></pre></div>
+</div>
+<p>Let’s step through the code to make sure we understand how this works.</p>
+<ul>
+<li>The function takes a complex number <code>coord</code> and a total number of iterations <code>iterations</code>.</li>
+<li>The first line declares an initial condition. When the number of iterations is 0, we return the <code>coord</code> itself. But why would the number of iterations ever be 0 if the whole point of this function is to iterate it some <code>n</code> number of times? Well…</li>
+<li>The last line of the function calls the <code>mandelbrot</code> function itself, but on a decremented number of iterations. This gives us the recursive behavior: the value <img src="https://latex.codecogs.com/png.latex?z_%7Bn+1%7D"> is a function of <img src="https://latex.codecogs.com/png.latex?z_%7Bn%7D">. We just re-express this by saying the value <img src="https://latex.codecogs.com/png.latex?z_%7Bn%7D"> is a function of <img src="https://latex.codecogs.com/png.latex?z_%7Bn-1%7D">.</li>
+</ul>
+<p>We can confirm that this function gives us the same values as when we plugged in a few numbers above.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;">mandelbrot</span>(<span class="dv" style="color: #AD0000;">1</span>, <span class="dv" style="color: #AD0000;">4</span>) <span class="sc" style="color: #5E5E5E;">==</span> <span class="dv" style="color: #AD0000;">677</span></span>
+<span id="cb5-2"><span class="do" style="color: #5E5E5E;
+font-style: italic;">## [1] TRUE</span></span>
+<span id="cb5-3"><span class="fu" style="color: #4758AB;">mandelbrot</span>(<span class="dv" style="color: #AD0000;">0</span> <span class="sc" style="color: #5E5E5E;">+</span> 1i, <span class="dv" style="color: #AD0000;">4</span>) <span class="sc" style="color: #5E5E5E;">==</span> <span class="sc" style="color: #5E5E5E;">-</span>1i</span>
+<span id="cb5-4"><span class="do" style="color: #5E5E5E;
+font-style: italic;">## [1] TRUE</span></span></code></pre></div>
+</div>
+<p>Great, now contrast this with the iterative approach <a href="https://www.r-bloggers.com/2014/12/the-mandelbrot-set-in-r/">here</a> in the function <code>mandelbrot_vectorized</code>, in the last code block between lines 53 and 57. There is some sense in which an iterative approach can be “easier” to read. The procedure is laid bare, and you can see every step the computer takes to give you the result. The recursive procedure, on the other hand, requires some imagination to see how the computer builds your procedure implicitly.</p>
+<p>Ok, so, the recursive function isn’t “easier” in that sense, but it is “simpler” in a different sense. There are no indexing variables, no indexing into arrays, no manually incrementing counters. There is only the function itself and an initial condition. The recursive function depends on <em>functionality</em> instead of syntax. Syntax is necessarily wrapped up in the particularities of a language, whereas functionality is mathematically abstract and transferable across languages. And I find that very appealing as someone who does a lot of functional programming in languages other than R.</p>
+</section>
+<section id="plot-the-results" class="level1">
+<h1>Plot the results</h1>
+<p>This post wouldn’t be complete if we didn’t plot the fractal. As it happens, the recursive implementation of the Mandelbrot function makes this whole process much simpler as well.</p>
+<p>First, let’s make a grid of data (<code>x</code> and <code>y</code>), and a variable <code>C</code> where we represent <code>y</code> as an imaginary dimension.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="fu" style="color: #4758AB;">library</span>(<span class="st" style="color: #20794D;">"dplyr"</span>)</span>
+<span id="cb6-2"><span class="fu" style="color: #4758AB;">library</span>(<span class="st" style="color: #20794D;">"tidyr"</span>)</span>
+<span id="cb6-3"></span>
+<span id="cb6-4">d <span class="ot" style="color: #003B4F;">=</span> <span class="fu" style="color: #4758AB;">crossing</span>(</span>
+<span id="cb6-5">        <span class="at" style="color: #657422;">x =</span> <span class="fu" style="color: #4758AB;">seq</span>(<span class="sc" style="color: #5E5E5E;">-</span><span class="dv" style="color: #AD0000;">2</span>, <span class="dv" style="color: #AD0000;">2</span>, <span class="at" style="color: #657422;">length.out =</span> <span class="dv" style="color: #AD0000;">500</span>),</span>
+<span id="cb6-6">        <span class="at" style="color: #657422;">y =</span> x</span>
+<span id="cb6-7">    ) <span class="sc" style="color: #5E5E5E;">|&gt;</span></span>
+<span id="cb6-8">    <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">C =</span> <span class="fu" style="color: #4758AB;">complex</span>(<span class="at" style="color: #657422;">real =</span> x, <span class="at" style="color: #657422;">imag =</span> y)) <span class="sc" style="color: #5E5E5E;">|&gt;</span></span>
+<span id="cb6-9">    <span class="fu" style="color: #4758AB;">print</span>()</span>
+<span id="cb6-10"><span class="do" style="color: #5E5E5E;
+font-style: italic;">## # A tibble: 250,000 × 3</span></span>
+<span id="cb6-11"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##        x     y C           </span></span>
+<span id="cb6-12"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##    &lt;dbl&gt; &lt;dbl&gt; &lt;cpl&gt;       </span></span>
+<span id="cb6-13"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  1    -2 -2    -2-2.000000i</span></span>
+<span id="cb6-14"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  2    -2 -1.99 -2-1.991984i</span></span>
+<span id="cb6-15"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  3    -2 -1.98 -2-1.983968i</span></span>
+<span id="cb6-16"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  4    -2 -1.98 -2-1.975952i</span></span>
+<span id="cb6-17"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  5    -2 -1.97 -2-1.967936i</span></span>
+<span id="cb6-18"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  6    -2 -1.96 -2-1.959920i</span></span>
+<span id="cb6-19"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  7    -2 -1.95 -2-1.951904i</span></span>
+<span id="cb6-20"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  8    -2 -1.94 -2-1.943888i</span></span>
+<span id="cb6-21"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  9    -2 -1.94 -2-1.935872i</span></span>
+<span id="cb6-22"><span class="do" style="color: #5E5E5E;
+font-style: italic;">## 10    -2 -1.93 -2-1.927856i</span></span>
+<span id="cb6-23"><span class="do" style="color: #5E5E5E;
+font-style: italic;">## # … with 249,990 more rows</span></span></code></pre></div>
+</div>
+<p>One upside of the design of our <code>mandelbrot</code> function is that, at least in R, it is automatically vectorized. As long as <code>iterations</code> is an integer, we can pass data of various shapes to <code>coord</code> and get reasonable results. In this case, we pass the entire <code>C</code> column from our data frame as a vector.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">d <span class="ot" style="color: #003B4F;">=</span> d <span class="sc" style="color: #5E5E5E;">|&gt;</span></span>
+<span id="cb7-2">    <span class="fu" style="color: #4758AB;">mutate</span>(</span>
+<span id="cb7-3">        <span class="at" style="color: #657422;">mand =</span> <span class="fu" style="color: #4758AB;">mandelbrot</span>(C, <span class="at" style="color: #657422;">iterations =</span> <span class="dv" style="color: #AD0000;">10</span>),</span>
+<span id="cb7-4">        <span class="at" style="color: #657422;">projected_value =</span> <span class="fu" style="color: #4758AB;">exp</span>(<span class="sc" style="color: #5E5E5E;">-</span><span class="fu" style="color: #4758AB;">abs</span>(mand))</span>
+<span id="cb7-5">    ) <span class="sc" style="color: #5E5E5E;">|&gt;</span></span>
+<span id="cb7-6">    <span class="fu" style="color: #4758AB;">print</span>()</span>
+<span id="cb7-7"><span class="do" style="color: #5E5E5E;
+font-style: italic;">## # A tibble: 250,000 × 5</span></span>
+<span id="cb7-8"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##        x     y C            mand     projected_value</span></span>
+<span id="cb7-9"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##    &lt;dbl&gt; &lt;dbl&gt; &lt;cpl&gt;        &lt;cpl&gt;              &lt;dbl&gt;</span></span>
+<span id="cb7-10"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  1    -2 -2    -2-2.000000i NaN-Infi               0</span></span>
+<span id="cb7-11"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  2    -2 -1.99 -2-1.991984i NaN+Infi               0</span></span>
+<span id="cb7-12"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  3    -2 -1.98 -2-1.983968i NaN+Infi               0</span></span>
+<span id="cb7-13"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  4    -2 -1.98 -2-1.975952i NaN-Infi               0</span></span>
+<span id="cb7-14"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  5    -2 -1.97 -2-1.967936i NaN+Infi               0</span></span>
+<span id="cb7-15"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  6    -2 -1.96 -2-1.959920i NaN+Infi               0</span></span>
+<span id="cb7-16"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  7    -2 -1.95 -2-1.951904i NaN-Infi               0</span></span>
+<span id="cb7-17"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  8    -2 -1.94 -2-1.943888i NaN-Infi               0</span></span>
+<span id="cb7-18"><span class="do" style="color: #5E5E5E;
+font-style: italic;">##  9    -2 -1.94 -2-1.935872i NaN+Infi               0</span></span>
+<span id="cb7-19"><span class="do" style="color: #5E5E5E;
+font-style: italic;">## 10    -2 -1.93 -2-1.927856i NaN+Infi               0</span></span>
+<span id="cb7-20"><span class="do" style="color: #5E5E5E;
+font-style: italic;">## # … with 249,990 more rows</span></span></code></pre></div>
+</div>
+<p>Notice we did another step to project <code>mand</code>, which is a complex number, into the positive reals again by taking its absolute value. We do another transformation <code>exp(-x)</code>, which, when we pass only positive numbers (hence <code>abs()</code>), will give us values between 0 and 1. Values on this scale will be much easier for continuous color palettes to differentiate in a graphic.</p>
+<p>And now the finale: we plot the whole thing. <code>ggplot</code> makes this pretty easy with <code>geom_raster</code>, we just map the color of the pixel (the <code>fill</code> aesthetic) to <code>exp(-abs(mand))</code>. I won’t do much else to refine the graphic so you can see what’s going on.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="fu" style="color: #4758AB;">library</span>(<span class="st" style="color: #20794D;">"ggplot2"</span>)</span>
+<span id="cb8-2"></span>
+<span id="cb8-3"><span class="fu" style="color: #4758AB;">ggplot</span>(d) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb8-4">    <span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">x =</span> x, <span class="at" style="color: #657422;">y =</span> y) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb8-5">    <span class="fu" style="color: #4758AB;">geom_raster</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">fill =</span> projected_value), <span class="at" style="color: #657422;">show.legend =</span> <span class="cn" style="color: #8f5902;">FALSE</span>) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb8-6">    <span class="fu" style="color: #4758AB;">coord_fixed</span>() <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb8-7">    <span class="fu" style="color: #4758AB;">theme_minimal</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mikedecr.netlify.app/blog/mandelbrot_iterative_recursive/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>A classic programming book. You can read it online for free as <a href="https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html">HTML</a> or as a <a href="https://web.mit.edu/6.001/6.037/sicp.pdf">PDF</a>↩︎</p></li>
+<li id="fn2"><p>There is even an R package called <a href="https://cran.r-project.org/web/packages/mandelbrot/index.html"><code>mandelbrot</code></a> which although it dispatches the implementation to C, also uses <a href="https://github.com/blmoore/mandelbrot/blob/fdb7b75294317f2111b45b9bea05c04251750c64/src/mandelbrot.c#L40-L51">iteration</a>.↩︎</p></li>
+<li id="fn3"><p>We will also use newer plotting tools to visualize the results—<code>ggplot</code> instead of <code>graphics::image</code> like the older posts.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>code</category>
+  <category>latex</category>
+  <guid>https://mikedecr.netlify.app/blog/mandelbrot_iterative_recursive/index.html</guid>
+  <pubDate>Fri, 10 Mar 2023 06:00:00 GMT</pubDate>
+  <media:content url="https://web.archive.org/web/20230302155231im_/https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Mandel_zoom_00_mandelbrot_set.jpg/644px-Mandel_zoom_00_mandelbrot_set.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Treating \(\mathrm{\LaTeX}\) like a programming language: the case of color-coded equations</title>
   <dc:creator>Michael DeCrescenzo</dc:creator>

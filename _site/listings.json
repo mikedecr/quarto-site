@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/blog/mandelbrot_iterative_recursive/index.html",
       "/blog/latex_colors/index.html",
       "/blog/fp_basics/index.html",
       "/blog/usable_repos/index.html",

@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mikedecr.netlify.app/index.html</loc>
-    <lastmod>2022-12-31T19:22:07.951Z</lastmod>
+    <lastmod>2023-03-11T18:01:53.772Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/latex_colors/index.html</loc>
@@ -30,6 +30,10 @@
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog.html</loc>
-    <lastmod>2022-12-31T19:22:18.442Z</lastmod>
+    <lastmod>2023-03-11T18:00:09.704Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mikedecr.netlify.app/blog/mandelbrot_iterative_recursive/index.html</loc>
+    <lastmod>2023-03-11T18:00:07.334Z</lastmod>
   </url>
 </urlset>
