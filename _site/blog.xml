@@ -10,7 +10,7 @@
 <atom:link href="https://mikedecr.netlify.app/blog.xml" rel="self" type="application/rss+xml"/>
 <description>political scientist turned high-frequency tradist</description>
 <generator>quarto-1.0.37</generator>
-<lastBuildDate>Fri, 10 Mar 2023 06:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sat, 11 Mar 2023 06:00:00 GMT</lastBuildDate>
 <item>
   <title>The Mandelbrot set, in R, with recursion instead of iteration</title>
   <dc:creator>Michael DeCrescenzo</dc:creator>
@@ -78,8 +78,8 @@ font-style: italic;">## [1] TRUE</span></span></code></pre></div>
 <p>Okay, some complex numbers diverge others don’t. Where does the fractal come from? The fractal image actually comes from sending an entire grid of complex numbers through the function, iterating the function a large number of times, and then coloring the points according to their values after <img src="https://latex.codecogs.com/png.latex?n"> iterations.</p>
 <p>We will start working on that now.</p>
 </section>
-<section id="a-recusive-mandelbrot-function" class="level1">
-<h1>A Recusive Mandelbrot Function</h1>
+<section id="a-recursive-mandelbrot-function" class="level1">
+<h1>A Recursive Mandelbrot Function</h1>
 <p>Like I said above, this isn’t the first post to implement some Mandelbrot code in R. But we will implement it as a recursive function, which is a bit special. If we write it well, we should only have to write the main equation, <img src="https://latex.codecogs.com/png.latex?z_%7Bn%20+%201%7D%20=%20z_%7Bn%7D%5E%7B2%7D%20+%20c">, and an initial condition. Lo and behold, here is such a function called <code>mandelbrot</code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">mandelbrot <span class="ot" style="color: #003B4F;">=</span> <span class="cf" style="color: #003B4F;">function</span>(coord, iterations) {</span>
@@ -213,9 +213,9 @@ font-style: italic;">## # … with 249,990 more rows</span></span></code></pre><
 </ol>
 </section></div> ]]></description>
   <category>code</category>
-  <category>latex</category>
+  <category>r</category>
   <guid>https://mikedecr.netlify.app/blog/mandelbrot_iterative_recursive/index.html</guid>
-  <pubDate>Fri, 10 Mar 2023 06:00:00 GMT</pubDate>
+  <pubDate>Sat, 11 Mar 2023 06:00:00 GMT</pubDate>
   <media:content url="https://web.archive.org/web/20230302155231im_/https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Mandel_zoom_00_mandelbrot_set.jpg/644px-Mandel_zoom_00_mandelbrot_set.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>

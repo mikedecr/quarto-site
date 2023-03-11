@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Michael DeCrescenzo">
-<meta name="dcterms.date" content="2023-03-10">
+<meta name="dcterms.date" content="2023-03-11">
 
 <title>michael decrescenzo - The Mandelbrot set, in R, with recursion instead of iteration</title>
 <style>
@@ -187,7 +187,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <h1 class="title"><p>The Mandelbrot set, in R, with recursion instead of iteration</p></h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">code</div>
-                <div class="quarto-category">latex</div>
+                <div class="quarto-category">r</div>
               </div>
                   </div>
   </div>
@@ -205,7 +205,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">March 10, 2023</p>
+        <p class="date">March 11, 2023</p>
       </div>
     </div>
       
@@ -293,8 +293,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Okay, some complex numbers diverge others don’t. Where does the fractal come from? The fractal image actually comes from sending an entire grid of complex numbers through the function, iterating the function a large number of times, and then coloring the points according to their values after <span class="math inline">\(n\)</span> iterations.</p>
 <p>We will start working on that now.</p>
 </section>
-<section id="a-recusive-mandelbrot-function" class="level1">
-<h1>A Recusive Mandelbrot Function</h1>
+<section id="a-recursive-mandelbrot-function" class="level1">
+<h1>A Recursive Mandelbrot Function</h1>
 <p>Like I said above, this isn’t the first post to implement some Mandelbrot code in R. But we will implement it as a recursive function, which is a bit special. If we write it well, we should only have to write the main equation, <span class="math inline">\(z_{n + 1} = z_{n}^{2} + c\)</span>, and an initial condition. Lo and behold, here is such a function called <code>mandelbrot</code>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>mandelbrot <span class="ot">=</span> <span class="cf">function</span>(coord, iterations) {</span>
