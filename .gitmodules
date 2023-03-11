@@ -16,3 +16,6 @@
 [submodule "blog/nonflat_implied_priors"]
 	path = blog/nonflat_implied_priors
 	url = git@github.com:mikedecr/post_nonflat-priors.git
+[submodule "blog/mandelbrot_iterative_recursive"]
+	path = blog/mandelbrot_iterative_recursive
+	url = git@github.com:mikedecr/post_mandelbrot_iterative_recursive.git
