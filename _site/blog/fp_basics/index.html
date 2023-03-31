@@ -225,11 +225,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <p>When people talk about “functional programming” in R, they usually mean two things.</p>
 <ol type="1">
-<li>Many intermediate R users have a <em>thing</em> against for-loops in R. This is because for-loops have a reputation<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> for being slow in R. Instead, these users advocate for <code>*apply</code> functions or <code>purrr::map</code>. This is called “functional programming” because we are applying a function to the data in some container instead of procedurally manipulating the data explicitly.</li>
-<li>More <a href="https://adv-r.hadley.nz/fp.html">advanced</a> R discussions refer to the fact that functions are first-class objects in R, meaning you can look at their properties and do operations on functions themselves, just like you could with other objects.</li>
+<li>Not doing for-loops. Many intermediate R users have a <em>thing</em> against for-loops because for-loops have a (not exactly fair<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>) reputation for being slow in R. Instead, these users advocate for <code>*apply</code> functions or <code>purrr::map</code>. This is called “functional programming” because we are applying a function to over some container of data instead of imperatively manipulating the data state directly.</li>
+<li>More <a href="https://adv-r.hadley.nz/fp.html">advanced</a> R discussions refer to the fact that functions are first-class objects in R, so you can examine their properties and do operations on functions themselves, just like you could with other objects.</li>
 </ol>
-<p>Most R users are probably more familiar with the meaning of [1] than [2], which is a shame because functional programming outside of R goes way deeper, and get <em>way</em> weirder, than <code>apply(function, data)</code>. This post is an attempt to explain a little of that weirdness and implement it in R with some obnoxious examples.</p>
-<p>Readers who are experienced with functional programming will recognize that this post isn’t the most rigorous explanation ever. They may also realize that R’s interfaces already contain a lot of functional ideas even if most users may not know how to recognize and articulate those ideas. But this post keeps the material fairly light.</p>
+<p>[1] is definitely the more popular understanding than [2], which is a shame because functional programming outside of R goes way deeper, and get <em>way</em> weirder, than <code>apply(function, data)</code>. This post is an attempt to explain a little of that weirdness and implement it in R with some obnoxious examples.</p>
+<p>Readers with more FP experience will recognize that this post isn’t the most rigorous. They may also realize that R is backed by a lot of functional ideas even if many users may not recognize or articulate those ideas readily. That’s fine if you know that stuff, but this post is meant to be light on the technicals.</p>
 <section id="what-is-functional-programming" class="level2">
 <h2 class="anchored" data-anchor-id="what-is-functional-programming">What is functional programming?</h2>
 <p>Let’s do the Wikipedia thing. From the <a href="https://en.wikipedia.org/wiki/Functional_programming">functional programming</a> article:</p>
@@ -241,7 +241,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <blockquote class="blockquote">
 <p>It is a declarative programming paradigm in which function definitions are trees of expressions that map values to other values, rather than a sequence of imperative statements which update the running state of the program.</p>
 </blockquote>
-<p>There are a lot of information-dense parts of that sentence that may be difficult to appreciate without knowing more of the theory. But let’s try to break it apart. Starting in the middle.</p>
+<p>There are a many information-dense pieces to that sentence that will be difficult to appreciate without a little more theory. But let’s try to break it apart, starting in the middle.</p>
 <section id="functions-map-values-to-other-values" class="level3">
 <h3 class="anchored" data-anchor-id="functions-map-values-to-other-values">“Functions map values to other values”</h3>
 <p>You have probably seen function definition written like this,</p>
@@ -249,133 +249,130 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 y = a + bx
 \]</span></p>
 <p>and we say that <span class="math inline">\(y\)</span> is a function of <span class="math inline">\(x\)</span>. We can label the transformation of <span class="math inline">\(x\)</span> as <span class="math inline">\(f\)</span> and say <span class="math inline">\(y = f(x)\)</span>. Easy!</p>
-<p>But there is another way to write statements like this that you may have seen in papers that have high opinions of their own notation:</p>
+<p>But there is another way to write statements like:</p>
 <p><span id="eq-map"><span class="math display">\[
 f : X \to Y
 \tag{1}\]</span></span></p>
-<p>which reads, “<span class="math inline">\(f\)</span> is a <em>map</em> from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>”, where capital-<span class="math inline">\(X\)</span> and capital-<span class="math inline">\(Y\)</span> are <em>sets</em> of values from which the single values <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are drawn. Which is to say: <span class="math inline">\(f\)</span> is like a lookup table then outputs a value from <span class="math inline">\(Y\)</span> when it sees an input from <span class="math inline">\(X\)</span>. In this example, the value of <span class="math inline">\(y\)</span> that it returns is <span class="math inline">\(a + (b \times x)\)</span>.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p>which reads, “<span class="math inline">\(f\)</span> is a <em>map</em> from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>”, where capital-<span class="math inline">\(X\)</span> and capital-<span class="math inline">\(Y\)</span> are <em>sets</em> of values from which little-<span class="math inline">\(x\)</span> and little-<span class="math inline">\(y\)</span> are drawn. Which is to say: <span class="math inline">\(f\)</span> is like a lookup table that outputs a value from <span class="math inline">\(Y\)</span> when it sees an input from <span class="math inline">\(X\)</span>. In this example, the value of <span class="math inline">\(y\)</span> that it returns is equal to <span class="math inline">\(a + (b \times x)\)</span>.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 </section>
 <section id="function-definitions-are-trees-of-expressions" class="level3">
 <h3 class="anchored" data-anchor-id="function-definitions-are-trees-of-expressions">“Function definitions are <em>trees</em> of expressions …”</h3>
 <p>Referring to functions as “trees” won’t make sense until we talk about <strong>function composition</strong> and <strong>associativity</strong>.</p>
-<p>First, composition. If the notation in <a href="#eq-map">Equation&nbsp;1</a> is new to you, your mental picture of function composition probably looks like this. We can take two functions <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span>… <span class="math display">\[\begin{align}
+<p>First, composition. If the notation in <a href="#eq-map">Equation&nbsp;1</a> is new to you, your mental picture of function composition probably looks like this. We can take two functions <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span>…</p>
+<p><span class="math display">\[\begin{align}
     y &amp;= f(x) \\
     z &amp;= g(y)
-\end{align}\]</span> and put them together…</p>
+\end{align}\]</span></p>
+<p>and put them together…</p>
 <p><span id="eq-nested"><span class="math display">\[ \begin{align} z &amp;= g(f(x)) \end{align}  \tag{2}\]</span></span> and then we can represent that composition with a different symbol <span class="math inline">\(h\)</span>, so that that <span class="math inline">\(h(x)\)</span> is equivalent to <span class="math inline">\(g(f(x))\)</span>.</p>
-<p>There’s nothing incorrect about that approach, but it is verbose. We actually don’t have to refer to any function arguments or values (x$, <span class="math inline">\(y\)</span>, or <span class="math inline">\(z\)</span>) to introduce <span class="math inline">\(h\)</span>. Instead we can define <span class="math inline">\(h\)</span> “point-free”: <span id="eq-composition"><span class="math display">\[ h = g \circ f  \tag{3}\]</span></span></p>
-<p>where the symbol <span class="math inline">\(\circ\)</span> refers to function composition (in a leftward direction). The expression <span class="math inline">\(g \circ f\)</span> is a new function, which we can speak aloud as “<span class="math inline">\(g\)</span> compose <span class="math inline">\(f\)</span>” or “<span class="math inline">\(g\)</span> after <span class="math inline">\(f\)</span>”. Because the composition is itself a function, we can pass it an argument: <span class="math inline">\((g \circ f)(x)\)</span> would spit out the value <span class="math inline">\(z\)</span>, just like in <a href="#eq-nested">Equation&nbsp;2</a>.</p>
-<p>Okay, next point. Associativity. Function composition is associative, which means compositions can be “grouped” in whatever way you want as long as you don’t rearrange the ordering of the base functions.</p>
-<p>To demonstrate, let’s write some functions out in “map” notation, and for the sake of simplicity let’s say that each is a map from a real number to a real number. <span class="math display">\[\begin{align}
-    \newcommand{\R}{\mathbb{R}}
-    f &amp;: \R \to \R \\
-    g &amp;: \R \to \R \\
-    j &amp;: \R \to \R
-\end{align}\]</span> Now we want to compose these functions. Because composition is associative, we could write the composition many ways:</p>
+<p>There’s nothing incorrect about that approach, but it is verbose. We actually don’t have to refer to any function arguments or values (x$, <span class="math inline">\(y\)</span>, or <span class="math inline">\(z\)</span>) to introduce <span class="math inline">\(h\)</span>. Instead we can define <span class="math inline">\(h\)</span> in a “point-free” style, <span id="eq-composition"><span class="math display">\[ h = g \circ f  \tag{3}\]</span></span></p>
+<p>where the symbol <span class="math inline">\(\circ\)</span> refers to function composition (in a leftward direction). The expression <span class="math inline">\(g \circ f\)</span> is a <em>new function</em>, which we can say aloud as “<span class="math inline">\(g\)</span> compose <span class="math inline">\(f\)</span>” or “<span class="math inline">\(g\)</span> after <span class="math inline">\(f\)</span>”. Because the composition is itself a function, we can pass it an argument: <span class="math inline">\((g \circ f)(x)\)</span> would spit out the value <span class="math inline">\(z\)</span>, just like in <a href="#eq-nested">Equation&nbsp;2</a>.</p>
+<p>Okay, now associativity. Function composition is associative, which means compositions can be “grouped” in whatever way you want as long as you don’t change the ordering of the functions.</p>
+<p>To demonstrate, let’s say we have three functions, <span class="math inline">\(f\)</span>, <span class="math inline">\(g\)</span>, and <span class="math inline">\(j\)</span>, and we want to compose these functions. There are a few ways to do it:</p>
 <ul>
 <li>As one single chained composition: <span class="math inline">\(j \circ g \circ f\)</span>, which if applied to <span class="math inline">\(x\)</span> would be equivalent to <span class="math inline">\(j(g(f(x)))\)</span>.</li>
-<li>Introduce <span class="math inline">\(h = g \circ f\)</span> as above, and rewrite as <span class="math inline">\(j \circ h\)</span>. This is the same as <span class="math inline">\(j \circ (g \circ f)\)</span> or <span class="math inline">\(j(h(x))\)</span>.</li>
+<li>Introduce <span class="math inline">\(h = g \circ f\)</span>, and rewrite as <span class="math inline">\(j \circ h\)</span>. This is the same as <span class="math inline">\(j \circ (g \circ f)\)</span> or <span class="math inline">\(j(h(x))\)</span>.</li>
 <li>Compose <span class="math inline">\(j\)</span> and <span class="math inline">\(g\)</span> into some <span class="math inline">\(d\)</span> and say <span class="math inline">\(d \circ f\)</span>, which is the same as <span class="math inline">\((j \circ g) \circ f\)</span> or <span class="math inline">\(d(f(x))\)</span>.</li>
 </ul>
 <p>All of these expressions are equivalent.</p>
 <p>Okay, recap. As long as the output of one map is <em>the same “type”</em> as the input to the some other map, we can compose those two functions. And we can take a series of compositions and group them in whatever way we want, as long as the input and output types conform.</p>
-<p><strong>But how is this a “tree”?</strong> I will make a little graph with nodes and edges that shows the basic idea. Caveats up front that this will be pretty informal, but let’s say the functions are nodes, and the edges point in the direction of composition. Here is an example showing <span class="math inline">\(a = (j \circ g \circ f)(x)\)</span> as a tree.</p>
+<p><strong>But how is this a “tree”?</strong> I will make a little graph with nodes and edges that shows the basic idea. Caveats up front that this will be pretty informal, but let’s say the functions are nodes, and the edges point in the direction of composition. Let’s say function <span class="math inline">\(f\)</span> takes two arguments, <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <p>
-<svg width="206pt" height="116pt" viewbox="0.00 0.00 206.00 116.00" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+<svg width="134pt" height="116pt" viewbox="0.00 0.00 134.00 116.00" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 112)">
 <title>
 F
 </title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-112 202,-112 202,4 -4,4"></polygon> <!-- j --> <g id="node1" class="node">
-<title>
-j
-</title>
-<ellipse fill="none" stroke="black" cx="27" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="27" y="-85.8" font-family="Times,serif" font-size="14.00">j</text> </g> <!-- a --> <g id="node2" class="node">
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-112 130,-112 130,4 -4,4"></polygon> <!-- a --> <g id="node1" class="node">
 <title>
 a
 </title>
-<ellipse fill="none" stroke="black" cx="99" cy="-18" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="99" y="-13.8" font-family="Times,serif" font-size="14.00">a</text> </g> <!-- j&#45;&gt;a --> <g id="edge1" class="edge">
-<title>
-j-&gt;a
-</title>
-<path fill="none" stroke="black" d="M41.57,-74.83C51.75,-64.94 65.52,-51.55 77.03,-40.36"></path> <polygon fill="black" stroke="black" points="79.47,-42.87 84.2,-33.38 74.59,-37.85 79.47,-42.87"></polygon> </g> <!-- g --> <g id="node3" class="node">
-<title>
-g
-</title>
-<ellipse fill="none" stroke="black" cx="99" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="99" y="-85.8" font-family="Times,serif" font-size="14.00">g</text> </g> <!-- g&#45;&gt;a --> <g id="edge2" class="edge">
-<title>
-g-&gt;a
-</title>
-<path fill="none" stroke="black" d="M99,-71.7C99,-63.98 99,-54.71 99,-46.11"></path> <polygon fill="black" stroke="black" points="102.5,-46.1 99,-36.1 95.5,-46.1 102.5,-46.1"></polygon> </g> <!-- f --> <g id="node4" class="node">
+<ellipse fill="none" stroke="black" cx="27" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="27" y="-85.8" font-family="Times,serif" font-size="14.00">a</text> </g> <!-- f --> <g id="node2" class="node">
 <title>
 f
 </title>
-<ellipse fill="none" stroke="black" cx="171" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="171" y="-85.8" font-family="Times,serif" font-size="14.00">f</text> </g> <!-- f&#45;&gt;a --> <g id="edge3" class="edge">
+<ellipse fill="none" stroke="black" cx="63" cy="-18" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="63" y="-13.8" font-family="Times,serif" font-size="14.00">f</text> </g> <!-- a&#45;&gt;f --> <g id="edge1" class="edge">
 <title>
-f-&gt;a
+a-&gt;f
 </title>
-<path fill="none" stroke="black" d="M156.43,-74.83C146.25,-64.94 132.48,-51.55 120.97,-40.36"></path> <polygon fill="black" stroke="black" points="123.41,-37.85 113.8,-33.38 118.53,-42.87 123.41,-37.85"></polygon> </g> </g>
+<path fill="none" stroke="black" d="M35.35,-72.76C39.71,-64.28 45.15,-53.71 50.04,-44.2"></path> <polygon fill="black" stroke="black" points="53.23,-45.64 54.7,-35.15 47.01,-42.44 53.23,-45.64"></polygon> </g> <!-- b --> <g id="node3" class="node">
+<title>
+b
+</title>
+<ellipse fill="none" stroke="black" cx="99" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="99" y="-85.8" font-family="Times,serif" font-size="14.00">b</text> </g> <!-- b&#45;&gt;f --> <g id="edge2" class="edge">
+<title>
+b-&gt;f
+</title>
+<path fill="none" stroke="black" d="M90.65,-72.76C86.29,-64.28 80.85,-53.71 75.96,-44.2"></path> <polygon fill="black" stroke="black" points="78.99,-42.44 71.3,-35.15 72.77,-45.64 78.99,-42.44"></polygon> </g> </g>
 </svg>
 </p>
 </div>
 </div>
 </div>
-<p>The tree lets us express associativity in a different way: we can pre-compose any two functions by creating another node from them.</p>
+<p>But maybe the value of <span class="math inline">\(a\)</span> is the result of a function that itself takes two arguments, <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span>, and <span class="math inline">\(b\)</span> is the result of a function of <span class="math inline">\(r\)</span>.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <p>
-<svg width="170pt" height="188pt" viewbox="0.00 0.00 170.00 188.00" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
+<svg width="206pt" height="188pt" viewbox="0.00 0.00 206.00 188.00" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink">
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 184)">
 <title>
 F
 </title>
-<polygon fill="white" stroke="transparent" points="-4,4 -4,-184 166,-184 166,4 -4,4"></polygon> <!-- j --> <g id="node1" class="node">
+<polygon fill="white" stroke="transparent" points="-4,4 -4,-184 202,-184 202,4 -4,4"></polygon> <!-- b --> <g id="node1" class="node">
 <title>
-j
+b
 </title>
-<ellipse fill="none" stroke="black" cx="27" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="27" y="-85.8" font-family="Times,serif" font-size="14.00">j</text> </g> <!-- a --> <g id="node2" class="node">
-<title>
-a
-</title>
-<ellipse fill="none" stroke="black" cx="63" cy="-18" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="63" y="-13.8" font-family="Times,serif" font-size="14.00">a</text> </g> <!-- j&#45;&gt;a --> <g id="edge1" class="edge">
-<title>
-j-&gt;a
-</title>
-<path fill="none" stroke="black" d="M35.35,-72.76C39.71,-64.28 45.15,-53.71 50.04,-44.2"></path> <polygon fill="black" stroke="black" points="53.23,-45.64 54.7,-35.15 47.01,-42.44 53.23,-45.64"></polygon> </g> <!-- h --> <g id="node3" class="node">
-<title>
-h
-</title>
-<ellipse fill="none" stroke="black" cx="99" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="99" y="-85.8" font-family="Times,serif" font-size="14.00">h</text> </g> <!-- h&#45;&gt;a --> <g id="edge2" class="edge">
-<title>
-h-&gt;a
-</title>
-<path fill="none" stroke="black" d="M90.65,-72.76C86.29,-64.28 80.85,-53.71 75.96,-44.2"></path> <polygon fill="black" stroke="black" points="78.99,-42.44 71.3,-35.15 72.77,-45.64 78.99,-42.44"></polygon> </g> <!-- g --> <g id="node4" class="node">
-<title>
-g
-</title>
-<ellipse fill="none" stroke="black" cx="63" cy="-162" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="63" y="-157.8" font-family="Times,serif" font-size="14.00">g</text> </g> <!-- g&#45;&gt;h --> <g id="edge3" class="edge">
-<title>
-g-&gt;h
-</title>
-<path fill="none" stroke="black" d="M71.35,-144.76C75.71,-136.28 81.15,-125.71 86.04,-116.2"></path> <polygon fill="black" stroke="black" points="89.23,-117.64 90.7,-107.15 83.01,-114.44 89.23,-117.64"></polygon> </g> <!-- f --> <g id="node5" class="node">
+<ellipse fill="none" stroke="black" cx="171" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="171" y="-85.8" font-family="Times,serif" font-size="14.00">b</text> </g> <!-- f --> <g id="node2" class="node">
 <title>
 f
 </title>
-<ellipse fill="none" stroke="black" cx="135" cy="-162" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="135" y="-157.8" font-family="Times,serif" font-size="14.00">f</text> </g> <!-- f&#45;&gt;h --> <g id="edge4" class="edge">
+<ellipse fill="none" stroke="black" cx="135" cy="-18" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="135" y="-13.8" font-family="Times,serif" font-size="14.00">f</text> </g> <!-- b&#45;&gt;f --> <g id="edge1" class="edge">
 <title>
-f-&gt;h
+b-&gt;f
 </title>
-<path fill="none" stroke="black" d="M126.65,-144.76C122.29,-136.28 116.85,-125.71 111.96,-116.2"></path> <polygon fill="black" stroke="black" points="114.99,-114.44 107.3,-107.15 108.77,-117.64 114.99,-114.44"></polygon> </g> </g>
+<path fill="none" stroke="black" d="M162.65,-72.76C158.29,-64.28 152.85,-53.71 147.96,-44.2"></path> <polygon fill="black" stroke="black" points="150.99,-42.44 143.3,-35.15 144.77,-45.64 150.99,-42.44"></polygon> </g> <!-- a --> <g id="node3" class="node">
+<title>
+a
+</title>
+<ellipse fill="none" stroke="black" cx="99" cy="-90" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="99" y="-85.8" font-family="Times,serif" font-size="14.00">a</text> </g> <!-- a&#45;&gt;f --> <g id="edge2" class="edge">
+<title>
+a-&gt;f
+</title>
+<path fill="none" stroke="black" d="M107.35,-72.76C111.71,-64.28 117.15,-53.71 122.04,-44.2"></path> <polygon fill="black" stroke="black" points="125.23,-45.64 126.7,-35.15 119.01,-42.44 125.23,-45.64"></polygon> </g> <!-- p --> <g id="node4" class="node">
+<title>
+p
+</title>
+<ellipse fill="none" stroke="black" cx="27" cy="-162" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="27" y="-157.8" font-family="Times,serif" font-size="14.00">p</text> </g> <!-- p&#45;&gt;a --> <g id="edge3" class="edge">
+<title>
+p-&gt;a
+</title>
+<path fill="none" stroke="black" d="M41.57,-146.83C51.75,-136.94 65.52,-123.55 77.03,-112.36"></path> <polygon fill="black" stroke="black" points="79.47,-114.87 84.2,-105.38 74.59,-109.85 79.47,-114.87"></polygon> </g> <!-- q --> <g id="node5" class="node">
+<title>
+q
+</title>
+<ellipse fill="none" stroke="black" cx="99" cy="-162" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="99" y="-157.8" font-family="Times,serif" font-size="14.00">q</text> </g> <!-- q&#45;&gt;a --> <g id="edge4" class="edge">
+<title>
+q-&gt;a
+</title>
+<path fill="none" stroke="black" d="M99,-143.7C99,-135.98 99,-126.71 99,-118.11"></path> <polygon fill="black" stroke="black" points="102.5,-118.1 99,-108.1 95.5,-118.1 102.5,-118.1"></polygon> </g> <!-- r --> <g id="node6" class="node">
+<title>
+r
+</title>
+<ellipse fill="none" stroke="black" cx="171" cy="-162" rx="27" ry="18"></ellipse> <text text-anchor="middle" x="171" y="-157.8" font-family="Times,serif" font-size="14.00">r</text> </g> <!-- r&#45;&gt;b --> <g id="edge5" class="edge">
+<title>
+r-&gt;b
+</title>
+<path fill="none" stroke="black" d="M171,-143.7C171,-135.98 171,-126.71 171,-118.11"></path> <polygon fill="black" stroke="black" points="174.5,-118.1 171,-108.1 167.5,-118.1 174.5,-118.1"></polygon> </g> </g>
 </svg>
 </p>
 </div>
 </div>
 </div>
-<p>We can see that the composition is associative because the composition of <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span> into <span class="math inline">\(h\)</span> doesn’t change the order in which functions are applied to form <span class="math inline">\(a\)</span>. We can “pre-group” functions in the tree however we want, but we can’t change their ordering except in special circumstances. Composition is associative, but not all functions are commutative.</p>
+<p>The tree lets us express composition and associativity in a different way: <span class="math inline">\(f\)</span> doesn’t really care how you compose or group the operations ahead of it, as long as the values that you pass are <span class="math inline">\(a\)</span>-like and <span class="math inline">\(b\)</span>-like.</p>
 </section>
 <section id="rather-than-a-sequence-of-imperative-statements-that-update-the-running-state." class="level3">
 <h3 class="anchored" data-anchor-id="rather-than-a-sequence-of-imperative-statements-that-update-the-running-state.">“…Rather than a sequence of imperative statements that update the running state.”</h3>
@@ -393,7 +390,7 @@ f-&gt;h
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>a <span class="ot">=</span> <span class="fu">compose</span>(j, h)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>And only later (say, in some <code>main()</code> routine) do we apply our ultimately-composed functions to data. The data have to be acted on eventually, but we do it only after we compose a map from the data to some endpoint.</p>
-<p>Stated a different way, when we do more imperative programming, the present state of <code>x</code> is always our concern. Our path from beginning to end requires us to leave <code>x</code> in some intermediate state at many different steps, and if the state of <code>x</code> is exposed along the way, there can be problems that mutate <code>x</code> into something you don’t want it to be. When we do functional programming, however, we simply write the recipe for what we will do to <code>x</code> before <code>x</code> is ever instantiated. The roadmap is set ahead of time, so the intermediate state of <code>x</code> is ideally always obscured to other runtime interventions. This is okay because the intermediate state isn’t what we want out of this program.</p>
+<p>Stated a different way, when we do more imperative programming, the present state of <code>x</code> is always our concern. Our path from beginning to end requires us to leave <code>x</code> in some intermediate state at many different steps, and if the state of <code>x</code> is exposed along the way, there can be problems that mutate <code>x</code> into something you don’t want it to be. When we do functional programming, however, we write the recipe for what we will do to <code>x</code> if we ever encountered such an <code>x</code>. The roadmap is set ahead of time, so the intermediate state of <code>x</code> is obscured behind the functions that we compose. We can’t really get to the intermediate state because we aren’t supposed to be able to.</p>
 <p>This might be hard to envision because we haven’t talked tangibly about functional programming interfaces in R yet, so let’s do that.</p>
 </section>
 </section>
@@ -407,7 +404,7 @@ a = (j \circ g \circ u)
 </div>
 <p>There are two important things to remember about this.</p>
 <ol type="1">
-<li>Function composition creates a <em>new function</em>. It does not immediately evaluate the function on data. In the example, <code>a</code> is the composition, and it is entirely ignorant of the data you may pass to it. It may not be evaluated on data at all directly—we will likely compose <code>a</code> with another function before we even think about data. If you have ever heard of <em>delayed evaluation</em>, this is probably why. You were probably doing something that implicitly created new functions instead of evaluating the literal command on the data. Tidy evaluation does this all the time, which is why you can pass unquoted variable names to <code>dplyr</code> verbs, for instance.</li>
+<li>Function composition creates a <em>new function</em>. It does not immediately <em>evaluate</em> the function on any data. In the above example, <code>a</code> is the composition, and it is entirely ignorant of any data you may pass to it.</li>
 <li>Function compositions are themselves composable, so we want a framework to compose a lot of functions all at once with whatever associative groupings we want. We saw above (with math) that we could compose an arbitrary sequence of functions and the result should be well-behaved (as long as their input and output types conform—more on that in a bit). We would like to achieve that behavior in the code as well.</li>
 </ol>
 <p>We start with a primitive operation to compose just two functions. We call it <code>compose_once</code>—it implements only one composition of a left-hand and a right-hand function.</p>
@@ -427,7 +424,7 @@ a = (j \circ g \circ u)
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># examine the object to convince yourself of this</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>n_unique</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## function(...) f(g(...))</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x1384423e8&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x104d87218&gt;</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># apply the function on some data</span></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>)</span>
@@ -476,7 +473,8 @@ a = (j \circ g \circ u)
 </section>
 <section id="something-bigger-means-within-groups" class="level2">
 <h2 class="anchored" data-anchor-id="something-bigger-means-within-groups">Something bigger: means within groups</h2>
-<p>This is where we really start to see the difference between typical “imperative” programming and functional programming “trees”. Let’s take something we commonly do in R, calculate means within groups of data, and do it with our functional tools. Let’s take the <code>mtcars</code> data frame…</p>
+<p>This is where we really start to see the difference between typical “imperative” programming and functional programming “trees”. Let’s take something we commonly do in R, calculate means within groups of data, and do it with our functional tools. We will write this in a functional setup that, I admit, is sort of an ugly interface. But the point isn’t to write a perfect interface, it’s to demonstrate what it’s like to be functional. So let’s roll with some ugly code for a while.</p>
+<p>Let’s take the <code>mtcars</code> data frame…</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mtcars, <span class="dv">5</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="do">##                    mpg cyl disp  hp drat    wt  qsec vs am gear carb</span></span>
@@ -543,7 +541,7 @@ a = (j \circ g \circ u)
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># examine, it's a function</span></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>lens</span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="do">## function(x) apply_on_elements(x, f)</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x12fa95cc0&gt;</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x104329978&gt;</span></span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">lens</span>(x)</span>
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="do">## [[1]]</span></span>
@@ -565,8 +563,8 @@ a = (j \circ g \circ u)
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">partial_apply</span>(means)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="do">## function(x) apply_on_elements(x, f)</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;bytecode: 0x12ffd14f8&gt;</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x12fefae08&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;bytecode: 0x1048653f8&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x10478e8d8&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="apply-our-partial-function-to-data." class="level3">
@@ -681,8 +679,8 @@ a = (j \circ g \circ u)
 <div id="quarto-appendix" class="default"><section class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1" role="doc-endnote"><p>This reputation may be unfair. Most of the time, loops in R are slow because people are doing unwise things with them, like copying data or growing objects in each iteration.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p>You may have assumed that <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are Real (that is, <span class="math inline">\(\mathbb{R}\)</span>) numbers and that the operations <span class="math inline">\(+\)</span> and <span class="math inline">\(\times\)</span> refer to the sum and product operations that we conventionally apply to real numbers. It’s fine if you made those assumptions, but it wasn’t necessary. One cool thing about this family of math is that you can let <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> be other kinds of sets containing god-knows-what, and as long as <span class="math inline">\(+\)</span> and <span class="math inline">\(\times\)</span> refer to operations on values from those sets that maintain certain properties, the <span class="math inline">\(f\)</span> map remains perfectly coherent. <a href="https://www.youtube.com/watch?v=I8LbkfSSR58&amp;list=PLbgaMIhjbmEnaH_LTkxLI7FMa2HsnawM_&amp;index=1">Category theory</a> tells us about which properties must be maintained for this expression to hold in other contexts.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1" role="doc-endnote"><p>Most of the time, loops in R are slow because people are doing unwise things with them.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>You may have assumed that <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are numbers and that the operations <span class="math inline">\(+\)</span> and <span class="math inline">\(\times\)</span> refer to the addition and multiplication of numbers. It’s fine if you made those assumptions, but it wasn’t necessary. <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> could be other sets containing god-knows-what, and there are many kinds of operations that follow “algebraic” patterns akin to addition and subtraction. But we leave algebraic data types for another day.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn3" role="doc-endnote"><p>You may have seen a reduction in an operation like <code>max()</code>—for an array of numbers, recursively check to see if <code>left</code> is greater than <code>right</code>, passing the winner to the next iteration as <code>left</code>. In this case, however, the array we are collapsing is full of functions rather than, say, numbers. And the operation we apply as we accumulate is <code>compose_once(left, right)</code> rather than <code>left &gt; right</code>. The result of the reduction is a function that encodes the composition of all functions in <code>fns</code> from left to right.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn4" role="doc-endnote"><p>The role of an initialization in a reduction is to handle an identity condition: how do we handle “empty” values along the reduction without affecting the output. Stated differently, what value can we pass to ensure a “no-op” when the reduction is applied, which can also be used as an initial value to <code>left</code>. For example, if we reduce an array of numbers by <em>addition</em>, the initialization would be the value <code>0</code>, because applying <code>+ 0</code> to any number gives you the original number. Same with multiplication and the value <code>1</code>. When we are reducing <em>functions</em> by <em>composing</em> them, we use the identity function. Not surprisingly, the identity function simply returns the function arguments unaffected: <code>identity(x)</code> gives you <code>x</code>. For function composition, <code>compose(f, identity)</code> is equal to <code>compose(identity, f)</code> is equal to <code>f</code>. Now you’re programmin with abstractions!<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
