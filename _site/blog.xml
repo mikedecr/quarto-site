@@ -24,7 +24,7 @@
 <p>We show how to use them with examples in the R plotting library <code>ggplot2</code>, which presents many currying opportunities.</p>
 <section id="in-short" class="level2">
 <h2 class="anchored" data-anchor-id="in-short">In short,</h2>
-<p>A <em>curried</em> function is a function with some of its arguments fixed. A curried function is also called a “partial” function, because its arguments have been partially pre-supplied.</p>
+<p>A <em>curried</em> function is a function with some of its arguments fixed. A curried function is also called a “partial” function, because its arguments have been partially pre-supplied. The name comes from Haskell Curry, who was a mathematician and not a food, although I love to eat curries too.</p>
 <p>Currying a function with arguments isn’t the same as <em>calling</em> a function with those arguments. Currying doesn’t call the function. It creates a new function.</p>
 <p>Here is a silly example in R. You have some logical vector <code>b</code>. What is its mean?</p>
 <div class="cell">
