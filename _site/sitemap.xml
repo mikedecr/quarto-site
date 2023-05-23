@@ -2,38 +2,42 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mikedecr.netlify.app/index.html</loc>
-    <lastmod>2023-04-02T21:58:32.011Z</lastmod>
+    <lastmod>2023-05-23T05:32:17.259Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/latex_colors/index.html</loc>
-    <lastmod>2023-04-02T21:58:33.308Z</lastmod>
+    <lastmod>2023-05-23T05:32:18.629Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/nonflat_implied_priors/index.html</loc>
-    <lastmod>2023-04-02T21:58:34.169Z</lastmod>
+    <lastmod>2023-05-23T05:32:19.561Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/usable_repos/index.html</loc>
-    <lastmod>2023-04-02T21:58:35.340Z</lastmod>
+    <lastmod>2023-05-23T05:32:20.729Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/modular_blog/index.html</loc>
-    <lastmod>2023-04-02T21:58:36.519Z</lastmod>
+    <lastmod>2023-05-23T05:32:21.906Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/mandelbrot_iterative_recursive/index.html</loc>
-    <lastmod>2023-04-02T21:58:37.211Z</lastmod>
+    <lastmod>2023-05-23T05:32:22.576Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/fp_basics/index.html</loc>
-    <lastmod>2023-04-02T21:58:39.172Z</lastmod>
+    <lastmod>2023-05-23T05:32:23.822Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mikedecr.netlify.app/blog/partial_fns_ggplot/index.html</loc>
+    <lastmod>2023-05-23T05:32:24.492Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/about.html</loc>
-    <lastmod>2023-04-02T21:58:40.231Z</lastmod>
+    <lastmod>2023-05-23T05:32:25.612Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog.html</loc>
-    <lastmod>2023-04-02T21:58:40.584Z</lastmod>
+    <lastmod>2023-05-23T05:32:25.967Z</lastmod>
   </url>
 </urlset>
