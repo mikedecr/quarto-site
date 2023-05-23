@@ -19,3 +19,6 @@
 [submodule "blog/mandelbrot_iterative_recursive"]
 	path = blog/mandelbrot_iterative_recursive
 	url = git@github.com:mikedecr/post_mandelbrot_iterative_recursive.git
+[submodule "blog/partial_fns_ggplot"]
+	path = blog/partial_fns_ggplot
+	url = git@github.com:mikedecr/post_partials.git
