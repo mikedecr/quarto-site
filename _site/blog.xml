@@ -24,8 +24,8 @@
 <p>We show how to use them with examples in the R plotting library <code>ggplot2</code>, which presents many currying opportunities.</p>
 <section id="in-short" class="level2">
 <h2 class="anchored" data-anchor-id="in-short">In short,</h2>
-<p>A <em>curried</em> function is a function with some of its arguments fixed. A curried function is also called a “partial” function, because its arguments have been partially pre-supplied. The name comes from Haskell Curry, who was a mathematician and not a food, although I love to eat curries too.</p>
-<p>Currying a function with arguments isn’t the same as <em>calling</em> a function with those arguments. Currying doesn’t call the function. It creates a new function.</p>
+<p>A curried function is a function with some of its arguments fixed. A curried function is also called a “partial” function, because its arguments have been partially pre-supplied. The name comes from Haskell Curry, who was a mathematician and not a food, although I love to eat curries too.</p>
+<p>Currying a function with arguments isn’t the same as calling a function with those arguments. Instead it creates a new function that can be called later.</p>
 <p>Here is a silly example in R. You have some logical vector <code>b</code>. What is its mean?</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">b <span class="ot" style="color: #003B4F;
@@ -52,7 +52,7 @@ font-style: inherit;">mean</span>(b)</span>
 background-color: null;
 font-style: italic;">## [1] NA</span></span></code></pre></div>
 </div>
-<p>Well, <code>b</code> is missing some data, so its mean is undefined. You can get around this by passing an argument to the <code>mean</code> function that ignores <code>NA</code> values.</p>
+<p>Well, <code>b</code> is missing some data, so the mean is undefined. You can get around this by passing an extra argument to skip over any <code>NA</code> elements.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -65,9 +65,35 @@ font-style: inherit;">TRUE</span>)</span>
 background-color: null;
 font-style: italic;">## [1] 0.6</span></span></code></pre></div>
 </div>
-<p>And that works okay, but it’s a function of two arguments. We could imagine a function that does the same thing with only one argument…</p>
+<p>And that works okay, but it’s a function of two arguments. We could imagine a function that achieves the same result with just one argument. Let’s create this function with currying.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">unsafe_mean <span class="ot" style="color: #003B4F;
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(purrr)  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># contains `partial`</span></span>
+<span id="cb3-2">unsafe_mean <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">partial</span>(mean, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span></code></pre></div>
+</div>
+<p>This code says, “create a new function that is like <code>mean</code> but with the <code>na.rm</code> argument fixed to <code>TRUE</code>”. The value that we assign to <code>unsafe_mean</code> is a new function. We don’t have to call it until we need it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unsafe_mean</span>(b)</span>
+<span id="cb4-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.6</span></span></code></pre></div>
+</div>
+<p>The curried function is morally the same thing as defining this new function “the long way”,</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">unsafe_mean <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
@@ -79,39 +105,14 @@ font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span>)</span></code></pre></div>
 </div>
-<p>This is, in essence, the same result as a partial function. But we normally create a partial function by <em>passing</em> a function as an argument and returning a new function. It looks like this:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(purrr)  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># contains `partial`</span></span>
-<span id="cb4-2">unsafe_mean <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">partial</span>(mean, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">TRUE</span>)</span></code></pre></div>
-</div>
-<p>This code says, “create a new function that is like <code>mean</code> but with the <code>na.rm</code> argument fixed to <code>TRUE</code>”. Importantly, we don’t have to <em>call</em> this function yet. We only create it once, and then we can use it wherever.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">unsafe_mean</span>(b)</span>
-<span id="cb5-2"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## [1] 0.6</span></span></code></pre></div>
-</div>
+<p>which has a bit more boilerplate involved.</p>
 </section>
 <section id="examples-with-ggplot" class="level2">
 <h2 class="anchored" data-anchor-id="examples-with-ggplot">Examples with <code>ggplot</code></h2>
 <section id="aesthetic-regularities" class="level3">
 <h3 class="anchored" data-anchor-id="aesthetic-regularities">Aesthetic regularities</h3>
-<p>Sometimes you want to re-use some aesthetic feature of a plot across multiple plot components or across multiple plots. These features may be reusable but fall short of being “defaults” that you want to set. This is a good place for partial functions.</p>
-<p>Here is an example where I want to plot two histograms side by side. Without partial functions, I might do this the “long way” with multiple calls to <code>geom_histogram</code>.</p>
+<p>Sometimes you want to re-use some aesthetic attributes of a plot across several plot components or across several, independent plots. These features may be reusable yet not be worthy to be considered “default” attributes, which you could otherwise set with the <code>ggplot2::update_geom_defaults</code> function. This middle area is a good place for partial functions.</p>
+<p>Here is an example where I have two variables in a dataset, and I want to plot histograms for each variable side by side.<sup>1</sup> Without partial functions, I might do this the “long way” with multiple calls to <code>geom_histogram</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -227,7 +228,8 @@ font-style: inherit;">theme_minimal</span>()</span></code></pre></div>
 <p><img src="https://mikedecr.netlify.app/blog/partial_fns_ggplot/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>This works, but I specified the <code>color</code> and <code>alpha</code> information multiple times.<sup>1</sup> Here is the same plot with a partial function approach:</p>
+<p>This works, but I specified some redundant information in multiple calls to <code>geom_histogram</code>. This is annoying and potentially error-prone, and if I want to change some of these features, I have to change the arguments to multiple functions.</p>
+<p>Here is the same plot with a partial function approach:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -300,16 +302,17 @@ font-style: inherit;">theme_minimal</span>()</span></code></pre></div>
 <p><img src="https://mikedecr.netlify.app/blog/partial_fns_ggplot/index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Notice we basically eliminated all redundant information out of the specification of the histograms. Call that a win.</p>
+<p>This approach eliminated all redundant information from the specification of the histograms. Call that a win.</p>
 </section>
 <section id="scale-functions" class="level3">
 <h3 class="anchored" data-anchor-id="scale-functions">Scale functions</h3>
-<p>When you are working for a while in one project, you are often mapping the same features in your data to the same colors, fills, point shapes, and so on. This leads you to write repeated calls of <code>scale_color_manual(values = c(...))</code>. It can be quite tedious.</p>
-<p>But you can create your own <code>scale_</code> functions that match the semantics of your projects by currying the built-in <code>scale_</code> functions. For instance, if I always want certain species in the <code>palmerpenguins</code> data to map to the same colors, I simply write some functions…</p>
+<p>When you are working for a while in one project, you are often mapping the same features in your data to the same colors, fills, point shapes, and so on. This leads you to write repeated calls of <code>scale_color_manual(values = c(...))</code>. In my years as a political scientist, I found myself doing this a lot with the same two colors to represent the U.S. Democratic and Republican political parties, for instance. It grows tedious.</p>
+<p>But you can create your own <code>scale_</code> functions that encode the “visual semantics” of your project data by currying the built-in <code>scale_</code> functions. You can write these new functions one time and save yourself the effort elsewhere in your project.</p>
+<p>For instance, if I always want certain species in the <code>palmerpenguins</code> data to map to the same colors, I can write some functions…</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># a map / vector of key-value pairs</span></span>
+font-style: inherit;"># a vector of key-value pairs, species to color</span></span>
 <span id="cb8-2">peng_colors <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
@@ -336,7 +339,7 @@ font-style: inherit;">"darkcyan"</span>)</span>
 <span id="cb8-3"></span>
 <span id="cb8-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># invoke the map</span></span>
+font-style: inherit;"># invoke the pairs in curried arguments</span></span>
 <span id="cb8-5">scale_color_species <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
@@ -352,7 +355,7 @@ font-style: inherit;">partial</span>(scale_fill_manual, <span class="at" style="
 background-color: null;
 font-style: inherit;">values =</span> peng_colors)</span></code></pre></div>
 </div>
-<p>And now I can use those wherever I want with no extra fuss.</p>
+<p>And now I can employ those visual standards wherever I want.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -411,16 +414,17 @@ font-style: italic;">## Warning: Removed 2 rows containing missing values (`geom
 <p><img src="https://mikedecr.netlify.app/blog/partial_fns_ggplot/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>And if I ever wanted to change the way I represent species as colors, I change the function in one place only. Nice.</p>
 </section>
 </section>
 <section id="why-use-partial-functions" class="level2">
 <h2 class="anchored" data-anchor-id="why-use-partial-functions">Why use partial functions?</h2>
-<p>By fixing a function’s arguments, it may seem like we are restricting a function’s behavior. And restricting a functions behavior may not seem like a good thing to do when I could have a more general, more flexible function. After all, the point of a function having arguments is to enhance its flexibility, right?</p>
-<p>There are a few reasons.</p>
+<p>By fixing a function’s arguments, it may seem like we are <strong>restricting</strong> a function’s behavior. And restricting a functions behavior may not seem like a good thing to do when I could have a more general, more flexible function. After all, the point of a function having arguments is to enhance its flexibility, right?</p>
+<p>There are a few perfectly good reasons.</p>
 <ol type="1">
-<li><p><strong>Convenience.</strong> If you are toggling between invoking some arguments some times but not other times, it really is no big deal to have another function instead of juggling the arguments yourself. This can be especially useful if the argument provision is repetitive and error-prone, as it can be with plotting. Our examples show how we can lock these arguments into their own functions, so we no longer have to worry about introducing bugs or inconsistencies in our code by misspecifying their “free” variables.</p></li>
-<li><p><strong>Composition.</strong> This is crucial. Functional programming makes heavy use of function composition (creating new functions from existing functions). For instance, we can rewrite <code>x |&gt; f() |&gt; g()</code> as <code>x |&gt; h()</code>, where <code>h</code> is the function composition of <code>g</code> and <code>f</code>. Composition works when the output of the first function <code>f</code> can serve as the input to the next function <code>g</code>, and this works great in R when your <code>g</code> takes one argument. But what if your <code>g</code> needs multiple arguments? No fear, we could create a partial <code>g</code> that fixes some arguments ahead of time, and use that to create our composed function <code>h</code>.</p></li>
-<li><p><strong>Abstraction</strong>. If you think about a function that takes more than one argument, is any single argument the “primary” argument? In a specific context that may <em>informally</em> make sense, but in no formal sense is that true. Thinking about our <code>mean</code> example above. The function <code>mean</code> takes two arguments (it actually takes more, but let’s consider <code>x</code> and <code>na.rm</code> only). We created an <code>unsafe_mean</code> function that fixes <code>na.rm</code>. But there just as easily we could have fixed the data argument,</p>
+<li><p><strong>Convenience.</strong> If you are writing the same function many places, but sometimes you invoke one set of arguments and sometimes you invoke others (calls to <code>ggplot2::theme</code> come to mind), it really is no big deal to have another function or two lying around that encapsulate some of those argument sets. This can be especially useful if the argument provision is repetitive and error-prone, as it can be with plotting. It can also be valuable when it’s easier to recall the function name instead of detailed argument data (again, <code>ggplot2::theme</code>). Our examples above how we can lock these arguments into their own functions, so we no longer have to worry about introducing bugs or inconsistencies in our code by misspecifying their “free” parameters.</p></li>
+<li><p><strong>Composition.</strong> This is crucial. Functional programming makes heavy use of function composition (creating new functions from existing functions). For instance, we can rewrite <code>g(f(x))</code> as <code>h(x)</code>, where <code>h</code> is just the function composition of <code>g</code> and <code>f</code>. Composition works when the output of the first function <code>f</code> matches the input type of the next function <code>g</code>, and this works great in R when your <code>g</code> takes one argument. But what if your <code>g</code> needs multiple arguments? <code>g(f(x), other_args = ...)</code> might be more irritating to read in whatever context you are working in. Another way to handle this is by creating a partial function in place of <code>g</code>, use that function to precompose <code>h</code>, and we’ll be on our way.</p></li>
+<li><p><strong>Abstraction</strong>. If a function takes more than one argument, is any single argument the “primary” argument? In some contexts this may <em>informally</em> be meaningful, but not in any formal sense. Consider our <code>unsafe_mean</code> example above. The <code>mean</code> function takes two arguments (it can actually take more, but let’s set them aside). We created an <code>unsafe_mean</code> function that fixes <code>na.rm</code>. But just as easily we could fixed the data argument <code>x</code>,</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1">b_mean <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -430,7 +434,7 @@ font-style: inherit;">partial</span>(mean, <span class="at" style="color: #65742
 background-color: null;
 font-style: inherit;">x =</span> b)</span></code></pre></div>
 </div>
-<p>and now we can call this function by passing <code>na.rm = TRUE</code>.</p>
+<p>and call this new function by passing <code>na.rm = TRUE</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="fu" style="color: #4758AB;
 background-color: null;
@@ -479,314 +483,223 @@ font-style: inherit;">partial</span>(lm, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">data =</span> palmerpenguins)</span></code></pre></div>
 </div>
-<p>Both of these partial functions are valid. Mathematically it makes no difference.</p></li>
+<p>Both of these partial functions are valid. Mathematically it makes no difference.</p>
+<p>One last weirdness. If I have a list <code>p</code> containing a mapping from <code>"a"</code> to <code>9</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1">p <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">a =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>)</span></code></pre></div>
+</div>
+<p>And I index this list to convert an <code>"a"</code> to a <code>9</code>…</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1">p[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"a"</span>]]</span>
+<span id="cb16-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 9</span></span></code></pre></div>
+</div>
+<p>then this mapping is sort of like a function. But what is the function, and what is the argument? Is <code>9</code> the value of a function <code>p</code> if I pass a string argument <code>"a"</code>? Or is <code>9</code> the value of a function <code>"a"</code> if I pass a list argument <code>p</code>? You can write functions intended to give you either brainfeel.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1">index <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(lst, k) lst[[k]]</span>
+<span id="cb17-2">p <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">index</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"a"</span>)</span>
+<span id="cb17-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 9</span></span>
+<span id="cb17-4"></span>
+<span id="cb17-5">key_into <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(k, lst) lst[[k]]</span>
+<span id="cb17-6"><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"a"</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">key_into</span>(p)</span>
+<span id="cb17-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 9</span></span></code></pre></div>
+</div></li>
 </ol>
-<p>These sorts of abstraction and compositions enable us to be creative even while we are supposedly “restricting” the behavior of functions. The creativity comes not from “what arguments can we supply to this function” but rather “what meta-structures can I build by composing functional routines that share certain patterns”. This brings us to some higher points about functions and functional programming in R.</p>
+<p>These abstractions and compositions let us be creative even while we are supposedly “restricting” the behavior of functions. The creativity comes not from “how many different argument configurations can I supply to this function” but rather “what meta-structures can I build by building functional routines that support certain patterns”. This brings us to some higher points about functions and functional programming in R.</p>
 </section>
 <section id="functions-are-objects" class="level2">
 <h2 class="anchored" data-anchor-id="functions-are-objects">Functions are objects</h2>
 <p>In R we like to say “everything is an object”. We can break this down into a couple important properties. First, we can ask about the properties of functions as if they were any other data.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="fu" style="color: #4758AB;
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">attributes</span>(unsafe_mean)</span>
-<span id="cb15-2"><span class="do" style="color: #5E5E5E;
+<span id="cb18-2"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: italic;">## $class</span></span>
-<span id="cb15-3"><span class="do" style="color: #5E5E5E;
+font-style: italic;">## $srcref</span></span>
+<span id="cb18-3"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: italic;">## [1] "purrr_function_partial" "function"              </span></span>
-<span id="cb15-4"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## </span></span>
-<span id="cb15-5"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## $body</span></span>
-<span id="cb15-6"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## mean(na.rm = TRUE, ...)</span></span></code></pre></div>
+font-style: italic;">## function(x) mean(x, na.rm = TRUE)</span></span></code></pre></div>
 </div>
 <p>We can pass functions as arguments to other functions. You may have seen this with <code>apply</code> functions or <code>purrr::map</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1">mtcars <span class="sc" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lapply</span>(unsafe_mean) <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">lapply</span>(mtcars, unsafe_mean) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">head</span>()</span>
-<span id="cb16-2"><span class="do" style="color: #5E5E5E;
+<span id="cb19-2"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $mpg</span></span>
-<span id="cb16-3"><span class="do" style="color: #5E5E5E;
+<span id="cb19-3"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 20.09062</span></span>
-<span id="cb16-4"><span class="do" style="color: #5E5E5E;
+<span id="cb19-4"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb16-5"><span class="do" style="color: #5E5E5E;
+<span id="cb19-5"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $cyl</span></span>
-<span id="cb16-6"><span class="do" style="color: #5E5E5E;
+<span id="cb19-6"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 6.1875</span></span>
-<span id="cb16-7"><span class="do" style="color: #5E5E5E;
+<span id="cb19-7"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb16-8"><span class="do" style="color: #5E5E5E;
+<span id="cb19-8"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $disp</span></span>
-<span id="cb16-9"><span class="do" style="color: #5E5E5E;
+<span id="cb19-9"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 230.7219</span></span>
-<span id="cb16-10"><span class="do" style="color: #5E5E5E;
+<span id="cb19-10"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb16-11"><span class="do" style="color: #5E5E5E;
+<span id="cb19-11"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $hp</span></span>
-<span id="cb16-12"><span class="do" style="color: #5E5E5E;
+<span id="cb19-12"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 146.6875</span></span>
-<span id="cb16-13"><span class="do" style="color: #5E5E5E;
+<span id="cb19-13"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb16-14"><span class="do" style="color: #5E5E5E;
+<span id="cb19-14"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $drat</span></span>
-<span id="cb16-15"><span class="do" style="color: #5E5E5E;
+<span id="cb19-15"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 3.596563</span></span>
-<span id="cb16-16"><span class="do" style="color: #5E5E5E;
+<span id="cb19-16"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb16-17"><span class="do" style="color: #5E5E5E;
+<span id="cb19-17"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $wt</span></span>
-<span id="cb16-18"><span class="do" style="color: #5E5E5E;
+<span id="cb19-18"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 3.21725</span></span></code></pre></div>
 </div>
 <p>And we can return functions as values from other functions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><span class="co" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># take in a function f and return a "lifted" function that applies f to a list</span></span>
-<span id="cb17-2">fmap <span class="ot" style="color: #003B4F;
+<span id="cb20-2">fmap <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">function</span>(f) {</span>
-<span id="cb17-3">    <span class="cf" style="color: #003B4F;
+<span id="cb20-3">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">function</span>(lst) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">lapply</span>(lst, f)</span>
-<span id="cb17-4">}</span>
-<span id="cb17-5"></span>
-<span id="cb17-6">mtcars <span class="sc" style="color: #5E5E5E;
+<span id="cb20-4">}</span>
+<span id="cb20-5"></span>
+<span id="cb20-6">map_unsafe_mean <span class="ot" style="color: #003B4F;
 background-color: null;
-font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">fmap</span>(unsafe_mean)() <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">fmap</span>(unsafe_mean)</span>
+<span id="cb20-7"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">map_unsafe_mean</span>(mtcars) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">head</span>()</span>
-<span id="cb17-7"><span class="do" style="color: #5E5E5E;
+<span id="cb20-8"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $mpg</span></span>
-<span id="cb17-8"><span class="do" style="color: #5E5E5E;
+<span id="cb20-9"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 20.09062</span></span>
-<span id="cb17-9"><span class="do" style="color: #5E5E5E;
+<span id="cb20-10"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb17-10"><span class="do" style="color: #5E5E5E;
+<span id="cb20-11"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $cyl</span></span>
-<span id="cb17-11"><span class="do" style="color: #5E5E5E;
+<span id="cb20-12"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 6.1875</span></span>
-<span id="cb17-12"><span class="do" style="color: #5E5E5E;
+<span id="cb20-13"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb17-13"><span class="do" style="color: #5E5E5E;
+<span id="cb20-14"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $disp</span></span>
-<span id="cb17-14"><span class="do" style="color: #5E5E5E;
+<span id="cb20-15"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 230.7219</span></span>
-<span id="cb17-15"><span class="do" style="color: #5E5E5E;
+<span id="cb20-16"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb17-16"><span class="do" style="color: #5E5E5E;
+<span id="cb20-17"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $hp</span></span>
-<span id="cb17-17"><span class="do" style="color: #5E5E5E;
+<span id="cb20-18"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 146.6875</span></span>
-<span id="cb17-18"><span class="do" style="color: #5E5E5E;
+<span id="cb20-19"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb17-19"><span class="do" style="color: #5E5E5E;
+<span id="cb20-20"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $drat</span></span>
-<span id="cb17-20"><span class="do" style="color: #5E5E5E;
+<span id="cb20-21"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 3.596563</span></span>
-<span id="cb17-21"><span class="do" style="color: #5E5E5E;
+<span id="cb20-22"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb17-22"><span class="do" style="color: #5E5E5E;
+<span id="cb20-23"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $wt</span></span>
-<span id="cb17-23"><span class="do" style="color: #5E5E5E;
+<span id="cb20-24"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 3.21725</span></span></code></pre></div>
 </div>
 <p>In this example, <code>fmap</code> is a higher-order function (a function of a function). The value <code>fmap(unsafe_mean)</code> is itself a function. It waits for the user to pass it a list.</p>
-<p>We could combine what we’ve learned here and make the <code>fmap</code> example even more disorienting.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># create a function composition g . f</span></span>
-<span id="cb18-2">compose <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">function</span>(g, f) {</span>
-<span id="cb18-3">    <span class="cf" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">function</span>(...) <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">g</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">f</span>(...))</span>
-<span id="cb18-4">}</span>
-<span id="cb18-5"></span>
-<span id="cb18-6"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">compose</span>(head, <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">fmap</span>(unsafe_mean))(mtcars)</span>
-<span id="cb18-7"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## $mpg</span></span>
-<span id="cb18-8"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## [1] 20.09062</span></span>
-<span id="cb18-9"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## </span></span>
-<span id="cb18-10"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## $cyl</span></span>
-<span id="cb18-11"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## [1] 6.1875</span></span>
-<span id="cb18-12"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## </span></span>
-<span id="cb18-13"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## $disp</span></span>
-<span id="cb18-14"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## [1] 230.7219</span></span>
-<span id="cb18-15"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## </span></span>
-<span id="cb18-16"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## $hp</span></span>
-<span id="cb18-17"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## [1] 146.6875</span></span>
-<span id="cb18-18"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## </span></span>
-<span id="cb18-19"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## $drat</span></span>
-<span id="cb18-20"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## [1] 3.596563</span></span>
-<span id="cb18-21"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## </span></span>
-<span id="cb18-22"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## $wt</span></span>
-<span id="cb18-23"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## [1] 3.21725</span></span>
-<span id="cb18-24"></span>
-<span id="cb18-25"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># or ...</span></span>
-<span id="cb18-26">mtcars <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">compose</span>(head, <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">fmap</span>(unsafe_mean))()</span>
-<span id="cb18-27"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## $mpg</span></span>
-<span id="cb18-28"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## [1] 20.09062</span></span>
-<span id="cb18-29"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## </span></span>
-<span id="cb18-30"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## $cyl</span></span>
-<span id="cb18-31"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## [1] 6.1875</span></span>
-<span id="cb18-32"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## </span></span>
-<span id="cb18-33"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## $disp</span></span>
-<span id="cb18-34"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## [1] 230.7219</span></span>
-<span id="cb18-35"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## </span></span>
-<span id="cb18-36"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## $hp</span></span>
-<span id="cb18-37"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## [1] 146.6875</span></span>
-<span id="cb18-38"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## </span></span>
-<span id="cb18-39"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## $drat</span></span>
-<span id="cb18-40"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## [1] 3.596563</span></span>
-<span id="cb18-41"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## </span></span>
-<span id="cb18-42"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## $wt</span></span>
-<span id="cb18-43"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## [1] 3.21725</span></span></code></pre></div>
-</div>
-<p>So you see, you can create many odd things by treating functions as first-class objects. This particular example is a bit of an ugly monster, but again, we are practicing with the abstractions more than anything.</p>
+<p>So you see, you can create many odd things by treating functions as first-class objects, letting functions be arguments and values to other functions, even thinking about non-function objects as behaving “sort of like functions”.</p>
 
 
 </section>
@@ -795,7 +708,7 @@ font-style: italic;">## [1] 3.21725</span></span></code></pre></div>
 <div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>I could “pivot” the data longer and create just one <code>geom_histogram</code> while mapping <code>fill</code> to the new <code>name</code> variable, but I don’t believe that’s the appropriate move here. This is a case where the plotting framework need not “flow backward” into our data framework. I consider that a code smell and may discuss that in a future post. We can achieve what we want without expensively reshaping the data.↩︎</p></li>
+<li id="fn1"><p>Suppose that I want to do this without reshaping/pivoting the data. If I reshape the data longer, I could create just one <code>geom_histogram</code> and map <code>fill</code> to the new <code>name</code> variable. But I actually don’t think reshaping the data is always a good idea. Reshaping can be unnecessarily expensive, and it is an instance where you are letting your plotting framework “flow backward” into your data organization. I consider that that backward flow a code smell in many cases, and I plan to discuss it in a future post.↩︎</p></li>
 </ol>
 </section></div> ]]></description>
   <category>code</category>
