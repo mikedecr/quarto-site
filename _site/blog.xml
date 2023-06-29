@@ -67,14 +67,14 @@ font-style: italic;">## [1] 0.6</span></span></code></pre></div>
 </div>
 <p>And that works okay, but it’s a function of two arguments. We could imagine a function that achieves the same result with just one argument. Let’s create this function with currying.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">library</span>(purrr)  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># contains `partial`</span></span>
+font-style: inherit;"># purrr has a partial() function</span></span>
 <span id="cb3-2">unsafe_mean <span class="ot" style="color: #003B4F;
 background-color: null;
-font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+font-style: inherit;">=</span> purrr<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">partial</span>(mean, <span class="at" style="color: #657422;
 background-color: null;
@@ -107,6 +107,48 @@ font-style: inherit;">TRUE</span>)</span></code></pre></div>
 </div>
 <p>which has a bit more boilerplate involved.</p>
 </section>
+<section id="writing-our-own-partial" class="level2">
+<h2 class="anchored" data-anchor-id="writing-our-own-partial">Writing our own <code>partial</code></h2>
+<p>We can write out own currying function. It is a higher-order function that eats a function and returns a new function. Let’s take a look.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">partial <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(f, ...) {</span>
+<span id="cb6-2">    fixed <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(...)</span>
+<span id="cb6-3">    g <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(...) {</span>
+<span id="cb6-4">        all_args <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(fixed, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(...))</span>
+<span id="cb6-5">        <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">do.call</span>(f, all_args)</span>
+<span id="cb6-6">    }</span>
+<span id="cb6-7">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">return</span>(g)</span>
+<span id="cb6-8">}</span></code></pre></div>
+</div>
+<ul>
+<li><code>partial</code> takes a function <code>f</code> and some unspecified arguments <code>...</code>. These are the arguments that we will fix. We store them in a list called <code>fixed</code>.</li>
+<li>We then return a <em>new</em> function, which I name <code>g</code> just to make it easier to keep track of. <code>g</code> is our curried function, it is like <code>f</code> but it knows the arguments we have already provided. <code>g</code> combines the <code>fixed</code> arguments with any new arguments provided when it is called (the second set of dots <code>...</code>, which are different from the first set) and uses <code>do.call</code> to call <code>f</code> on those arguments.</li>
+</ul>
+<p>There are a couple extra things to note. For the outer set of <code>fixed</code> arguments, we could have captured them <em>unevaluated</em>, and delay their evaluation until the <code>g</code> call. This would most accurately reflect what we want our pre-supplied arguments to mean when we call the curried function later, and it is what Konrad Rudolph does in his <a href="https://github.com/klmr/fun/blob/898148c5b89bccc10ccadf960b81fab0543e97af/__init__.r#L85-L134">currying function</a>. It is a bit beyond the scope our needs right now though.</p>
+<p>Secondly, take a second to appreciate the use of <code>do.call</code> to evaluate our function with all of its arguments. If you aren’t familiar with <code>do.call</code>, it is a higher order function that evaluates a function (the first argument) with the arguments provided through a list (the second argument). Imagine instead of writing <code>mean(x, na.rm = TRUE)</code>, you write <code>do.call(mean, list(x = x, na.rm = TRUE))</code>. Passing a container of arguments may feel odd at first, but it actually very useful for functional programming because we can rewrite any multi-argument function as a function of only one argument: a list. This gives us a sublanguage where we can imagine that <em>every function</em> takes only one object as its argument and returns only one object as its value…it’s just that some objects are cheekily more complex than others. You may have seen something similar in Python, but instead of a higher order function, you have tuple and dictionary unpacking. So you can write <code>mean(*(x, TRUE))</code> or <code>mean(**{'x': x, 'na.rm': TRUE})</code> and get the same effect. From a functional programming point of view, there isn’t much difference a tuple and an unnamed list (each is essentially an ordered set of values) or between a dict and a named list (each is a set of named values, at which point who cares about the ordering [although you can maybe think of the names as isomorphic to an ordering {but we shouldn’t talk about isomorphism right now}]). We may have to write a blog post with more creative uses of <code>do.call</code>.</p>
+</section>
 <section id="examples-with-ggplot" class="level2">
 <h2 class="anchored" data-anchor-id="examples-with-ggplot">Examples with <code>ggplot</code></h2>
 <section id="aesthetic-regularities" class="level3">
@@ -114,22 +156,22 @@ font-style: inherit;">TRUE</span>)</span></code></pre></div>
 <p>Sometimes you want to re-use some aesthetic attributes of a plot across several plot components or across several, independent plots. These features may be reusable yet not be worthy to be considered “default” attributes, which you could otherwise set with the <code>ggplot2::update_geom_defaults</code> function. This middle area is a good place for partial functions.</p>
 <p>Here is an example where I have two variables in a dataset, and I want to plot histograms for each variable side by side.<sup>1</sup> Without partial functions, I might do this the “long way” with multiple calls to <code>geom_histogram</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="fu" style="color: #4758AB;
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(tibble)</span>
-<span id="cb6-2"><span class="fu" style="color: #4758AB;
+<span id="cb7-2"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(ggplot2)</span>
-<span id="cb6-3"></span>
-<span id="cb6-4"><span class="co" style="color: #5E5E5E;
+<span id="cb7-3"></span>
+<span id="cb7-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># first, some data...</span></span>
-<span id="cb6-5">d <span class="ot" style="color: #003B4F;
+<span id="cb7-5">d <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">tibble</span>(</span>
-<span id="cb6-6">    <span class="at" style="color: #657422;
+<span id="cb7-6">    <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">z =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -144,7 +186,7 @@ background-color: null;
 font-style: inherit;">sd =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>),</span>
-<span id="cb6-7">    <span class="at" style="color: #657422;
+<span id="cb7-7">    <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">e =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
@@ -155,14 +197,14 @@ background-color: null;
 font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">3</span></span>
-<span id="cb6-8">)</span>
-<span id="cb6-9"></span>
-<span id="cb6-10"><span class="fu" style="color: #4758AB;
+<span id="cb7-8">)</span>
+<span id="cb7-9"></span>
+<span id="cb7-10"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggplot</span>(d) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb6-11">    <span class="fu" style="color: #4758AB;
+<span id="cb7-11">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_histogram</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
@@ -187,7 +229,7 @@ background-color: null;
 font-style: inherit;">"tomato"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb6-12">    <span class="fu" style="color: #4758AB;
+<span id="cb7-12">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_histogram</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
@@ -212,7 +254,7 @@ background-color: null;
 font-style: inherit;">"lightblue"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb6-13">    <span class="fu" style="color: #4758AB;
+<span id="cb7-13">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -221,20 +263,20 @@ background-color: null;
 font-style: inherit;">"variable"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb6-14">    <span class="fu" style="color: #4758AB;
+<span id="cb7-14">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">theme_minimal</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mikedecr.netlify.app/blog/partial_fns_ggplot/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+<p><img src="https://mikedecr.netlify.app/blog/partial_fns_ggplot/index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>This works, but I specified some redundant information in multiple calls to <code>geom_histogram</code>. This is annoying and potentially error-prone, and if I want to change some of these features, I have to change the arguments to multiple functions.</p>
 <p>Here is the same plot with a partial function approach:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># create a new histogram function w/ arguments fixed</span></span>
-<span id="cb7-2">geom_hist_rv <span class="ot" style="color: #003B4F;
+<span id="cb8-2">geom_hist_rv <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -251,16 +293,16 @@ background-color: null;
 font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.8</span>)</span>
-<span id="cb7-3"></span>
-<span id="cb7-4"><span class="co" style="color: #5E5E5E;
+<span id="cb8-3"></span>
+<span id="cb8-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># apply our function</span></span>
-<span id="cb7-5"><span class="fu" style="color: #4758AB;
+<span id="cb8-5"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggplot</span>(d) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb7-6">    <span class="fu" style="color: #4758AB;
+<span id="cb8-6">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_hist_rv</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
@@ -273,7 +315,7 @@ background-color: null;
 font-style: inherit;">"tomato"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb7-7">    <span class="fu" style="color: #4758AB;
+<span id="cb8-7">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_hist_rv</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
@@ -286,7 +328,7 @@ background-color: null;
 font-style: inherit;">"lightblue"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb7-8">    <span class="fu" style="color: #4758AB;
+<span id="cb8-8">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -295,11 +337,11 @@ background-color: null;
 font-style: inherit;">"variable"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb7-9">    <span class="fu" style="color: #4758AB;
+<span id="cb8-9">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">theme_minimal</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mikedecr.netlify.app/blog/partial_fns_ggplot/index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+<p><img src="https://mikedecr.netlify.app/blog/partial_fns_ggplot/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>This approach eliminated all redundant information from the specification of the histograms. Call that a win.</p>
@@ -310,10 +352,10 @@ font-style: inherit;">theme_minimal</span>()</span></code></pre></div>
 <p>But you can create your own <code>scale_</code> functions that encode the “visual semantics” of your project data by currying the built-in <code>scale_</code> functions. You can write these new functions one time and save yourself the effort elsewhere in your project.</p>
 <p>For instance, if I always want certain species in the <code>palmerpenguins</code> data to map to the same colors, I can write some functions…</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># a vector of key-value pairs, species to color</span></span>
-<span id="cb8-2">peng_colors <span class="ot" style="color: #003B4F;
+<span id="cb9-2">peng_colors <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -336,18 +378,18 @@ background-color: null;
 font-style: inherit;">=</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"darkcyan"</span>)</span>
-<span id="cb8-3"></span>
-<span id="cb8-4"><span class="co" style="color: #5E5E5E;
+<span id="cb9-3"></span>
+<span id="cb9-4"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># invoke the pairs in curried arguments</span></span>
-<span id="cb8-5">scale_color_species <span class="ot" style="color: #003B4F;
+<span id="cb9-5">scale_color_species <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">partial</span>(scale_color_manual, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">values =</span> peng_colors)</span>
-<span id="cb8-6">scale_fill_species <span class="ot" style="color: #003B4F;
+<span id="cb9-6">scale_fill_species <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -357,16 +399,16 @@ font-style: inherit;">values =</span> peng_colors)</span></code></pre></div>
 </div>
 <p>And now I can employ those visual standards wherever I want.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="fu" style="color: #4758AB;
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">library</span>(palmerpenguins)</span>
-<span id="cb9-2"></span>
-<span id="cb9-3"><span class="fu" style="color: #4758AB;
+<span id="cb10-2"></span>
+<span id="cb10-3"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggplot</span>(penguins) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb9-4">    <span class="fu" style="color: #4758AB;
+<span id="cb10-4">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -379,12 +421,12 @@ background-color: null;
 font-style: inherit;">fill =</span> species) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb9-5">    <span class="fu" style="color: #4758AB;
+<span id="cb10-5">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_point</span>() <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb9-6">    <span class="fu" style="color: #4758AB;
+<span id="cb10-6">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_smooth</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -393,25 +435,25 @@ background-color: null;
 font-style: inherit;">"lm"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb9-7">    <span class="fu" style="color: #4758AB;
+<span id="cb10-7">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">scale_color_species</span>() <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb9-8">    <span class="fu" style="color: #4758AB;
+<span id="cb10-8">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">scale_fill_species</span>()</span>
-<span id="cb9-9"><span class="do" style="color: #5E5E5E;
+<span id="cb10-9"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## `geom_smooth()` using formula = 'y ~ x'</span></span>
-<span id="cb9-10"><span class="do" style="color: #5E5E5E;
+<span id="cb10-10"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## Warning: Removed 2 rows containing non-finite values (`stat_smooth()`).</span></span>
-<span id="cb9-11"><span class="do" style="color: #5E5E5E;
+<span id="cb10-11"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## Warning: Removed 2 rows containing missing values (`geom_point()`).</span></span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mikedecr.netlify.app/blog/partial_fns_ggplot/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<p><img src="https://mikedecr.netlify.app/blog/partial_fns_ggplot/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>And if I ever wanted to change the way I represent species as colors, I change the function in one place only. Nice.</p>
@@ -426,7 +468,7 @@ font-style: italic;">## Warning: Removed 2 rows containing missing values (`geom
 <li><p><strong>Composition.</strong> This is crucial. Functional programming makes heavy use of function composition (creating new functions from existing functions). For instance, we can rewrite <code>g(f(x))</code> as <code>h(x)</code>, where <code>h</code> is just the function composition of <code>g</code> and <code>f</code>. Composition works when the output of the first function <code>f</code> matches the input type of the next function <code>g</code>, and this works great in R when your <code>g</code> takes one argument. But what if your <code>g</code> needs multiple arguments? <code>g(f(x), other_args = ...)</code> might be more irritating to read in whatever context you are working in. Another way to handle this is by creating a partial function in place of <code>g</code>, use that function to precompose <code>h</code>, and we’ll be on our way.</p></li>
 <li><p><strong>Abstraction</strong>. If a function takes more than one argument, is any single argument the “primary” argument? In some contexts this may <em>informally</em> be meaningful, but not in any formal sense. Consider our <code>unsafe_mean</code> example above. The <code>mean</code> function takes two arguments (it can actually take more, but let’s set them aside). We created an <code>unsafe_mean</code> function that fixes <code>na.rm</code>. But just as easily we could fixed the data argument <code>x</code>,</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1">b_mean <span class="ot" style="color: #003B4F;
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1">b_mean <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -436,30 +478,30 @@ font-style: inherit;">x =</span> b)</span></code></pre></div>
 </div>
 <p>and call this new function by passing <code>na.rm = TRUE</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="fu" style="color: #4758AB;
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">b_mean</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">TRUE</span>)</span>
-<span id="cb11-2"><span class="do" style="color: #5E5E5E;
+<span id="cb12-2"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 0.6</span></span></code></pre></div>
 </div>
 <p>…or by passing nothing at all! Which would use the base function’s defaults.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="fu" style="color: #4758AB;
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">b_mean</span>()</span>
-<span id="cb12-2"><span class="do" style="color: #5E5E5E;
+<span id="cb13-2"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] NA</span></span></code></pre></div>
 </div>
 <p>This is obviously a weird example, but I am trying to get you to embrace that weird.</p>
 <p>You can imagine other examples, like <code>lm</code> or <code>glm</code>. Are <code>lm</code> and <code>glm</code> functions of regression formulae, or are they functions of datasets? We could fix the formula and let the dataset vary…</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1">apply_reg <span class="ot" style="color: #003B4F;
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1">apply_reg <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -475,13 +517,13 @@ font-style: inherit;">+</span> w)</span></code></pre></div>
 </div>
 <p>Or we could fix the dataset and let the formula vary:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1">reg_on_penguins <span class="ot" style="color: #003B4F;
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1">reg_on_penguins <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">partial</span>(lm, <span class="at" style="color: #657422;
 background-color: null;
-font-style: inherit;">data =</span> palmerpenguins)</span></code></pre></div>
+font-style: inherit;">data =</span> penguins)</span></code></pre></div>
 </div>
 <p>Both of these partial functions are valid. Mathematically it makes no difference.</p></li>
 </ol>
@@ -491,155 +533,155 @@ font-style: inherit;">data =</span> palmerpenguins)</span></code></pre></div>
 <h2 class="anchored" data-anchor-id="functions-are-objects">Functions are objects</h2>
 <p>In R we like to say “everything is an object”. We can break this down into a couple important properties. First, we can ask about the properties of functions as if they were any other data.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="fu" style="color: #4758AB;
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">attributes</span>(unsafe_mean)</span>
-<span id="cb15-2"><span class="do" style="color: #5E5E5E;
+<span id="cb16-2"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $srcref</span></span>
-<span id="cb15-3"><span class="do" style="color: #5E5E5E;
+<span id="cb16-3"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## function(x) mean(x, na.rm = TRUE)</span></span></code></pre></div>
 </div>
 <p>We can pass functions as arguments to other functions. You may have seen this with <code>apply</code> functions or <code>purrr::map</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="fu" style="color: #4758AB;
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">lapply</span>(mtcars, unsafe_mean) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">head</span>()</span>
-<span id="cb16-2"><span class="do" style="color: #5E5E5E;
+<span id="cb17-2"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $mpg</span></span>
-<span id="cb16-3"><span class="do" style="color: #5E5E5E;
+<span id="cb17-3"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 20.09062</span></span>
-<span id="cb16-4"><span class="do" style="color: #5E5E5E;
+<span id="cb17-4"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb16-5"><span class="do" style="color: #5E5E5E;
+<span id="cb17-5"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $cyl</span></span>
-<span id="cb16-6"><span class="do" style="color: #5E5E5E;
+<span id="cb17-6"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 6.1875</span></span>
-<span id="cb16-7"><span class="do" style="color: #5E5E5E;
+<span id="cb17-7"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb16-8"><span class="do" style="color: #5E5E5E;
+<span id="cb17-8"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $disp</span></span>
-<span id="cb16-9"><span class="do" style="color: #5E5E5E;
+<span id="cb17-9"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 230.7219</span></span>
-<span id="cb16-10"><span class="do" style="color: #5E5E5E;
+<span id="cb17-10"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb16-11"><span class="do" style="color: #5E5E5E;
+<span id="cb17-11"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $hp</span></span>
-<span id="cb16-12"><span class="do" style="color: #5E5E5E;
+<span id="cb17-12"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 146.6875</span></span>
-<span id="cb16-13"><span class="do" style="color: #5E5E5E;
+<span id="cb17-13"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb16-14"><span class="do" style="color: #5E5E5E;
+<span id="cb17-14"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $drat</span></span>
-<span id="cb16-15"><span class="do" style="color: #5E5E5E;
+<span id="cb17-15"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 3.596563</span></span>
-<span id="cb16-16"><span class="do" style="color: #5E5E5E;
+<span id="cb17-16"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb16-17"><span class="do" style="color: #5E5E5E;
+<span id="cb17-17"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $wt</span></span>
-<span id="cb16-18"><span class="do" style="color: #5E5E5E;
+<span id="cb17-18"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 3.21725</span></span></code></pre></div>
 </div>
 <p>And we can return functions as values from other functions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><span class="co" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># take in a function f and return a "lifted" function that applies f to a list</span></span>
-<span id="cb17-2">fmap <span class="ot" style="color: #003B4F;
+<span id="cb18-2">fmap <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">function</span>(f) {</span>
-<span id="cb17-3">    <span class="cf" style="color: #003B4F;
+<span id="cb18-3">    <span class="cf" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">function</span>(lst) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">lapply</span>(lst, f)</span>
-<span id="cb17-4">}</span>
-<span id="cb17-5"></span>
-<span id="cb17-6">map_unsafe_mean <span class="ot" style="color: #003B4F;
+<span id="cb18-4">}</span>
+<span id="cb18-5"></span>
+<span id="cb18-6">map_unsafe_mean <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">fmap</span>(unsafe_mean)</span>
-<span id="cb17-7"><span class="fu" style="color: #4758AB;
+<span id="cb18-7"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">map_unsafe_mean</span>(mtcars) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">head</span>()</span>
-<span id="cb17-8"><span class="do" style="color: #5E5E5E;
+<span id="cb18-8"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $mpg</span></span>
-<span id="cb17-9"><span class="do" style="color: #5E5E5E;
+<span id="cb18-9"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 20.09062</span></span>
-<span id="cb17-10"><span class="do" style="color: #5E5E5E;
+<span id="cb18-10"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb17-11"><span class="do" style="color: #5E5E5E;
+<span id="cb18-11"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $cyl</span></span>
-<span id="cb17-12"><span class="do" style="color: #5E5E5E;
+<span id="cb18-12"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 6.1875</span></span>
-<span id="cb17-13"><span class="do" style="color: #5E5E5E;
+<span id="cb18-13"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb17-14"><span class="do" style="color: #5E5E5E;
+<span id="cb18-14"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $disp</span></span>
-<span id="cb17-15"><span class="do" style="color: #5E5E5E;
+<span id="cb18-15"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 230.7219</span></span>
-<span id="cb17-16"><span class="do" style="color: #5E5E5E;
+<span id="cb18-16"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb17-17"><span class="do" style="color: #5E5E5E;
+<span id="cb18-17"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $hp</span></span>
-<span id="cb17-18"><span class="do" style="color: #5E5E5E;
+<span id="cb18-18"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 146.6875</span></span>
-<span id="cb17-19"><span class="do" style="color: #5E5E5E;
+<span id="cb18-19"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb17-20"><span class="do" style="color: #5E5E5E;
+<span id="cb18-20"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $drat</span></span>
-<span id="cb17-21"><span class="do" style="color: #5E5E5E;
+<span id="cb18-21"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 3.596563</span></span>
-<span id="cb17-22"><span class="do" style="color: #5E5E5E;
+<span id="cb18-22"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## </span></span>
-<span id="cb17-23"><span class="do" style="color: #5E5E5E;
+<span id="cb18-23"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## $wt</span></span>
-<span id="cb17-24"><span class="do" style="color: #5E5E5E;
+<span id="cb18-24"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## [1] 3.21725</span></span></code></pre></div>
 </div>
