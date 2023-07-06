@@ -10,7 +10,7 @@
 <atom:link href="https://mikedecr.netlify.app/blog.xml" rel="self" type="application/rss+xml"/>
 <description>political scientist turned high-frequency tradist</description>
 <generator>quarto-1.3.302</generator>
-<lastBuildDate>Fri, 30 Jun 2023 05:00:00 GMT</lastBuildDate>
+<lastBuildDate>Thu, 06 Jul 2023 05:00:00 GMT</lastBuildDate>
 <item>
   <title>Dreams of a “Lazyverse”</title>
   <dc:creator>Michael DeCrescenzo</dc:creator>
@@ -959,7 +959,7 @@ font-style: italic;">## 7  2009 male             2.16</span></span></code></pre>
   <category>code</category>
   <category>r</category>
   <guid>https://mikedecr.netlify.app/blog/delayplyr/index.html</guid>
-  <pubDate>Fri, 30 Jun 2023 05:00:00 GMT</pubDate>
+  <pubDate>Thu, 06 Jul 2023 05:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Curried functions in R</title>
