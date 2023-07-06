@@ -142,21 +142,21 @@
   {
     "objectID": "blog/delayplyr/index.html",
     "href": "blog/delayplyr/index.html",
-    "title": "Dreams of a “Lazyverse”: a delayed evaluation interface for tidy data manipulation in R",
+    "title": "Dreams of a “Lazyverse”",
     "section": "",
     "text": "It is hard to introduce what this post is about. I will try.\nThis post proposes a delayed evaluation, function-forward interface for Tidyverse data manipulation, focusing primarily on dplyr verbs. Instead of writing data |&gt; verb(args), it should be easier to write verb(args) as its own expression, save it ahead of time, and later evaluate it on data.\nThis post provides some less-than-ideal code to implement such an interface. It is surely incomplete. But the interface is interesting and appealing at least to me, a nostalgic R user with a new love of functional programming."
   },
   {
     "objectID": "blog/delayplyr/index.html#but-first-function-composition-helpers",
     "href": "blog/delayplyr/index.html#but-first-function-composition-helpers",
-    "title": "Dreams of a “Lazyverse”: a delayed evaluation interface for tidy data manipulation in R",
+    "title": "Dreams of a “Lazyverse”",
     "section": "But first… Function composition helpers",
     "text": "But first… Function composition helpers\nFirst I will write a tool to facilitate function composition. This compose function takes two functions, g and f, and returns a new function that applies g after f to whatever data you provide.\n\n# (function, function) -&gt; function\ncompose = function(g, f) function(...) g(f(...))\n\n# and as an infix operator :)\n`%.%` = compose\n\nTraditional function composition is “left” composition: \\(g \\cdot f\\) means “\\(g\\) after \\(f\\)”, which isn’t linear. To be more consistent with R’s “pipe” style, we can write a rightward version:\n\n# (function, function) -&gt; function\ncompose_right = function(f, g) compose(g, f)\n\n# as infix\n`%;%` = compose_right\n\nTo demonstrate:\n\nx = c(1, 1, 2, 2, 2)\ncompose(length, unique)(x)\n## [1] 2\n\n# same as...\n(length %.% unique)(x)\n## [1] 2\n\n# same as...\ncompose_right(unique, length)(x)\n## [1] 2\n\n# same as...\n(unique %;% length)(x)\n## [1] 2"
   },
   {
     "objectID": "blog/delayplyr/index.html#okay-now-the-example.",
     "href": "blog/delayplyr/index.html#okay-now-the-example.",
-    "title": "Dreams of a “Lazyverse”: a delayed evaluation interface for tidy data manipulation in R",
+    "title": "Dreams of a “Lazyverse”",
     "section": "Okay, now the example.",
     "text": "Okay, now the example.\nHere’s the recipe I stated above:\n\nfilter to Adelie species\ncompute a ratio of bill length to depth\nfind the mean of this ratio\n\nHere we write these steps with delayed verbs. Each of these expressions return separate functions from dataframe to dataframe.\n\nadelie_only = dfilter(species == \"Adelie\")\n\ncompute_length_to_depth = dmutate(\n    bill_length_to_depth = bill_length_mm / bill_depth_mm\n)\n\nmean_bill_ratio = dsummarize(\n    avg_bill_ratio = mean(bill_length_to_depth, na.rm = TRUE)\n)\n\nI can now write a “data pipeline” not as eager actions on data, but as functions that don’t need to know anything about data.\n\n# using \"right\" / \"postfix\" composition\nadelie_mean_bill_ratio = (\n    adelie_only %;%\n    compute_length_to_depth %;%\n    mean_bill_ratio\n)\n\nSince my pipeline is a function, it is simple to apply it to any dataset I want. For instance, here it is in the full dataset:\n\nadelie_mean_bill_ratio(penguins)\n## # A tibble: 1 × 1\n##   avg_bill_ratio\n##            &lt;dbl&gt;\n## 1           2.12\n\nBut let’s say I wanted to group by year and sex and compute the same pipeline. Do I need to write the same pipeline with a different starting point? Do I need to stack my data and apply my pipeline with purrr::map? No, I simply call the function on a different dataset.\n\n# grouping: this is also a function :)\nby_year_sex = dgroup_by(year, sex)\n\n# using left composition this time\ncompose(adelie_mean_bill_ratio, by_year_sex)(penguins)\n## `summarise()` has grouped output by 'year'. You can override using the\n## `.groups` argument.\n## # A tibble: 7 × 3\n## # Groups:   year [3]\n##    year sex    avg_bill_ratio\n##   &lt;int&gt; &lt;fct&gt;           &lt;dbl&gt;\n## 1  2007 female           2.10\n## 2  2007 male             2.05\n## 3  2007 &lt;NA&gt;             2.07\n## 4  2008 female           2.10\n## 5  2008 male             2.15\n## 6  2009 female           2.16\n## 7  2009 male             2.16"
   },
@@ -326,6 +326,6 @@
     "href": "blog.html",
     "title": "Blog Posts",
     "section": "",
-    "text": "Posts are timestamped with an approximate “first-published” date, but I tend to revise them after the fact.\n\n\n\n\n\n\n\n\n\n\nDate\n\n\nTitle\n\n\n\n\n\n\nJun 30, 2023\n\n\nDreams of a “Lazyverse”: a delayed evaluation interface for tidy data manipulation in R\n\n\n\n\nMay 23, 2023\n\n\nCurried functions in R\n\n\n\n\nMar 11, 2023\n\n\nThe Mandelbrot set, in R, with recursion instead of iteration\n\n\n\n\nAug 31, 2022\n\n\nTreating \\(\\mathrm{\\LaTeX}\\) like a programming language: the case of color-coded equations\n\n\n\n\nAug 17, 2022\n\n\nObnoxious functional programming in R\n\n\n\n\nMay 15, 2022\n\n\nReplication code should be more usable.\n\n\n\n\nNov 6, 2021\n\n\nHighly modular blogging with Blogdown\n\n\n\n\nJun 30, 2020\n\n\nNon-flat implications of flat priors\n\n\n\n\n\n\nNo matching items"
+    "text": "Posts are timestamped with an approximate “first-published” date, but I tend to revise them after the fact.\n\n\n\n\n\n\n\n\n\n\nDate\n\n\nTitle\n\n\n\n\n\n\nJun 30, 2023\n\n\nDreams of a “Lazyverse”\n\n\n\n\nMay 23, 2023\n\n\nCurried functions in R\n\n\n\n\nMar 11, 2023\n\n\nThe Mandelbrot set, in R, with recursion instead of iteration\n\n\n\n\nAug 31, 2022\n\n\nTreating \\(\\mathrm{\\LaTeX}\\) like a programming language: the case of color-coded equations\n\n\n\n\nAug 17, 2022\n\n\nObnoxious functional programming in R\n\n\n\n\nMay 15, 2022\n\n\nReplication code should be more usable.\n\n\n\n\nNov 6, 2021\n\n\nHighly modular blogging with Blogdown\n\n\n\n\nJun 30, 2020\n\n\nNon-flat implications of flat priors\n\n\n\n\n\n\nNo matching items"
   }
 ]
