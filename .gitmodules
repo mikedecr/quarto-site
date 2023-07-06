@@ -22,3 +22,6 @@
 [submodule "blog/partial_fns_ggplot"]
 	path = blog/partial_fns_ggplot
 	url = git@github.com:mikedecr/post_partials.git
+[submodule "blog/delayplyr"]
+	path = blog/delayplyr
+	url = git@github.com:mikedecr/post_delayplyr.git
