@@ -10,7 +10,957 @@
 <atom:link href="https://mikedecr.netlify.app/blog.xml" rel="self" type="application/rss+xml"/>
 <description>political scientist turned high-frequency tradist</description>
 <generator>quarto-1.3.302</generator>
-<lastBuildDate>Tue, 23 May 2023 05:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 30 Jun 2023 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Dreams of a “Lazyverse”: a delayed evaluation interface for tidy data manipulation in R</title>
+  <dc:creator>Michael DeCrescenzo</dc:creator>
+  <link>https://mikedecr.netlify.app/blog/delayplyr/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>It is hard to introduce what this post is about. I will try.</p>
+<p>This post proposes a delayed evaluation, function-forward interface for Tidyverse data manipulation, focusing primarily on <code>dplyr</code> verbs. Instead of writing <code>data |&gt; verb(args)</code>, it should be easier to write <code>verb(args)</code> as its own expression, save it ahead of time, and later evaluate it on <code>data</code>.</p>
+<p>This post provides some less-than-ideal code to implement such an interface. It is surely incomplete. But the interface is interesting and appealing at least to me, a nostalgic R user with a new love of functional programming.</p>
+<section id="many-r-users-love-the-tidyverse" class="level1">
+<h1>(Many) R users love the Tidyverse</h1>
+<p>Let us count the reasons:</p>
+<ul>
+<li><strong>Uniform interfaces</strong> mean functions are composable. <code>dplyr</code> and <code>tidyr</code> provide functions that map dataframes to dataframes. <code>stringr</code> functions map string vector to string vector. <code>forcats</code> functions map factor to factor. And the argument structures are similar: an object of type T goes in the first argument, and an object of type T is returned. (N.B. by “type” I basically mean “class”.)</li>
+<li><strong>The forward pipe (<code>%&gt;%</code> or <code>|&gt;</code>)</strong>. Write a <em>linear</em> sequence of procedures instead of a nested expression. Instead of <code>g(f(x))</code> we can write <code>x |&gt; f() |&gt; g()</code>. That rules.</li>
+<li><strong>Unquoted expressions</strong> let you write “ergonomic” code that remains flexible. Instead of <code>data[["new_var"]] = ...</code>, we can write <code>mutate(data, new_var = ...)</code> which feels much nicer.</li>
+</ul>
+<p>These are the same reasons why I love the Tidyverse too.</p>
+<p>But the Tidyverse is also missing something for me. Something major.</p>
+</section>
+<section id="the-functional-style" class="level1">
+<h1>The functional style</h1>
+<p>the tidyverse advertises itself as a “functional” interface for data manipulation in r. and compared to the object oriented style of python (<code>pandas</code> in particular), that’s certainly true. it is much easier to combine tidy functions (<code>dplyr</code> and <code>tidyr</code> “verbs” in particular) than it is to do, frankly, anything at all in <code>pandas</code>. and i write python every day for my job.</p>
+<p>But taking a wider view, the “functional” interfaces of the Tidyverse have some key limitations. Take the following example. I want to filter the <code>palmerpenguins</code> data to the “Adelie” species only.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(palmerpenguins)</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(dplyr)</span></code></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">penguins <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb2-2">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(species <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Adelie"</span>)</span>
+<span id="cb2-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 152 × 8</span></span>
+<span id="cb2-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g</span></span>
+<span id="cb2-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;</span></span>
+<span id="cb2-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  1 Adelie  Torgersen           39.1          18.7               181        3750</span></span>
+<span id="cb2-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  2 Adelie  Torgersen           39.5          17.4               186        3800</span></span>
+<span id="cb2-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  3 Adelie  Torgersen           40.3          18                 195        3250</span></span>
+<span id="cb2-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  4 Adelie  Torgersen           NA            NA                  NA          NA</span></span>
+<span id="cb2-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  5 Adelie  Torgersen           36.7          19.3               193        3450</span></span>
+<span id="cb2-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  6 Adelie  Torgersen           39.3          20.6               190        3650</span></span>
+<span id="cb2-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  7 Adelie  Torgersen           38.9          17.8               181        3625</span></span>
+<span id="cb2-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  8 Adelie  Torgersen           39.2          19.6               195        4675</span></span>
+<span id="cb2-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  9 Adelie  Torgersen           34.1          18.1               193        3475</span></span>
+<span id="cb2-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 10 Adelie  Torgersen           42            20.2               190        4250</span></span>
+<span id="cb2-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 142 more rows</span></span>
+<span id="cb2-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;</span></span></code></pre></div>
+</div>
+<p>This works fine if I want to tie my functionality (drop all species but “Adelie”) to my data (<code>penguins</code>). But can I separate these steps? Can I write a function (using <code>dplyr</code>) that filters on species, and then later apply that function to a dataframe?</p>
+<p>Here is what I want.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># a "partial" recipe for filtering.</span></span>
+<span id="cb3-2"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># here is how I want to filter, regardless of the dataset.</span></span>
+<span id="cb3-3">adelie_only <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(species <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Adelie"</span>)</span>
+<span id="cb3-4"></span>
+<span id="cb3-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># apply the filter to a dataset</span></span>
+<span id="cb3-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">adelie_only</span>(penguins)</span></code></pre></div>
+</div>
+<p>Here is what I get:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">adelie_only <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(species <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Adelie"</span>)</span>
+<span id="cb4-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## Error in filter(species == "Adelie"): object 'species' not found</span></span></code></pre></div>
+</div>
+<p>So what we have is a <strong>clash between two tenets of the Tidyverse interface</strong>: functional style and unquoted expressions. I cannot write the function that I want to apply to my data. Not that easily, at least.</p>
+<p>I <em>could</em> write the function with a “base” style…</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># clunkier</span></span>
+<span id="cb5-2">adelie_only <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(d) {</span>
+<span id="cb5-3">    condition <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> (d<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>species <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Adelie"</span>)</span>
+<span id="cb5-4">    d[condition, ]</span>
+<span id="cb5-5">}</span>
+<span id="cb5-6"></span>
+<span id="cb5-7"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># but at least it works</span></span>
+<span id="cb5-8"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">adelie_only</span>(penguins)</span>
+<span id="cb5-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 152 × 8</span></span>
+<span id="cb5-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g</span></span>
+<span id="cb5-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;</span></span>
+<span id="cb5-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  1 Adelie  Torgersen           39.1          18.7               181        3750</span></span>
+<span id="cb5-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  2 Adelie  Torgersen           39.5          17.4               186        3800</span></span>
+<span id="cb5-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  3 Adelie  Torgersen           40.3          18                 195        3250</span></span>
+<span id="cb5-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  4 Adelie  Torgersen           NA            NA                  NA          NA</span></span>
+<span id="cb5-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  5 Adelie  Torgersen           36.7          19.3               193        3450</span></span>
+<span id="cb5-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  6 Adelie  Torgersen           39.3          20.6               190        3650</span></span>
+<span id="cb5-18"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  7 Adelie  Torgersen           38.9          17.8               181        3625</span></span>
+<span id="cb5-19"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  8 Adelie  Torgersen           39.2          19.6               195        4675</span></span>
+<span id="cb5-20"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  9 Adelie  Torgersen           34.1          18.1               193        3475</span></span>
+<span id="cb5-21"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 10 Adelie  Torgersen           42            20.2               190        4250</span></span>
+<span id="cb5-22"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 142 more rows</span></span>
+<span id="cb5-23"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;</span></span></code></pre></div>
+</div>
+<p>But there is more boilerplate code, and the magic of unquoted expressions is gone. So the interface is less expressive than what the Tidyverse ordinarily feels like.</p>
+<p><strong>More abstractly, I want to separate functions from data</strong>. I want to pass data <code>x</code> to functions <code>f</code>, <code>g</code>, and <code>h</code>. But instead of writing this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">x <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb6-2">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">f</span>(...) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb6-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">g</span>(...) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb6-4">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">h</span>(...)</span></code></pre></div>
+</div>
+<p>I want to write this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">do_f <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">f</span>(...)</span>
+<span id="cb7-2">do_g <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">g</span>(...)</span>
+<span id="cb7-3">do_h <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">h</span>(...)</span>
+<span id="cb7-4"></span>
+<span id="cb7-5">fgh <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose</span>(f, g, h)</span>
+<span id="cb7-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">fgh</span>(x)</span></code></pre></div>
+</div>
+<p>Why do I want this? Because I should be able to reuse the <code>do_f</code>, <code>do_g</code>, and <code>do_h</code> functions on different data. These operations don’t have any necessary dependence on the data <code>x</code>, but I cannot easily write these functions as abstract expressions on some yet-to-be-provided data. Not with an ergonomic Tidy style, anyway.</p>
+<p>What can we do to make this possible?</p>
+</section>
+<section id="tidy-evaluation-magic" class="level1">
+<h1>Tidy evaluation magic</h1>
+<p>Take just the <code>do_f</code> function. What I want to do is write an expression <code>f(...)</code> and <strong>delay the evaluation of the arguments <code>...</code></strong> until I call this function with data.</p>
+<p>If this is unclear, I am going to rephrase it a handful of ways in hopes that one of them clicks.</p>
+<ul>
+<li>If <code>f(.data = x, ...)</code> is a fully-formed expression that takes input data and returns output data, then <code>f(...)</code> is a procedure that we could do to some data <code>x</code>, if we were to pass <code>x</code>. But if I don’t pass data <code>x</code>, the statement <code>f(...)</code> is just a function.</li>
+<li>If a fully-formed expression is <code>f(.data = x, ...)</code>, then the expression without data <code>f(.data = ?, ...)</code> is a partial/curried function. Whereas <code>f</code> is a function that takes arguments <code>.data</code> and <code>...</code>, if we fix the <code>...</code> arguments ahead of time, the result is a function that takes only <code>.data</code>. I have written about <a href="https://mikedecr.netlify.app/blog/partial_fns_ggplot/">curried functions</a> before, hint hint, and have interpreted <a href="https://mikedecr.netlify.app/blog/fp_basics/#ending-notes-on-the-tidyverse">pipe chains as curried functions</a> quite explicitly.</li>
+<li>This is just as if <code>do_f = f(...)</code> and <code>do_f = \(x) f(x, ...)</code> were the same thing.</li>
+</ul>
+<p>The issue is, of course, the evaluation of the expression in the <code>...</code> slot of <code>f</code>. You have probably noticed that functions like <code>mutate</code>, <code>select</code>, <code>filter</code>, etc. allow you to write <em>unquoted</em> variable names without throwing errors. This is similar to writing <em>formulae</em> in R (such as in the <code>lm</code> or <code>aggregate</code> functions).</p>
+<p>How can we achieve this? In general, the answer to write a function that “captures” arguments unevaluated in one environment and evaluates those arguments in some different environment containing other necessary information. To use an example, in the code <code>filter(penguins, species == "Adelie")</code> the object <code>species</code> does not exist in the global environment. But it does exist in the environment of the dataset <code>penguins</code>. What the <code>filter</code> function does is <em>prevent the evaluation</em> of the expression <code>species == "Adelie"</code> in the global environment, evaluating that expression in the <code>.data = penguins</code> environment instead.</p>
+<p>We must use a similar trick.</p>
+</section>
+<section id="the-simplest-example-delay_filter" class="level1">
+<h1>The simplest example, <code>delay_filter</code></h1>
+<p>The <code>filter</code> function already delays the evaluation of <code>...</code> into the data environment. But we must delay it further; I don’t want to pass data <em>at all</em> when the expression is captured.</p>
+<p>So we write a function that captures arguments <code>...</code>, and returns a <em>new function</em> that would take <code>.data</code> and execute <code>filter(.data, ...)</code>. We capture the unevaluated arguments with <code>rlang::enquos</code> and evaluate them in the data context with <code>rlang::eval_tidy</code> and the <code>!!!</code> operator. Sadly I cannot explain these tools in detail here. If you want to learn more, I would recommend the <a href="https://adv-r.hadley.nz/metaprogramming.html">Advanced R chapters on metaprogramming</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># args -&gt; function(.data, args)</span></span>
+<span id="cb8-2">delay_filter <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(...) {</span>
+<span id="cb8-3">    args <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">enquos</span>(...)</span>
+<span id="cb8-4">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(.data) rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval_tidy</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(.data, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!!!</span>args))</span>
+<span id="cb8-5">}</span></code></pre></div>
+</div>
+<p>Here it is in action. I delay the evaluation of <code>filter</code> and pass some arguments to filter on. The result is a <em>new function</em>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># creates a function</span></span>
+<span id="cb9-2">adelie_only <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">delay_filter</span>(species <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Adelie"</span>)</span>
+<span id="cb9-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">class</span>(adelie_only)</span>
+<span id="cb9-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] "function"</span></span></code></pre></div>
+</div>
+<p>And only when I pass a dataset is the expression <code>species == "Adelie"</code> evaluated.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">adelie_only</span>(penguins)</span>
+<span id="cb10-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 152 × 8</span></span>
+<span id="cb10-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g</span></span>
+<span id="cb10-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;</span></span>
+<span id="cb10-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  1 Adelie  Torgersen           39.1          18.7               181        3750</span></span>
+<span id="cb10-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  2 Adelie  Torgersen           39.5          17.4               186        3800</span></span>
+<span id="cb10-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  3 Adelie  Torgersen           40.3          18                 195        3250</span></span>
+<span id="cb10-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  4 Adelie  Torgersen           NA            NA                  NA          NA</span></span>
+<span id="cb10-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  5 Adelie  Torgersen           36.7          19.3               193        3450</span></span>
+<span id="cb10-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  6 Adelie  Torgersen           39.3          20.6               190        3650</span></span>
+<span id="cb10-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  7 Adelie  Torgersen           38.9          17.8               181        3625</span></span>
+<span id="cb10-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  8 Adelie  Torgersen           39.2          19.6               195        4675</span></span>
+<span id="cb10-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  9 Adelie  Torgersen           34.1          18.1               193        3475</span></span>
+<span id="cb10-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 10 Adelie  Torgersen           42            20.2               190        4250</span></span>
+<span id="cb10-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 142 more rows</span></span>
+<span id="cb10-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;</span></span></code></pre></div>
+</div>
+</section>
+<section id="more-generally-delay_verb" class="level1">
+<h1>More generally, <code>delay_verb</code></h1>
+<p>There are more <code>dplyr</code> verbs than <code>filter</code>. We also have <code>mutate</code>, <code>select</code>, <code>count</code> and so on. How can we scale this routine up to these functions as well?</p>
+<p>This is where functional programming shines. Let’s write a function that takes a verb and returns a delayed-verb-creator function. That is, we pass a function (like <code>filter</code>), and it returns a function of args <code>...</code> which would, in turn, return a function of <code>.data</code>. It sounds like a mouthful, but let’s see how it goes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># verb -&gt; (function(...) -&gt; function(.data))</span></span>
+<span id="cb11-2">delay_verb <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(verb) {</span>
+<span id="cb11-3">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(...) {</span>
+<span id="cb11-4">        args <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">enquos</span>(...)</span>
+<span id="cb11-5">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(.data) rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval_tidy</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">verb</span>(.data, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!!!</span>args))</span>
+<span id="cb11-6">    }</span>
+<span id="cb11-7">}</span></code></pre></div>
+</div>
+<p>And now we can create many delayed verbs with this function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1">dfilter <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">delay_verb</span>(filter)</span>
+<span id="cb12-2">dmutate <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">delay_verb</span>(mutate)</span>
+<span id="cb12-3">dselect <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">delay_verb</span>(select)</span>
+<span id="cb12-4">dcount <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">delay_verb</span>(count)</span>
+<span id="cb12-5">dsummarize <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">delay_verb</span>(summarize)</span>
+<span id="cb12-6">dgroup_by <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">delay_verb</span>(group_by)</span>
+<span id="cb12-7">darrange <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">delay_verb</span>(arrange)</span></code></pre></div>
+</div>
+<p>These delayed verbs let us pre-supply arguments without data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># create the function</span></span>
+<span id="cb13-2">adelie_only <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfilter</span>(species <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Adelie"</span>)</span></code></pre></div>
+</div>
+<p>And then call these functions with whatever data we want.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">adelie_only</span>(penguins)</span>
+<span id="cb14-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 152 × 8</span></span>
+<span id="cb14-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g</span></span>
+<span id="cb14-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;</span></span>
+<span id="cb14-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  1 Adelie  Torgersen           39.1          18.7               181        3750</span></span>
+<span id="cb14-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  2 Adelie  Torgersen           39.5          17.4               186        3800</span></span>
+<span id="cb14-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  3 Adelie  Torgersen           40.3          18                 195        3250</span></span>
+<span id="cb14-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  4 Adelie  Torgersen           NA            NA                  NA          NA</span></span>
+<span id="cb14-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  5 Adelie  Torgersen           36.7          19.3               193        3450</span></span>
+<span id="cb14-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  6 Adelie  Torgersen           39.3          20.6               190        3650</span></span>
+<span id="cb14-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  7 Adelie  Torgersen           38.9          17.8               181        3625</span></span>
+<span id="cb14-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  8 Adelie  Torgersen           39.2          19.6               195        4675</span></span>
+<span id="cb14-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  9 Adelie  Torgersen           34.1          18.1               193        3475</span></span>
+<span id="cb14-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 10 Adelie  Torgersen           42            20.2               190        4250</span></span>
+<span id="cb14-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 142 more rows</span></span>
+<span id="cb14-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;</span></span></code></pre></div>
+</div>
+<p>Let’s verify that some other delayed verbs work as expected.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># delay mutate: convert species to uppercase</span></span>
+<span id="cb15-2">upper_species <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dmutate</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">species =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">toupper</span>(species))</span>
+<span id="cb15-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">upper_species</span>(penguins)</span>
+<span id="cb15-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 344 × 8</span></span>
+<span id="cb15-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g</span></span>
+<span id="cb15-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    &lt;chr&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;</span></span>
+<span id="cb15-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  1 ADELIE  Torgersen           39.1          18.7               181        3750</span></span>
+<span id="cb15-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  2 ADELIE  Torgersen           39.5          17.4               186        3800</span></span>
+<span id="cb15-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  3 ADELIE  Torgersen           40.3          18                 195        3250</span></span>
+<span id="cb15-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  4 ADELIE  Torgersen           NA            NA                  NA          NA</span></span>
+<span id="cb15-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  5 ADELIE  Torgersen           36.7          19.3               193        3450</span></span>
+<span id="cb15-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  6 ADELIE  Torgersen           39.3          20.6               190        3650</span></span>
+<span id="cb15-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  7 ADELIE  Torgersen           38.9          17.8               181        3625</span></span>
+<span id="cb15-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  8 ADELIE  Torgersen           39.2          19.6               195        4675</span></span>
+<span id="cb15-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  9 ADELIE  Torgersen           34.1          18.1               193        3475</span></span>
+<span id="cb15-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 10 ADELIE  Torgersen           42            20.2               190        4250</span></span>
+<span id="cb15-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 334 more rows</span></span>
+<span id="cb15-18"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;</span></span>
+<span id="cb15-19"></span>
+<span id="cb15-20"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># delay select: only columns that start with "bill"</span></span>
+<span id="cb15-21">bill_cols <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dselect</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">starts_with</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"bill"</span>))</span>
+<span id="cb15-22"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">bill_cols</span>(penguins)</span>
+<span id="cb15-23"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 344 × 2</span></span>
+<span id="cb15-24"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    bill_length_mm bill_depth_mm</span></span>
+<span id="cb15-25"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##             &lt;dbl&gt;         &lt;dbl&gt;</span></span>
+<span id="cb15-26"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  1           39.1          18.7</span></span>
+<span id="cb15-27"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  2           39.5          17.4</span></span>
+<span id="cb15-28"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  3           40.3          18  </span></span>
+<span id="cb15-29"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  4           NA            NA  </span></span>
+<span id="cb15-30"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  5           36.7          19.3</span></span>
+<span id="cb15-31"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  6           39.3          20.6</span></span>
+<span id="cb15-32"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  7           38.9          17.8</span></span>
+<span id="cb15-33"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  8           39.2          19.6</span></span>
+<span id="cb15-34"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  9           34.1          18.1</span></span>
+<span id="cb15-35"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 10           42            20.2</span></span>
+<span id="cb15-36"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 334 more rows</span></span>
+<span id="cb15-37"></span>
+<span id="cb15-38"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># delay summarize, compute mean mass</span></span>
+<span id="cb15-39">avg_mass <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dsummarize</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">avg_mass =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>))</span>
+<span id="cb15-40"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">avg_mass</span>(penguins)</span>
+<span id="cb15-41"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 1 × 1</span></span>
+<span id="cb15-42"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   avg_mass</span></span>
+<span id="cb15-43"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##      &lt;dbl&gt;</span></span>
+<span id="cb15-44"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1    4202.</span></span></code></pre></div>
+</div>
+</section>
+<section id="the-payoff-even-more-functional-approach-to-data-munging" class="level1">
+<h1>The payoff: even more “functional” approach to data munging</h1>
+<p>As we mentioned above, one of the key benefits of the Tidyverse was composable, linear code. The drawback was that pipe chains need both functions <em>and</em> data.</p>
+<p>With this new delayed interface, we can separate the functions from the data. So I can write the same linear pipeline of functionality <em>without passing any data</em>. This lets me evaluate the same function pipeline of multiple datasets without redundant typing.</p>
+<p>This new style is much more like “traditional” function composition. Say I have two functions <img src="https://latex.codecogs.com/png.latex?f"> and <img src="https://latex.codecogs.com/png.latex?g">. If I want to compose these functions, I can write the composition <img src="https://latex.codecogs.com/png.latex?g%20%5Ccdot%20f">, which means “do <img src="https://latex.codecogs.com/png.latex?g"> after <img src="https://latex.codecogs.com/png.latex?f">”. The result is a new function, and there is no reference to data. I can pass data later.</p>
+<p>Let’s consider an example. I want to (a) filter to Adelie species, (b) compute a ratio of bill length to depth, and (c) find the mean of this ratio. I can write this routine <em>as a series of functions</em> without any data.</p>
+<section id="but-first-function-composition-helpers" class="level2">
+<h2 class="anchored" data-anchor-id="but-first-function-composition-helpers">But first… Function composition helpers</h2>
+<p>First I will write a tool to facilitate function composition. This <code>compose</code> function takes two functions, <code>g</code> and <code>f</code>, and returns a new function that applies <code>g</code> after <code>f</code> to whatever data you provide.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># (function, function) -&gt; function</span></span>
+<span id="cb16-2">compose <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(g, f) <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(...) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">g</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">f</span>(...))</span>
+<span id="cb16-3"></span>
+<span id="cb16-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># and as an infix operator :)</span></span>
+<span id="cb16-5"><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">%.%</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> compose</span></code></pre></div>
+</div>
+<p>Traditional function composition is “left” composition: <img src="https://latex.codecogs.com/png.latex?g%20%5Ccdot%20f"> means “<img src="https://latex.codecogs.com/png.latex?g"> after <img src="https://latex.codecogs.com/png.latex?f">”, which isn’t linear. To be more consistent with R’s “pipe” style, we can write a rightward version:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># (function, function) -&gt; function</span></span>
+<span id="cb17-2">compose_right <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(f, g) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose</span>(g, f)</span>
+<span id="cb17-3"></span>
+<span id="cb17-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># as infix</span></span>
+<span id="cb17-5"><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">%;%</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> compose_right</span></code></pre></div>
+</div>
+<p>To demonstrate:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1">x <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb18-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose</span>(length, unique)(x)</span>
+<span id="cb18-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 2</span></span>
+<span id="cb18-4"></span>
+<span id="cb18-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># same as...</span></span>
+<span id="cb18-6">(length <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%.%</span> unique)(x)</span>
+<span id="cb18-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 2</span></span>
+<span id="cb18-8"></span>
+<span id="cb18-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># same as...</span></span>
+<span id="cb18-10"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose_right</span>(unique, length)(x)</span>
+<span id="cb18-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 2</span></span>
+<span id="cb18-12"></span>
+<span id="cb18-13"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># same as...</span></span>
+<span id="cb18-14">(unique <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%;%</span> length)(x)</span>
+<span id="cb18-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 2</span></span></code></pre></div>
+</div>
+</section>
+<section id="okay-now-the-example." class="level2">
+<h2 class="anchored" data-anchor-id="okay-now-the-example.">Okay, now the example.</h2>
+<p>Here’s the recipe I stated above:</p>
+<ol type="a">
+<li>filter to Adelie species</li>
+<li>compute a ratio of bill length to depth</li>
+<li>find the mean of this ratio</li>
+</ol>
+<p>Here we write these steps with <em>delayed</em> verbs. Each of these expressions return <strong>separate functions</strong> from dataframe to dataframe.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1">adelie_only <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dfilter</span>(species <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Adelie"</span>)</span>
+<span id="cb19-2"></span>
+<span id="cb19-3">compute_length_to_depth <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dmutate</span>(</span>
+<span id="cb19-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">bill_length_to_depth =</span> bill_length_mm <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> bill_depth_mm</span>
+<span id="cb19-5">)</span>
+<span id="cb19-6"></span>
+<span id="cb19-7">mean_bill_ratio <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dsummarize</span>(</span>
+<span id="cb19-8">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">avg_bill_ratio =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(bill_length_to_depth, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span>
+<span id="cb19-9">)</span></code></pre></div>
+</div>
+<p>I can now write a “data pipeline” not as eager actions on data, but as <strong>functions</strong> that don’t need to know anything about data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># using "right" / "postfix" composition</span></span>
+<span id="cb20-2">adelie_mean_bill_ratio <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> (</span>
+<span id="cb20-3">    adelie_only <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%;%</span></span>
+<span id="cb20-4">    compute_length_to_depth <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%;%</span></span>
+<span id="cb20-5">    mean_bill_ratio</span>
+<span id="cb20-6">)</span></code></pre></div>
+</div>
+<p>Since my pipeline is a <em>function</em>, it is simple to apply it to any dataset I want. For instance, here it is in the full dataset:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">adelie_mean_bill_ratio</span>(penguins)</span>
+<span id="cb21-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 1 × 1</span></span>
+<span id="cb21-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   avg_bill_ratio</span></span>
+<span id="cb21-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##            &lt;dbl&gt;</span></span>
+<span id="cb21-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1           2.12</span></span></code></pre></div>
+</div>
+<p>But let’s say I wanted to group by year and sex and compute the same pipeline. Do I need to write the same pipeline with a different starting point? Do I need to stack my data and apply my pipeline with <code>purrr::map</code>? No, I simply call the function on a different dataset.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># grouping: this is also a function :)</span></span>
+<span id="cb22-2">by_year_sex <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">dgroup_by</span>(year, sex)</span>
+<span id="cb22-3"></span>
+<span id="cb22-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># using left composition this time</span></span>
+<span id="cb22-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose</span>(adelie_mean_bill_ratio, by_year_sex)(penguins)</span>
+<span id="cb22-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## `summarise()` has grouped output by 'year'. You can override using the</span></span>
+<span id="cb22-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## `.groups` argument.</span></span>
+<span id="cb22-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 7 × 3</span></span>
+<span id="cb22-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # Groups:   year [3]</span></span>
+<span id="cb22-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    year sex    avg_bill_ratio</span></span>
+<span id="cb22-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   &lt;int&gt; &lt;fct&gt;           &lt;dbl&gt;</span></span>
+<span id="cb22-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1  2007 female           2.10</span></span>
+<span id="cb22-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 2  2007 male             2.05</span></span>
+<span id="cb22-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 3  2007 &lt;NA&gt;             2.07</span></span>
+<span id="cb22-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 4  2008 female           2.10</span></span>
+<span id="cb22-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 5  2008 male             2.15</span></span>
+<span id="cb22-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 6  2009 female           2.16</span></span>
+<span id="cb22-18"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 7  2009 male             2.16</span></span></code></pre></div>
+</div>
+</section>
+</section>
+<section id="the-argument-for-delayplyr-functions-over-pipelines" class="level1">
+<h1>The argument for “Delayplyr”: functions over pipelines</h1>
+<p>The proposition of a delayed / functional approach to data manipulation is that you can create complex results by writing and applying functions instead of executing procedures on data.</p>
+<p>One key benefit of this style is modularity. Many of the “steps” in your pipeline are not dependent on the exact state of your data in the pipeline. They can instead be expressions that would do <em>some operation</em> to <em>some data</em>. In that approach, your “pipeline” isn’t a dataset being transformed; it is the <em>recipe</em> for transforming the data. The difference? A pipeline binds the functions to the data The recipe lets the functions exist separate from the data.</p>
+<p>As a result, you can write and save many separate components ahead of time: <code>adelie_only</code>, <code>compute_length_to_depth</code>, <code>mean_bill_ratio</code>, <code>by_year_sex</code>… In a traditional <code>dplyr</code> chain, these functions would be steps in a pipe chain that have to carry the data from one state to the next. The state of the data in one function is intimately related to the state of the data in all prior functions. And although <code>dplyr</code> verbs are in theory abstract functions on dataframes, the pipelines you create are not abstract at all. They are actually quite fragile.</p>
+<p>But when you write a lot of separate functions, these functions don’t depend on one another. You can costlessly combine and rearrange them. You only pay the cost when you apply the functions on data, which you can do much more flexibly now that you have separated the data from the chain of operations.</p>
+<p>Now <em>that</em> is functional programming with the Tidyverse!</p>
+
+
+</section>
+
+ ]]></description>
+  <category>code</category>
+  <category>r</category>
+  <guid>https://mikedecr.netlify.app/blog/delayplyr/index.html</guid>
+  <pubDate>Fri, 30 Jun 2023 05:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Curried functions in R</title>
   <dc:creator>Michael DeCrescenzo</dc:creator>
