@@ -2,46 +2,50 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mikedecr.netlify.app/index.html</loc>
-    <lastmod>2023-07-06T04:30:27.070Z</lastmod>
+    <lastmod>2023-07-08T17:12:45.437Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/latex_colors/index.html</loc>
-    <lastmod>2023-07-06T04:30:28.759Z</lastmod>
+    <lastmod>2023-07-08T17:12:46.744Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/nonflat_implied_priors/index.html</loc>
-    <lastmod>2023-07-06T04:30:29.644Z</lastmod>
+    <lastmod>2023-07-08T17:12:47.604Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/usable_repos/index.html</loc>
-    <lastmod>2023-07-06T04:30:30.866Z</lastmod>
+    <lastmod>2023-07-08T17:12:48.750Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/delayplyr/index.html</loc>
-    <lastmod>2023-07-06T04:30:32.419Z</lastmod>
+    <lastmod>2023-07-08T17:12:49.569Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/modular_blog/index.html</loc>
-    <lastmod>2023-07-06T04:30:33.627Z</lastmod>
+    <lastmod>2023-07-08T17:12:50.746Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/mandelbrot_iterative_recursive/index.html</loc>
-    <lastmod>2023-07-06T04:30:34.305Z</lastmod>
+    <lastmod>2023-07-08T17:12:51.419Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mikedecr.netlify.app/blog/composition/index.html</loc>
+    <lastmod>2023-07-08T17:12:52.102Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/fp_basics/index.html</loc>
-    <lastmod>2023-07-06T04:30:35.592Z</lastmod>
+    <lastmod>2023-07-08T17:12:53.349Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog/partial_fns_ggplot/index.html</loc>
-    <lastmod>2023-07-06T04:30:36.391Z</lastmod>
+    <lastmod>2023-07-08T17:12:54.145Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/about.html</loc>
-    <lastmod>2023-07-06T04:30:37.801Z</lastmod>
+    <lastmod>2023-07-08T17:12:55.215Z</lastmod>
   </url>
   <url>
     <loc>https://mikedecr.netlify.app/blog.html</loc>
-    <lastmod>2023-07-06T04:30:38.173Z</lastmod>
+    <lastmod>2023-07-08T17:12:55.595Z</lastmod>
   </url>
 </urlset>

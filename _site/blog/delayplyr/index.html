@@ -204,6 +204,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
+<!-- # New outline: -->
+<!---->
+<!-- - tldr: -->
+<!--     - here's what I want to do -->
+<!--     - here is why I can't do it. -->
+<!--     - here is the solution. -->
+<!---->
+<!-- - Motivation: there is something missing about the Tidyverse. -->
+<!-- - Problem: tidy evaluation -->
+<!-- - Fix: eval magic -->
+<!-- - Applications -->
 <p>It is hard to introduce what this post is about. I will try.</p>
 <p>This post proposes a delayed evaluation, function-forward interface for Tidyverse data manipulation, focusing primarily on <code>dplyr</code> verbs. Instead of writing <code>data |&gt; verb(args)</code>, it should be easier to write <code>verb(args)</code> as its own expression, save it ahead of time, and later evaluate it on <code>data</code>.</p>
 <p>This post provides some less-than-ideal code to implement such an interface. It is surely incomplete. But the interface is interesting and appealing at least to me, a nostalgic R user with a new love of functional programming.</p>

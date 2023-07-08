@@ -10,7 +10,439 @@
 <atom:link href="https://mikedecr.netlify.app/blog.xml" rel="self" type="application/rss+xml"/>
 <description>political scientist turned high-frequency tradist</description>
 <generator>quarto-1.3.302</generator>
-<lastBuildDate>Thu, 06 Jul 2023 05:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sat, 08 Jul 2023 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Function composition</title>
+  <dc:creator>Michael DeCrescenzo</dc:creator>
+  <link>https://mikedecr.netlify.app/blog/composition/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>This blog post is an basic overview of function composition with implementation and examples in the programming language <code>R</code>. We will see:</p>
+<ul>
+<li>Some basic mathematical notation for composition.</li>
+<li>R code to create function generic compositions.</li>
+<li>How to implement composition with custom binary (infix) operators.</li>
+<li>Some concrete examples.</li>
+</ul>
+<section id="leading-with-an-example." class="level1">
+<h1>Leading with an example.</h1>
+<p>Consider the <code>palmerpenguins</code> data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(palmerpenguins)</span>
+<span id="cb1-2"></span>
+<span id="cb1-3">penguins</span>
+<span id="cb1-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 344 × 8</span></span>
+<span id="cb1-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g</span></span>
+<span id="cb1-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;</span></span>
+<span id="cb1-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  1 Adelie  Torgersen           39.1          18.7               181        3750</span></span>
+<span id="cb1-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  2 Adelie  Torgersen           39.5          17.4               186        3800</span></span>
+<span id="cb1-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  3 Adelie  Torgersen           40.3          18                 195        3250</span></span>
+<span id="cb1-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  4 Adelie  Torgersen           NA            NA                  NA          NA</span></span>
+<span id="cb1-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  5 Adelie  Torgersen           36.7          19.3               193        3450</span></span>
+<span id="cb1-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  6 Adelie  Torgersen           39.3          20.6               190        3650</span></span>
+<span id="cb1-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  7 Adelie  Torgersen           38.9          17.8               181        3625</span></span>
+<span id="cb1-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  8 Adelie  Torgersen           39.2          19.6               195        4675</span></span>
+<span id="cb1-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  9 Adelie  Torgersen           34.1          18.1               193        3475</span></span>
+<span id="cb1-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 10 Adelie  Torgersen           42            20.2               190        4250</span></span>
+<span id="cb1-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 334 more rows</span></span>
+<span id="cb1-18"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;</span></span></code></pre></div>
+</div>
+<p>Actually, just consider the <code>year</code> column.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(penguins<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>year)</span>
+<span id="cb2-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 2007 2007 2007 2007 2007 2007</span></span></code></pre></div>
+</div>
+<p>How many unique years are there?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unique</span>(penguins<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>year))</span>
+<span id="cb3-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 3</span></span></code></pre></div>
+</div>
+<p>How did we do that? First we removed all duplicates from the <code>year</code> vector.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">n =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unique</span>(penguins<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>year))</span>
+<span id="cb4-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 2007 2008 2009</span></span></code></pre></div>
+</div>
+<p>And then we count the number of elements in that result.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(n)</span>
+<span id="cb5-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 3</span></span></code></pre></div>
+</div>
+<p>So that was two functions, one after the other: <code>unique</code> and <code>length</code>.</p>
+<p><strong>Function composition</strong> is combining two or more functions into one function. Here is the “typical” way we could do that in R.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">n_unique <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(x) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unique</span>(x))</span>
+<span id="cb6-2"></span>
+<span id="cb6-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">n_unique</span>(penguins<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>year)</span>
+<span id="cb6-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 3</span></span></code></pre></div>
+</div>
+<p>But this post will cover atypical ways of doing it. Obviously the atypical ways are less common, but they open up new interfaces and stylistic possibilities for our code. Let’s explore.</p>
+</section>
+<section id="a-barely-formal-definition-of-composition." class="level1">
+<h1>A barely-formal definition of composition.</h1>
+<p>In the abstract, what we saw above is <img src="https://latex.codecogs.com/png.latex?g(f(x))">. We have two functions, <img src="https://latex.codecogs.com/png.latex?g"> and <img src="https://latex.codecogs.com/png.latex?f">. We evaluate <img src="https://latex.codecogs.com/png.latex?f"> on <img src="https://latex.codecogs.com/png.latex?x">, and then evaluate <img src="https://latex.codecogs.com/png.latex?g"> on the result. We could define a new function <img src="https://latex.codecogs.com/png.latex?h(x)%20=%20g(f(x))"> that means the same thing. This <img src="https://latex.codecogs.com/png.latex?h"> is a function composition similar to <code>n_unique</code> above.</p>
+<p>This is easy enough.</p>
+<p>But here is another way to write function composition that better resembles what is to come. We can define <img src="https://latex.codecogs.com/png.latex?h"> without reference to the input <img src="https://latex.codecogs.com/png.latex?x"> at all. We can use the notation <img src="https://latex.codecogs.com/png.latex?h%20=%20g%20%5Ccdot%20f">, where the dot <img src="https://latex.codecogs.com/png.latex?%5Ccdot"> is an operator representing function composition. We can read it as “do <img src="https://latex.codecogs.com/png.latex?g"> after <img src="https://latex.codecogs.com/png.latex?f">”. The resulting function is the same: <img src="https://latex.codecogs.com/png.latex?h(x)%20=%20(g%20%5Ccdot%20f)(x)">. Just like <img src="https://latex.codecogs.com/png.latex?h">, the composition <img src="https://latex.codecogs.com/png.latex?g%20%5Ccdot%20f"> is a <em>new function</em>, and it can take an argument <img src="https://latex.codecogs.com/png.latex?x">, but we do not actually need to refer to <img src="https://latex.codecogs.com/png.latex?x"> when defining the composition.</p>
+</section>
+<section id="implementing-abstract-function-composition-in-r" class="level1">
+<h1>Implementing abstract function composition in R</h1>
+<p>I say “abstract” because, unlike our definition of <code>n_unique</code> above, we will write a tool to compose <em>any</em> functions, without reference to specific functions or specific arguments.</p>
+<p>Here it is:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">compose_left <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(g, f) {</span>
+<span id="cb7-2">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(...) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">g</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">f</span>(...))</span>
+<span id="cb7-3">}</span></code></pre></div>
+</div>
+<p><code>compose_left</code> takes two arguments <code>g</code> and <code>f</code>, which are functions, and internally defines a <em>new function</em> that applies <code>f</code> and then <code>g</code> on some unspecified arguments <code>...</code>.<sup>1</sup></p>
+<p>Here is how we would use this tool to define <code>n_unique</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">n_unique <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose_left</span>(length, unique)</span></code></pre></div>
+</div>
+<p>That’s it.</p>
+<p>And it works, too.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">n_unique</span>(penguins<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>year)</span>
+<span id="cb9-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 3</span></span></code></pre></div>
+</div>
+</section>
+<section id="interface-possibilities" class="level1">
+<h1>Interface possibilities</h1>
+<p>The <code>compose_left</code> function we wrote takes functions as arguments. Functions that take functions as arguments are sometimes called higher-order functions, and they can have dramatic effects on the way we write code. You may have experienced this effect with other higher-order functions in R like <code>lapply</code> or <code>purrr::map</code>.</p>
+<p>We will now discuss how to modify our interface to function composition, so we can invoke it in more convenient and ergonomic ways.</p>
+<section id="rightward-composition-and-its-relationship-to-the-pipe-operator" class="level2">
+<h2 class="anchored" data-anchor-id="rightward-composition-and-its-relationship-to-the-pipe-operator">Rightward composition and its relationship to the pipe operator</h2>
+<p>You may be thinking, this is a <em>little</em> like the pipe operator. The pipe operator <code>|&gt;</code> (or <code>%&gt;%</code>, if you’re old school) also lets us combine functions with convenient syntax. But the piping and composing are different. Composition lets you define a function ahead of time and pass the data whenever you want, or not at all. Piping forces you to pass the data <em>now</em>. This is extremely important because you can many more wacky things with an unevaluated function object. You can use a composed function as an ingredient to other function compositions. You can “lift” this function with other higher-order procedures like <code>*apply</code>, <code>Map</code>/<code>purrr::map</code>, <code>Reduce</code>, and so on. But with the pipe, it’s all-or-nothing.<sup>2</sup></p>
+<p>A less important difference is that the pipe reads from left to right, while composition reads from right to left. <img src="https://latex.codecogs.com/png.latex?g%20%5Ccdot%20f"> means <img src="https://latex.codecogs.com/png.latex?g"> <em>after</em> <img src="https://latex.codecogs.com/png.latex?f">. I call this difference “less important” because we can simply write a rightward composition function…</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># note the order of g and f</span></span>
+<span id="cb10-2">compose_right <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(f, g) {</span>
+<span id="cb10-3">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(...) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">g</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">f</span>(...))</span>
+<span id="cb10-4">}</span>
+<span id="cb10-5"></span>
+<span id="cb10-6">n_unique <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose_right</span>(unique, length)</span>
+<span id="cb10-7"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">n_unique</span>(penguins<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>year)</span>
+<span id="cb10-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 3</span></span></code></pre></div>
+</div>
+<p>…to achieve the same orientation. There is no functional difference between <code>compose_left(b, a)</code> and <code>compose_right(a, b)</code>.<sup>3</sup></p>
+</section>
+<section id="infix-operators-for-function-composition." class="level2">
+<h2 class="anchored" data-anchor-id="infix-operators-for-function-composition.">Infix operators for function composition.</h2>
+<p>An infix operator is an operator that goes between its arguments, like <code>+</code> (add), <code>&lt;-</code> (assign), and so on. Infix operators are nothing but syntax overtop a function that takes two arguments.<sup>4</sup></p>
+<p>We can declare our own infix operators in R by assigning a function to a special character sequence. This sequence must begin and end with <code>%</code>, and you must use backticks when the operator is defined.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># left: evokes g . f</span></span>
+<span id="cb11-2"><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">%.%</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> compose_left</span>
+<span id="cb11-3"></span>
+<span id="cb11-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># right: evokes f ; g</span></span>
+<span id="cb11-5"><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">%;%</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> compose_right</span></code></pre></div>
+</div>
+<p>We could then use these operators to define <code>n_unique</code> like so:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># left</span></span>
+<span id="cb12-2">n_unique <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> length <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%.%</span> unique</span>
+<span id="cb12-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">n_unique</span>(penguins<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>year)</span>
+<span id="cb12-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 3</span></span>
+<span id="cb12-5"></span>
+<span id="cb12-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># right</span></span>
+<span id="cb12-7">n_unique <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> unique <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%;%</span> length </span>
+<span id="cb12-8"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">n_unique</span>(penguins<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>year)</span>
+<span id="cb12-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 3</span></span></code></pre></div>
+</div>
+</section>
+<section id="n-ary-composition" class="level2">
+<h2 class="anchored" data-anchor-id="n-ary-composition">n-ary composition</h2>
+<p>The <code>compose_left</code> and <code>compose_right</code> functions each take <em>two</em> arguments. But you can compose as many functions as we want. Composition is <strong>associative</strong>, so <img src="https://latex.codecogs.com/png.latex?(a%20%5Ccdot%20b)%20%5Ccdot%20c"> is the same as <img src="https://latex.codecogs.com/png.latex?a%20%5Ccdot%20(b%20%5Ccdot%20c)">. The result is the same as long as the order of function application doesn’t change.</p>
+<p>So let’s write a <code>compose</code> function that can handle as many functions as we can give it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1">compose <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(...) {</span>
+<span id="cb13-2">    fns <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(...)</span>
+<span id="cb13-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">Reduce</span>(compose_left, fns, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">init =</span> identity)</span>
+<span id="cb13-4">}</span></code></pre></div>
+</div>
+<p>We will introduce a third function for our example, <code>as.character</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1">chr_n_unique <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose</span>(as.character, length, unique)</span>
+<span id="cb14-2"></span>
+<span id="cb14-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">chr_n_unique</span>(penguins<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>year)</span>
+<span id="cb14-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] "3"</span></span></code></pre></div>
+</div>
+<p>We implement this n-ary composition with an underlying call to <code>Reduce</code>. A reduction is a programming technique where a binary operation is repeatedly applied over a sequence of values until one output value remains. So our function <code>compose(as.character, length, unique)</code> is created in the following way:</p>
+<ul>
+<li>compose <code>identity</code> and <code>as.character</code> (any function <code>f</code> composed with <code>identity</code> is just <code>f</code>)</li>
+<li>compose the result up to now with <code>length</code></li>
+<li>compose the result up to now with <code>unique</code></li>
+</ul>
+<p>So it creates essentially <code>compose_left(compose_left(compose_left(identity, as.character), length), unique)</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1">chr_n_unique <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose_left</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose_left</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose_left</span>(identity, as.character), length), unique)</span>
+<span id="cb15-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">chr_n_unique</span>(penguins<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>year)</span>
+<span id="cb15-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] "3"</span></span></code></pre></div>
+</div>
+<p>One clever thing about this design is that we can pass arguments as dots <code>...</code> or as a vector <code>c(...)</code>. This is useful because we can organize our functions with normal R data containers ahead of time: the functions <em>are data!</em> It also lets the syntax directly mimic the associative property of function composition in mathematics, as function compositions are equivalent regardless of the prior “grouping” of composed units.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1">yr <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> penguins<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>year</span>
+<span id="cb16-2"></span>
+<span id="cb16-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(as.character, length, unique))(yr)</span>
+<span id="cb16-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] "3"</span></span>
+<span id="cb16-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(as.character, length), unique)(yr)</span>
+<span id="cb16-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] "3"</span></span>
+<span id="cb16-7"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose</span>(as.character, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(length, unique))(yr)</span>
+<span id="cb16-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] "3"</span></span>
+<span id="cb16-9"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose</span>(as.character, length), unique)(yr)</span>
+<span id="cb16-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] "3"</span></span>
+<span id="cb16-11"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose</span>(as.character, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">compose</span>(length, unique))(yr)</span>
+<span id="cb16-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] "3"</span></span></code></pre></div>
+</div>
+
+
+</section>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p> Why does this function take dots <code>...</code> instead of one argument <code>x</code>? This lets us evaluate our first function (<code>f</code>) on potentially multiple arguments. The second function <code>g</code> doesn’t have the same flexibility—it has to work with the simple returned value from <code>f</code>—but if we needed to provide other arguments to <code>g</code>, we could insert a <a href="https://mikedecr.netlify.app/blog/partial_fns_ggplot/">partial function</a> for <code>g</code>.↩︎</p></li>
+<li id="fn2"><p>I actually find the eager behavior of the pipe operator quite inconvenient in some cases. So much so that I am working on tools that let the user write “pipe-like” expressions without providing data and save those expressions as functions. And because these “unevaluated pipe expressions” are just functions, they can be composed with other functions, lifted with higher order functions, and so on. This would improve the composability and reusability of data science code in R broadly. I wrote about the effort <a href="https://mikedecr.netlify.app/blog/delayplyr/">here</a>.↩︎</p></li>
+<li id="fn3"><p> Composing left seems more conventional in mathematics (from my limited point of view), but “postfix” notation also exists: <img src="https://latex.codecogs.com/png.latex?g%20%5Ccdot%20f"> can be written as <img src="https://latex.codecogs.com/png.latex?f%20;%20g">.↩︎</p></li>
+<li id="fn4"><p>I am writing a different package called <a href="https://github.com/mikedecr/prefix"><code>prefix</code></a> that provides prefix function bindings for R’s built-in infix operators. This makes it easier to write <code>a + b</code> as <code>add(a, b)</code>, or, more importantly, <code>a |&gt; add(b)</code>.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>code</category>
+  <category>r</category>
+  <guid>https://mikedecr.netlify.app/blog/composition/index.html</guid>
+  <pubDate>Sat, 08 Jul 2023 05:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Dreams of a “Lazyverse”</title>
   <dc:creator>Michael DeCrescenzo</dc:creator>
@@ -20,6 +452,17 @@
 
 
 
+<!-- # New outline: -->
+<!---->
+<!-- - tldr: -->
+<!--     - here's what I want to do -->
+<!--     - here is why I can't do it. -->
+<!--     - here is the solution. -->
+<!---->
+<!-- - Motivation: there is something missing about the Tidyverse. -->
+<!-- - Problem: tidy evaluation -->
+<!-- - Fix: eval magic -->
+<!-- - Applications -->
 <p>It is hard to introduce what this post is about. I will try.</p>
 <p>This post proposes a delayed evaluation, function-forward interface for Tidyverse data manipulation, focusing primarily on <code>dplyr</code> verbs. Instead of writing <code>data |&gt; verb(args)</code>, it should be easier to write <code>verb(args)</code> as its own expression, save it ahead of time, and later evaluate it on <code>data</code>.</p>
 <p>This post provides some less-than-ideal code to implement such an interface. It is surely incomplete. But the interface is interesting and appealing at least to me, a nostalgic R user with a new love of functional programming.</p>
