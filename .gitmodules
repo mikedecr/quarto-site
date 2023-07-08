@@ -25,3 +25,6 @@
 [submodule "blog/delayplyr"]
 	path = blog/delayplyr
 	url = git@github.com:mikedecr/post_delayplyr.git
+[submodule "blog/composition"]
+	path = blog/composition
+	url = git@github.com:mikedecr/post_composition.git
