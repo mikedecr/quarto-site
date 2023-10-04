@@ -204,9 +204,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p>This post proposes a dialect for data frame operations that I call <code>currr</code>. (I am not married to the name.) You can find and install a (very unfinished) package on <a href="https://github.com/mikedecr/currr">Github</a>.</p>
+<p>This post proposes a dialect for data frame operations that I call <code>currr</code>. (I am not married to the name.) You can find and install a very unfinished package on <a href="https://github.com/mikedecr/currr">Github</a>.</p>
 <p><code>currr</code> is built on <code>dplyr</code>, but it uses a distinct grammar.</p>
-<p>A typical <code>dplyr</code> workflow pipes a data frame through a series of functions (in this case <code>filter</code>, <code>group_by</code>, and <code>summarize</code>).</p>
+<p>A typical <code>dplyr</code> workflow will pipe a data frame through a series of functions (in this case <code>filter</code>, <code>group_by</code>, and <code>summarize</code>).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"palmerpenguins"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"dplyr"</span>)</span>
@@ -230,7 +230,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 5 male   Dream        3950      3987.     350.</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 6 male   Torgersen    4000      4035.     372.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The purpose of <code>currr</code> is to provide a convenient way to <em>pre-define</em> functions that perform these data manipulation steps, without referring to a data frame. Instead of <code>filter</code>, <code>group_by</code>, and <code>summarize</code>, here we use <code>filtering</code>, <code>grouping</code>, and <code>summarizing</code> to create <em>new functions</em>.</p>
+<p>The purpose of <code>currr</code> is to provide a convenient way to <em>pre-define</em> functions that perform these data manipulation steps, without referring to a data frame. Instead of <code>filter</code>, <code>group_by</code>, and <code>summarize</code>, here we use <code>currr::filtering</code>, <code>currr::grouping</code>, and <code>currr::summarizing</code> to create <em>new functions</em>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(currr)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
@@ -239,7 +239,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="do">##     grouping</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># each of these is a function of a data frame</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># each of these returns a new function that is dataframe -&gt; dataframe</span></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>flt_sex_FM <span class="ot">=</span> <span class="fu">filtering</span>(sex <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"male"</span>, <span class="st">"female"</span>))</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>by_sex_isl <span class="ot">=</span> <span class="fu">grouping</span>(sex, island)</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>smz_mass <span class="ot">=</span> <span class="fu">summarizing</span>(</span>
@@ -278,10 +278,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>At this point you may be wondering,</p>
 <blockquote class="blockquote">
-<p>If <code>dplyr</code> is already so good, why do I need this confusing, tedious style?</p>
+<p>If <code>dplyr</code> is already so good, why should I complicate my life with this new style?</p>
 </blockquote>
-<p>and I intend to give you a thorough answer as the post proceeds.</p>
-<p>This post proceeds in three sections:</p>
+<p>…and this post will try to answer.</p>
+<p>We proceed in three sections below:</p>
 <ol type="1">
 <li><strong>The tl;dr</strong>: how to use and understand <code>currr</code></li>
 <li><strong>For the skeptics</strong>: why you would want to use <code>currr</code>.</li>
@@ -294,8 +294,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>currr</code> code is just curried <code>dplyr</code> code.</li>
 <li><code>currr</code> functions are meant to be composed without evaluating them immediately.</li>
 </ol>
-<section id="currr-code-is-just-curried-dplyr-code." class="level3">
-<h3 class="anchored" data-anchor-id="currr-code-is-just-curried-dplyr-code."><code>currr</code> code is just curried <code>dplyr</code> code.</h3>
+<section id="thing-1-of-2-currr-code-is-just-curried-dplyr-code." class="level3">
+<h3 class="anchored" data-anchor-id="thing-1-of-2-currr-code-is-just-curried-dplyr-code.">Thing 1 of 2: <code>currr</code> code is just curried <code>dplyr</code> code.</h3>
 <p>“Currying” a function means turning a function of many arguments into a function of fewer arguments. I have <a href="https://mikedecr.netlify.app/blog/partial_fns_ggplot/">written about this before</a>, but we will explain it plenty here too.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <p><code>dplyr</code> functions like <code>filter</code> and <code>select</code> have analogous <code>currr</code> functions like <code>filtering</code> and <code>selecting</code>. The <code>currr</code> functions create <em>curried</em> versions of the <code>dplyr</code> functions. Let me give you an example. Here is how we can use <code>dplyr::filter</code> to keep only known male and female penguins in the <code>palmerpenguins</code> dataset.</p>
 <div class="cell">
@@ -325,11 +325,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="do">## {</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="do">##     return((purrr::partial(verb))(.data, ...))</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="do">## }</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;bytecode: 0x10adecc70&gt;</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x103b17158&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;bytecode: 0x123dda7b8&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x113cdbb68&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>And instead of getting a data frame back, I get a <em>new function</em>. That resulting function would take me from data frame to data frame, but I can pass that data frame some time later. I have <em>curried</em> the <code>filter</code> function with the argument <code>sex %in% c("male", "female")</code>. In other words, I created a version of the <code>filter</code> function with that boolean condition pre-specified. When I call that function later, it will invoke the boolean expression without me specifying it later.</p>
-<p>To assure you how it works, I will build the same function <em>and then</em> pass the <code>penguins</code> data to the curried function. I will get the same result as the original, fully-specified <code>filter</code> call.</p>
+<p>And instead of getting a data frame back, I get a <em>new function</em>. The new function maps me from dataframe to dataframe. I can pass that dataframe later on, though. I don’t have to do it right now.</p>
+<p>Another way to say this is that I have partially applied the argument <code>sex %in% c("male", "female")</code> to the <code>filter</code> function. That is, I created a version of the <code>filter</code> function with that boolean condition pre-specified. When I call that function later, it will invoke the boolean expression without needing me to pass it again.</p>
+<p>To assure you that it works, here I build the same function, give it a name, and then pass the <code>penguins</code> data. I get the same result as the original, fully-specified <code>filter</code> call.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>flt_sex <span class="ot">=</span> <span class="fu">filtering</span>(sex <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"male"</span>, <span class="st">"female"</span>))</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">flt_sex</span>(penguins)</span>
@@ -349,34 +350,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="do">## # ℹ 323 more rows</span></span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="do">## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>You typically don’t want to pass the data immediately after creating the function. The purpose of <code>currr</code> is to create the curried function and evaluate it on data later on. Why delay the evaluation of data? Because by <em>separating the function from the data</em>, it is easier to compose and recycle functionality and multiple datasets. More explanation in the “Why” section below.</p>
+<p>You typically don’t want to pass the data immediately after creating the function. The purpose of <code>currr</code> is to create the curried function and evaluate it on data later on. Why delay the evaluation of data? Because by <em>separating the function from the data</em>, it is easier to compose and recycle functionality to act on multiple datasets. More explanation in the “Why” section below.</p>
 </section>
-<section id="currr-functions-can-be-composed-without-evaluating-on-data." class="level3">
-<h3 class="anchored" data-anchor-id="currr-functions-can-be-composed-without-evaluating-on-data."><code>currr</code> functions can be composed without evaluating on data.</h3>
-<p>Most R uders hear “function composition” and think of the pipe operator <code>|&gt;</code>. The pipe operator turns a nested function call like <code>h(g(f(x)))</code> into something like <code>x |&gt; f() |&gt; g() |&gt; h()</code>. That is convenient, but its behavior is too <em>eager</em> for our needs. We want to separate the <code>x</code> from the <code>f</code>, <code>g</code>, and <code>h</code>.</p>
-<p>I could get around this limitation by writing a new function that combines <code>f</code>, <code>g</code>, and <code>h</code> and then passing <code>x</code> to that function like this…</p>
+<section id="thing-2-of-2-currr-functions-can-be-composed-without-evaluating-on-data." class="level3">
+<h3 class="anchored" data-anchor-id="thing-2-of-2-currr-functions-can-be-composed-without-evaluating-on-data.">Thing 2 of 2: <code>currr</code> functions can be composed without evaluating on data.</h3>
+<p>Most R users hear “function composition” and think of the pipe operator <code>|&gt;</code>, which turns a nested function call like <code>h(g(f(x)))</code> into <code>x |&gt; f() |&gt; g() |&gt; h()</code>. That is convenient, but its behavior is too eager for our needs. We want to combine functions without passing the data <code>x</code>.</p>
+<p>I could write a new function that combines <code>f</code>, <code>g</code>, and <code>h</code> and then pass <code>x</code> to that function like this…</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fgh <span class="ot">=</span> <span class="cf">function</span>(...) <span class="fu">f</span>(...) <span class="sc">|&gt;</span> <span class="fu">g</span>() <span class="sc">|&gt;</span> <span class="fu">h</span>()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>x <span class="sc">|&gt;</span> <span class="fu">fgh</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>…but it is a bit clunky Mathemematical notation for function composition, meanwhile, is simple: <span class="math inline">\(fgh = h \cdot g \cdot f\)</span>.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
-<p><code>currr</code> provides operators to two function composition operators to make this easy. First, the <code>%.%</code> operator for classical mathematical composition: <code>(g %.% f)(x)</code> is like <code>g(f(x))</code>. Second, a postfix-style <code>%;%</code> composition operator that reads more “pipe-like”: <code>(f %;% g)(x)</code> is like <code>x |&gt; f() |&gt; g()</code>.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
-<p>These operators let us take little functions and combine them without evaluating on data. Take the example at the top of the post. These are functions.</p>
+<p>…but that is a bit clunky. Mathematical notation for function composition, meanwhile, is simple: <span class="math inline">\(fgh = h \cdot g \cdot f\)</span>.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Can I achieve something that simple in R? Yes.</p>
+<p><code>currr</code> provides operators for two different kinds of function composition. First, the <code>%.%</code> operator for classical mathematical composition: <code>(g %.% f)(x)</code> is like <code>g(f(x))</code>. You should read <code>g %.% f</code> as “do <code>g</code> after <code>f</code>”. Second, we have a postfix-style <code>%;%</code> composition operator that reads more “pipe-like”: <code>(f %;% g)(x)</code> is like <code>x |&gt; f() |&gt; g()</code>.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> <code>f %;% g</code> is “do <code>f</code> and then <code>g</code>”.</p>
+<p>These operators let us compose little functions into bigger functions without applying them on data. Take the example at the top of the post. Each of these objects is a function.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(currr)</span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>flt_sex_FM <span class="ot">=</span> <span class="fu">filtering</span>(sex <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"male"</span>, <span class="st">"female"</span>))</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># each of these is a function of a data frame</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>flt_sex_FM <span class="ot">=</span> <span class="fu">filtering</span>(sex <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"male"</span>, <span class="st">"female"</span>))</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>by_sex_isl <span class="ot">=</span> <span class="fu">grouping</span>(sex, island)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>smz_mass <span class="ot">=</span> <span class="fu">summarizing</span>(</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">mass_med =</span> <span class="fu">median</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">mass_mean =</span> <span class="fu">mean</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">mass_std =</span> <span class="fu">sd</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>by_sex_isl <span class="ot">=</span> <span class="fu">grouping</span>(sex, island)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>smz_mass <span class="ot">=</span> <span class="fu">summarizing</span>(</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">mass_med =</span> <span class="fu">median</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">mass_mean =</span> <span class="fu">mean</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">mass_std =</span> <span class="fu">sd</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>I compose them into a “chain” of operations (really, a new function) without evaluating them.</p>
+<p>I compose them into a “chain” of operations, which is itself a new function, without evaluating it.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mass_by_sex_isl <span class="ot">=</span> (flt_sex_FM <span class="sc">%;%</span> by_sex_isl <span class="sc">%;%</span> smz_mass)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -412,7 +412,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="do">##      &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     4050     4202.     802.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Okay, I also want to compute the same stats, grouped by <code>sex</code>.</p>
+<p>Okay, I also want to compute the same stats, grouped by <code>sex</code>. Notice I have to write the <code>summarize</code> step again.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(sex, island) <span class="sc">|&gt;</span></span>
@@ -435,7 +435,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 8 &lt;NA&gt;   Dream        2975      2975       NA </span></span>
 <span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 9 &lt;NA&gt;   Torgersen    3588.     3681.     413.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Notice I had to write the <code>summarize</code> step all over again. And if I also wanted it grouped by sex <em>and</em> island…</p>
+<p>And if I also wanted it grouped by sex <em>and</em> island, summarize yet again.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(sex, island) <span class="sc">|&gt;</span></span>
@@ -458,7 +458,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 8 &lt;NA&gt;   Dream        2975      2975       NA </span></span>
 <span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 9 &lt;NA&gt;   Torgersen    3588.     3681.     413.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Now I have three instances in my code where I need to write the same <code>summarize</code> code, because I wanted to see it three different ways. And if I want to change that code (say, add a mean abs. deviation statistic), I have to change it in multiple places. This is a good reason to use a function! <code>currr</code> gives us a way write that function conveniently and composably. We write the <code>summarize</code> step one time and re-use whenever we want later.</p>
+<p>Now I have three instances in my code where I need to write the same <code>summarize</code> code, because I wanted to see it three different ways. And if I want to change that code (say, add a mean abs. deviation statistic), I have to change it in multiple places. This is a good scenario to write a function! <code>currr</code> gives us a way to write that function conveniently and composably. We write the <code>summarize</code> step one time and re-use whenever we want later.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>smz_mass <span class="ot">=</span> <span class="fu">summarizing</span>(</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">mass_med =</span> <span class="fu">median</span>(body_mass_g, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
@@ -498,45 +498,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>This is the benefit we get by <em>separating the data from the functionality</em>.</p>
 <ul>
 <li>When functions are pre-defined, we can pass whatever data whenever we want.</li>
-<li>It is easier to abstract over the data because we wrote modular functions instead of a bundled pipeline.</li>
-<li>We pay a little up-front cost to store the <code>dplyr</code> verb as a function, but we amortize the cost of repeated invocations of the same functionality. Lots of little functions may look silly in isolation, but they play important roles when composed with other functions.</li>
-<li>We greatly reduce the cost of changing key functionality; change the function definition in one place, and inherit the change everywhere the function is called.</li>
+<li>It is easier to abstract over the data because we wrote modular functions instead of a pipeline that forces you to provide the data up front.</li>
+<li>We expend a little up-front effort to define these little functions, but we amortize the costs when we invoke those functions repeatedly. Lots of little functions may look silly in isolation, but they aren’t silly when you compose them to create bigger functionality.</li>
+<li>We greatly reduce the cost of <em>changing</em> the definitions of these functions; change the function definition in one place, and inherit the change everywhere the function is called.</li>
 </ul>
 </section>
 <section id="how-currr-works" class="level1">
 <h1>How <code>currr</code> works</h1>
+<p>All of <code>currr</code> fits in <a href="https://github.com/mikedecr/currr/blob/main/R/currr.R">one small file</a>. Although in fairness, it probably isn’t finished yet.</p>
 <p><code>currr</code> works by creating curryable <code>dplyr</code> verbs. For example:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>filtering <span class="ot">=</span> <span class="fu">currify_verb</span>(filter)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>mutating <span class="ot">=</span> <span class="fu">currify_verb</span>(mutating)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>summarizing <span class="ot">=</span> <span class="fu">currify_verb</span>(summarize)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>grouping <span class="ot">=</span> <span class="fu">currify_verb</span>(group_by)</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>ungrouping <span class="ot">=</span> <span class="fu">currify_verb</span>(ungroup)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>selecting <span class="ot">&lt;-</span> <span class="fu">currify_verb</span>(dplyr<span class="sc">::</span>select)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The implementation of <code>currify_verb</code> is, in turn…</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># curry a verb</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># returns a function (...) -&gt; (data -&gt; data) which curries the provided verb.</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># the innermost function assumes the data provided </span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">#    is the first arg to the fully specified verb call</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>currify_verb <span class="ot">&lt;-</span> <span class="cf">function</span>(verb) {</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(...) {</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>        intention <span class="ot">&lt;-</span> <span class="cf">function</span>(.data) {</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>            <span class="fu">return</span>(purrr<span class="sc">::</span><span class="fu">partial</span>(verb)(.data, ...))</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        memoise<span class="sc">::</span><span class="fu">memoise</span>(intention)</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>currify_verb <span class="ot">&lt;-</span> <span class="cf">function</span>(verb) {</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(...) {</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>        intention <span class="ot">&lt;-</span> <span class="cf">function</span>(.data) {</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>            <span class="fu">return</span>(purrr<span class="sc">::</span><span class="fu">partial</span>(verb)(.data, ...))</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        memoise<span class="sc">::</span><span class="fu">memoise</span>(intention)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The outermost function <code>currify_verb</code> takes a <code>verb</code> and returns a new function of args <code>...</code>. The args are then used to return <em>another function</em> of <code>.data</code>, enclosing both the verb and the args in the environment of the innermost function. I call the innermost function an <code>intention</code>, because it declares an intent to evaluate a verb without actually evaluating it (yet).</p>
-<p>Another notable detail is that we return not the <code>intention</code> object but a memoized <code>intention</code> using the <a href="https://memoise.r-lib.org/">memoise</a> package. <em>Memoization</em> associates a function value with the arguments that created that value, and caches the result. This way, if a function is ever called again with the same arguments as before, we return the cached value associated with those arguments instead of recomputing the value anew.</p>
-<p>Memoization is commonly used in functional programming because we want to express values as the result of functions. If data have to pass through intermediate states, we want that state to be handled inside of functions instead of sitting in the open in main environment of the program. Contrast this to <code>dplyr</code>, where we would avoid recomputation by storing a copy of our data in some intermediate state that we can use as a midway point to branch out from. Memoization lets us get all the efficiency of intermediate data without polluting our program environment with stateful data that we don’t care about. Instead, we are only responsible for defining and composing the functionality that we want to invoke to transform our raw data. Now that’s functional programming!</p>
+<p>Another notable detail is that we return not the <code>intention</code> object but a memoized <code>intention</code> using the <a href="https://memoise.r-lib.org/">memoise</a> package. Memoization caches function values in (morally) a hash table keyed by the function arguments. If I evaluate a function for the first time, I hash the value by the function arguments. If I evaluate a function a second time or more, I can lookup the value in the lookup table instead of recomputing the value from scratch. This gives us the same efficiency as, say, storing a copy of data in some intermediate state, without the need to pollute our environment with intermediately-stateful data that we don’t care about unto itself. Now that’s functional programming!</p>
 <p>The only other thing to note is how we implement function composition:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">%.%</span><span class="st">`</span> <span class="ot">=</span> <span class="cf">function</span>(g, f) <span class="cf">function</span>(...) <span class="fu">g</span>(<span class="fu">f</span>(...))</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">%;%</span><span class="st">`</span> <span class="ot">=</span> <span class="cf">function</span>(f, g) <span class="cf">function</span>(...) <span class="fu">g</span>(<span class="fu">f</span>(...))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">%.%</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(g, f) <span class="cf">function</span>(...) <span class="fu">g</span>(<span class="fu">f</span>(...))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>In R, we can define our own binary operations as functions of two arguments. Function composition is associative, so in the case of these binary operators, it is sufficient to define composition on just two arguments and let infix notation take care of the rest. This is similar to the way <code>+</code> is a function of two variables, yet we can still write <code>a + b + c</code> without parentheses. Associativity tells us the grouping doesn’t matter. Now that’s also functional programming!</p>
+<p>In R, we can define custom binary operations as functions of two arguments. Function composition is associative, which lets me compose multiple functions like <code>f %.% g %.% h %.% i</code> without parentheses. Associativity tells us the grouping doesn’t matter. This is similar to the way <code>+</code> is a function of two variables, yet we can still write <code>a + b + c + d</code> and so on. Now that’s also functional programming!</p>
 
 
 </section>
@@ -545,9 +536,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p> If <code>add(1, 2)</code> returns <code>3</code>, then <code>curry(add, 1)</code> creates a new function that adds an argument to <code>1</code>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p> If <code>add(1, 2)</code> returns <code>3</code>, then <code>curry(add, 1)</code> creates a new function that adds an argument to <code>1</code>. <em>Technically speaking</em> currying has a stricter definition than that: currying is turning a multi-argument function into a series of lambda functions that each take one argument. What we are doing is “merely” partial application of arguments. <a href="https://medium.com/@AlecBenzer/currying-vs-partial-application-bb72a14e5d59">Read about the differences</a> if you are so inclined.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2"><p> You can read more about function composition in <a href="https://mikedecr.netlify.app/blog/composition/">this other post</a> as well.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p> There is also <code>purrr::compose</code>, which takes a vector of functions and an optional <code>.dir</code> argument to switch the direction of composition. Take your pick.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p> There also exists <code>purrr::compose</code>, which takes an arbitrary number of functions and an optional <code>.dir</code> argument to switch the direction of composition. Take your pick.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
