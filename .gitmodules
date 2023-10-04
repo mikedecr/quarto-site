@@ -28,3 +28,6 @@
 [submodule "blog/composition"]
 	path = blog/composition
 	url = git@github.com:mikedecr/post_composition.git
+[submodule "blog/currr"]
+	path = blog/currr
+	url = git@github.com:mikedecr/post_currr.git
