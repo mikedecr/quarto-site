@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/blog/currr/index.html",
       "/blog/composition/index.html",
       "/blog/delayplyr/index.html",
       "/blog/partial_fns_ggplot/index.html",

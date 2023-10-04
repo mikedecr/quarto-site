@@ -10,7 +10,1089 @@
 <atom:link href="https://mikedecr.netlify.app/blog.xml" rel="self" type="application/rss+xml"/>
 <description>political scientist turned high-frequency tradist</description>
 <generator>quarto-1.3.302</generator>
-<lastBuildDate>Sat, 08 Jul 2023 05:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 03 Oct 2023 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>currr: a functional grammar for data frame operations.</title>
+  <dc:creator>Michael DeCrescenzo</dc:creator>
+  <link>https://mikedecr.netlify.app/blog/currr/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>This post proposes a dialect for data frame operations that I call <code>currr</code>. (I am not married to the name.) You can find and install a (very unfinished) package on <a href="https://github.com/mikedecr/currr">Github</a>.</p>
+<p><code>currr</code> is built on <code>dplyr</code>, but it uses a distinct grammar.</p>
+<p>A typical <code>dplyr</code> workflow pipes a data frame through a series of functions (in this case <code>filter</code>, <code>group_by</code>, and <code>summarize</code>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"palmerpenguins"</span>)</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dplyr"</span>)</span>
+<span id="cb1-3"></span>
+<span id="cb1-4">penguins <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb1-5">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(sex <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"male"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"female"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb1-6">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">group_by</span>(sex, island) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb1-7">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarize</span>(</span>
+<span id="cb1-8">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_med =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">median</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb1-9">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_mean =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb1-10">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_std =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb1-11">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">.groups =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"drop"</span></span>
+<span id="cb1-12">    )</span>
+<span id="cb1-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 6 × 5</span></span>
+<span id="cb1-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   sex    island    mass_med mass_mean mass_std</span></span>
+<span id="cb1-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   &lt;fct&gt;  &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb1-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1 female Biscoe       4588.     4319.     660.</span></span>
+<span id="cb1-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 2 female Dream        3450      3446.     270.</span></span>
+<span id="cb1-18"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 3 female Torgersen    3400      3396.     259.</span></span>
+<span id="cb1-19"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 4 male   Biscoe       5350      5105.     714.</span></span>
+<span id="cb1-20"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 5 male   Dream        3950      3987.     350.</span></span>
+<span id="cb1-21"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 6 male   Torgersen    4000      4035.     372.</span></span></code></pre></div>
+</div>
+<p>The purpose of <code>currr</code> is to provide a convenient way to <em>pre-define</em> functions that perform these data manipulation steps, without referring to a data frame. Instead of <code>filter</code>, <code>group_by</code>, and <code>summarize</code>, here we use <code>filtering</code>, <code>grouping</code>, and <code>summarizing</code> to create <em>new functions</em>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(currr)</span>
+<span id="cb2-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## </span></span>
+<span id="cb2-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## Attaching package: 'currr'</span></span>
+<span id="cb2-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## The following object is masked from 'package:base':</span></span>
+<span id="cb2-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## </span></span>
+<span id="cb2-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##     grouping</span></span>
+<span id="cb2-7"></span>
+<span id="cb2-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># each of these is a function of a data frame</span></span>
+<span id="cb2-9">flt_sex_FM <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filtering</span>(sex <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"male"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"female"</span>))</span>
+<span id="cb2-10">by_sex_isl <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">grouping</span>(sex, island)</span>
+<span id="cb2-11">smz_mass <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarizing</span>(</span>
+<span id="cb2-12">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_med =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">median</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb2-13">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_mean =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb2-14">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_std =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb2-15">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">.groups =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"drop"</span></span>
+<span id="cb2-16">)</span></code></pre></div>
+</div>
+<p>These functions can be rearranged, composed, and called later.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">(smz_mass <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%.%</span> by_sex_isl)(penguins)</span>
+<span id="cb3-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 9 × 5</span></span>
+<span id="cb3-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   sex    island    mass_med mass_mean mass_std</span></span>
+<span id="cb3-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   &lt;fct&gt;  &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb3-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1 female Biscoe       4588.     4319.     660.</span></span>
+<span id="cb3-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 2 female Dream        3450      3446.     270.</span></span>
+<span id="cb3-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 3 female Torgersen    3400      3396.     259.</span></span>
+<span id="cb3-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 4 male   Biscoe       5350      5105.     714.</span></span>
+<span id="cb3-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 5 male   Dream        3950      3987.     350.</span></span>
+<span id="cb3-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 6 male   Torgersen    4000      4035.     372.</span></span>
+<span id="cb3-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 7 &lt;NA&gt;   Biscoe       4688.     4588.     338.</span></span>
+<span id="cb3-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 8 &lt;NA&gt;   Dream        2975      2975       NA </span></span>
+<span id="cb3-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 9 &lt;NA&gt;   Torgersen    3588.     3681.     413.</span></span>
+<span id="cb3-14"></span>
+<span id="cb3-15">(smz_mass <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%.%</span> by_sex_isl <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%.%</span> flt_sex_FM)(penguins)</span>
+<span id="cb3-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 6 × 5</span></span>
+<span id="cb3-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   sex    island    mass_med mass_mean mass_std</span></span>
+<span id="cb3-18"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   &lt;fct&gt;  &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb3-19"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1 female Biscoe       4588.     4319.     660.</span></span>
+<span id="cb3-20"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 2 female Dream        3450      3446.     270.</span></span>
+<span id="cb3-21"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 3 female Torgersen    3400      3396.     259.</span></span>
+<span id="cb3-22"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 4 male   Biscoe       5350      5105.     714.</span></span>
+<span id="cb3-23"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 5 male   Dream        3950      3987.     350.</span></span>
+<span id="cb3-24"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 6 male   Torgersen    4000      4035.     372.</span></span></code></pre></div>
+</div>
+<p>At this point you may be wondering,</p>
+<blockquote class="blockquote">
+<p>If <code>dplyr</code> is already so good, why do I need this confusing, tedious style?</p>
+</blockquote>
+<p>and I intend to give you a thorough answer as the post proceeds.</p>
+<p>This post proceeds in three sections:</p>
+<ol type="1">
+<li><strong>The tl;dr</strong>: how to use and understand <code>currr</code></li>
+<li><strong>For the skeptics</strong>: why you would want to use <code>currr</code>.</li>
+<li><strong>For the dorks</strong>: how <code>currr</code> really works.</li>
+</ol>
+<section id="the-basics-of-currr" class="level1">
+<h1>The basics of <code>currr</code></h1>
+<p>If you know <code>dplyr</code>, you know almost everything you need to know about <code>currr</code>. There are only two things going on here.</p>
+<ol type="1">
+<li><code>currr</code> code is just curried <code>dplyr</code> code.</li>
+<li><code>currr</code> functions are meant to be composed without evaluating them immediately.</li>
+</ol>
+<section id="currr-code-is-just-curried-dplyr-code." class="level3">
+<h3 class="anchored" data-anchor-id="currr-code-is-just-curried-dplyr-code."><code>currr</code> code is just curried <code>dplyr</code> code.</h3>
+<p>“Currying” a function means turning a function of many arguments into a function of fewer arguments. I have <a href="https://mikedecr.netlify.app/blog/partial_fns_ggplot/">written about this before</a>, but we will explain it plenty here too.<sup>1</sup></p>
+<p><code>dplyr</code> functions like <code>filter</code> and <code>select</code> have analogous <code>currr</code> functions like <code>filtering</code> and <code>selecting</code>. The <code>currr</code> functions create <em>curried</em> versions of the <code>dplyr</code> functions. Let me give you an example. Here is how we can use <code>dplyr::filter</code> to keep only known male and female penguins in the <code>palmerpenguins</code> dataset.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter</span>(penguins, sex <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"male"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"female"</span>))</span>
+<span id="cb4-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 333 × 8</span></span>
+<span id="cb4-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g</span></span>
+<span id="cb4-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;</span></span>
+<span id="cb4-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  1 Adelie  Torgersen           39.1          18.7               181        3750</span></span>
+<span id="cb4-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  2 Adelie  Torgersen           39.5          17.4               186        3800</span></span>
+<span id="cb4-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  3 Adelie  Torgersen           40.3          18                 195        3250</span></span>
+<span id="cb4-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  4 Adelie  Torgersen           36.7          19.3               193        3450</span></span>
+<span id="cb4-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  5 Adelie  Torgersen           39.3          20.6               190        3650</span></span>
+<span id="cb4-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  6 Adelie  Torgersen           38.9          17.8               181        3625</span></span>
+<span id="cb4-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  7 Adelie  Torgersen           39.2          19.6               195        4675</span></span>
+<span id="cb4-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  8 Adelie  Torgersen           41.1          17.6               182        3200</span></span>
+<span id="cb4-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  9 Adelie  Torgersen           38.6          21.2               191        3800</span></span>
+<span id="cb4-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 10 Adelie  Torgersen           34.6          21.1               198        4400</span></span>
+<span id="cb4-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 323 more rows</span></span>
+<span id="cb4-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;</span></span></code></pre></div>
+</div>
+<p>Notice that <code>filter</code> has several arguments: the data frame itself, and as many boolean expressions as you want to filter with. And it returns a new data frame.</p>
+<p>Here is how to accomplish a similar functionality with <code>currr::filtering</code>. <code>filtering</code> is just like <code>filter</code>, but I don’t pass the data frame.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filtering</span>(sex <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"male"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"female"</span>))</span>
+<span id="cb5-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## Memoised Function:</span></span>
+<span id="cb5-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## function (.data) </span></span>
+<span id="cb5-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## {</span></span>
+<span id="cb5-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##     return((purrr::partial(verb))(.data, ...))</span></span>
+<span id="cb5-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## }</span></span>
+<span id="cb5-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## &lt;bytecode: 0x10adecc70&gt;</span></span>
+<span id="cb5-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## &lt;environment: 0x103b17158&gt;</span></span></code></pre></div>
+</div>
+<p>And instead of getting a data frame back, I get a <em>new function</em>. That resulting function would take me from data frame to data frame, but I can pass that data frame some time later. I have <em>curried</em> the <code>filter</code> function with the argument <code>sex %in% c("male", "female")</code>. In other words, I created a version of the <code>filter</code> function with that boolean condition pre-specified. When I call that function later, it will invoke the boolean expression without me specifying it later.</p>
+<p>To assure you how it works, I will build the same function <em>and then</em> pass the <code>penguins</code> data to the curried function. I will get the same result as the original, fully-specified <code>filter</code> call.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">flt_sex <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filtering</span>(sex <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"male"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"female"</span>))</span>
+<span id="cb6-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">flt_sex</span>(penguins)</span>
+<span id="cb6-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 333 × 8</span></span>
+<span id="cb6-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g</span></span>
+<span id="cb6-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;</span></span>
+<span id="cb6-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  1 Adelie  Torgersen           39.1          18.7               181        3750</span></span>
+<span id="cb6-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  2 Adelie  Torgersen           39.5          17.4               186        3800</span></span>
+<span id="cb6-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  3 Adelie  Torgersen           40.3          18                 195        3250</span></span>
+<span id="cb6-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  4 Adelie  Torgersen           36.7          19.3               193        3450</span></span>
+<span id="cb6-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  5 Adelie  Torgersen           39.3          20.6               190        3650</span></span>
+<span id="cb6-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  6 Adelie  Torgersen           38.9          17.8               181        3625</span></span>
+<span id="cb6-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  7 Adelie  Torgersen           39.2          19.6               195        4675</span></span>
+<span id="cb6-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  8 Adelie  Torgersen           41.1          17.6               182        3200</span></span>
+<span id="cb6-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##  9 Adelie  Torgersen           38.6          21.2               191        3800</span></span>
+<span id="cb6-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 10 Adelie  Torgersen           34.6          21.1               198        4400</span></span>
+<span id="cb6-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 323 more rows</span></span>
+<span id="cb6-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;</span></span></code></pre></div>
+</div>
+<p>You typically don’t want to pass the data immediately after creating the function. The purpose of <code>currr</code> is to create the curried function and evaluate it on data later on. Why delay the evaluation of data? Because by <em>separating the function from the data</em>, it is easier to compose and recycle functionality and multiple datasets. More explanation in the “Why” section below.</p>
+</section>
+<section id="currr-functions-can-be-composed-without-evaluating-on-data." class="level3">
+<h3 class="anchored" data-anchor-id="currr-functions-can-be-composed-without-evaluating-on-data."><code>currr</code> functions can be composed without evaluating on data.</h3>
+<p>Most R uders hear “function composition” and think of the pipe operator <code>|&gt;</code>. The pipe operator turns a nested function call like <code>h(g(f(x)))</code> into something like <code>x |&gt; f() |&gt; g() |&gt; h()</code>. That is convenient, but its behavior is too <em>eager</em> for our needs. We want to separate the <code>x</code> from the <code>f</code>, <code>g</code>, and <code>h</code>.</p>
+<p>I could get around this limitation by writing a new function that combines <code>f</code>, <code>g</code>, and <code>h</code> and then passing <code>x</code> to that function like this…</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">fgh <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(...) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">f</span>(...) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">g</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">h</span>()</span>
+<span id="cb7-2"></span>
+<span id="cb7-3">x <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">fgh</span>()</span></code></pre></div>
+</div>
+<p>…but it is a bit clunky Mathemematical notation for function composition, meanwhile, is simple: <img src="https://latex.codecogs.com/png.latex?fgh%20=%20h%20%5Ccdot%20g%20%5Ccdot%20f">.<sup>2</sup></p>
+<p><code>currr</code> provides operators to two function composition operators to make this easy. First, the <code>%.%</code> operator for classical mathematical composition: <code>(g %.% f)(x)</code> is like <code>g(f(x))</code>. Second, a postfix-style <code>%;%</code> composition operator that reads more “pipe-like”: <code>(f %;% g)(x)</code> is like <code>x |&gt; f() |&gt; g()</code>.<sup>3</sup></p>
+<p>These operators let us take little functions and combine them without evaluating on data. Take the example at the top of the post. These are functions.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(currr)</span>
+<span id="cb8-2"></span>
+<span id="cb8-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># each of these is a function of a data frame</span></span>
+<span id="cb8-4">flt_sex_FM <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filtering</span>(sex <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"male"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"female"</span>))</span>
+<span id="cb8-5">by_sex_isl <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">grouping</span>(sex, island)</span>
+<span id="cb8-6">smz_mass <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarizing</span>(</span>
+<span id="cb8-7">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_med =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">median</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb8-8">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_mean =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb8-9">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_std =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb8-10">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">.groups =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"drop"</span></span>
+<span id="cb8-11">)</span></code></pre></div>
+</div>
+<p>I compose them into a “chain” of operations (really, a new function) without evaluating them.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">mass_by_sex_isl <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> (flt_sex_FM <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%;%</span> by_sex_isl <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%;%</span> smz_mass)</span></code></pre></div>
+</div>
+<p>And only when I need the results, I can pass the data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mass_by_sex_isl</span>(penguins)</span>
+<span id="cb10-2"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 6 × 5</span></span>
+<span id="cb10-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   sex    island    mass_med mass_mean mass_std</span></span>
+<span id="cb10-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   &lt;fct&gt;  &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb10-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1 female Biscoe       4588.     4319.     660.</span></span>
+<span id="cb10-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 2 female Dream        3450      3446.     270.</span></span>
+<span id="cb10-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 3 female Torgersen    3400      3396.     259.</span></span>
+<span id="cb10-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 4 male   Biscoe       5350      5105.     714.</span></span>
+<span id="cb10-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 5 male   Dream        3950      3987.     350.</span></span>
+<span id="cb10-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 6 male   Torgersen    4000      4035.     372.</span></span></code></pre></div>
+</div>
+</section>
+</section>
+<section id="why-use-the-currr-style" class="level1">
+<h1>Why use the <code>currr</code> style?</h1>
+<p>Now that you know how to use <code>currr</code>, you may want to know why you would bother.</p>
+<p>First, <strong>pipe chains are easy to write but hard to re-use</strong>. Let’s look at an example in <code>dplyr</code> world. I have the <code>penguins</code> and I want to summarize the body mass column.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1">penguins <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb11-2">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarize</span>(</span>
+<span id="cb11-3">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_med =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">median</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb11-4">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_mean =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb11-5">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_std =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb11-6">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">.groups =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"drop"</span></span>
+<span id="cb11-7">    )</span>
+<span id="cb11-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 1 × 3</span></span>
+<span id="cb11-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   mass_med mass_mean mass_std</span></span>
+<span id="cb11-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##      &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb11-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1     4050     4202.     802.</span></span></code></pre></div>
+</div>
+<p>Okay, I also want to compute the same stats, grouped by <code>sex</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1">penguins <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb12-2">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">group_by</span>(sex, island) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb12-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarize</span>(</span>
+<span id="cb12-4">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_med =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">median</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb12-5">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_mean =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb12-6">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_std =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb12-7">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">.groups =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"drop"</span></span>
+<span id="cb12-8">    )</span>
+<span id="cb12-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 9 × 5</span></span>
+<span id="cb12-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   sex    island    mass_med mass_mean mass_std</span></span>
+<span id="cb12-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   &lt;fct&gt;  &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb12-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1 female Biscoe       4588.     4319.     660.</span></span>
+<span id="cb12-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 2 female Dream        3450      3446.     270.</span></span>
+<span id="cb12-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 3 female Torgersen    3400      3396.     259.</span></span>
+<span id="cb12-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 4 male   Biscoe       5350      5105.     714.</span></span>
+<span id="cb12-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 5 male   Dream        3950      3987.     350.</span></span>
+<span id="cb12-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 6 male   Torgersen    4000      4035.     372.</span></span>
+<span id="cb12-18"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 7 &lt;NA&gt;   Biscoe       4688.     4588.     338.</span></span>
+<span id="cb12-19"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 8 &lt;NA&gt;   Dream        2975      2975       NA </span></span>
+<span id="cb12-20"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 9 &lt;NA&gt;   Torgersen    3588.     3681.     413.</span></span></code></pre></div>
+</div>
+<p>Notice I had to write the <code>summarize</code> step all over again. And if I also wanted it grouped by sex <em>and</em> island…</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1">penguins <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb13-2">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">group_by</span>(sex, island) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb13-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarize</span>(</span>
+<span id="cb13-4">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_med =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">median</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb13-5">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_mean =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb13-6">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_std =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb13-7">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">.groups =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"drop"</span></span>
+<span id="cb13-8">    )</span>
+<span id="cb13-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 9 × 5</span></span>
+<span id="cb13-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   sex    island    mass_med mass_mean mass_std</span></span>
+<span id="cb13-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   &lt;fct&gt;  &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb13-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1 female Biscoe       4588.     4319.     660.</span></span>
+<span id="cb13-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 2 female Dream        3450      3446.     270.</span></span>
+<span id="cb13-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 3 female Torgersen    3400      3396.     259.</span></span>
+<span id="cb13-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 4 male   Biscoe       5350      5105.     714.</span></span>
+<span id="cb13-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 5 male   Dream        3950      3987.     350.</span></span>
+<span id="cb13-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 6 male   Torgersen    4000      4035.     372.</span></span>
+<span id="cb13-18"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 7 &lt;NA&gt;   Biscoe       4688.     4588.     338.</span></span>
+<span id="cb13-19"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 8 &lt;NA&gt;   Dream        2975      2975       NA </span></span>
+<span id="cb13-20"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 9 &lt;NA&gt;   Torgersen    3588.     3681.     413.</span></span></code></pre></div>
+</div>
+<p>Now I have three instances in my code where I need to write the same <code>summarize</code> code, because I wanted to see it three different ways. And if I want to change that code (say, add a mean abs. deviation statistic), I have to change it in multiple places. This is a good reason to use a function! <code>currr</code> gives us a way write that function conveniently and composably. We write the <code>summarize</code> step one time and re-use whenever we want later.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1">smz_mass <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summarizing</span>(</span>
+<span id="cb14-2">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_med =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">median</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb14-3">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_mean =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb14-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mass_std =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(body_mass_g, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">na.rm =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>),</span>
+<span id="cb14-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">.groups =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"drop"</span></span>
+<span id="cb14-6">)</span>
+<span id="cb14-7"></span>
+<span id="cb14-8"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">smz_mass</span>(penguins)</span>
+<span id="cb14-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 1 × 3</span></span>
+<span id="cb14-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   mass_med mass_mean mass_std</span></span>
+<span id="cb14-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##      &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb14-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1     4050     4202.     802.</span></span>
+<span id="cb14-13"></span>
+<span id="cb14-14">penguins <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">group_by</span>(sex) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">smz_mass</span>()</span>
+<span id="cb14-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 3 × 4</span></span>
+<span id="cb14-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   sex    mass_med mass_mean mass_std</span></span>
+<span id="cb14-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   &lt;fct&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb14-18"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1 female     3650     3862.     666.</span></span>
+<span id="cb14-19"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 2 male       4300     4546.     788.</span></span>
+<span id="cb14-20"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 3 &lt;NA&gt;       4100     4006.     679.</span></span>
+<span id="cb14-21"></span>
+<span id="cb14-22">penguins <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">group_by</span>(sex, island) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">smz_mass</span>()</span>
+<span id="cb14-23"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## # A tibble: 9 × 5</span></span>
+<span id="cb14-24"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   sex    island    mass_med mass_mean mass_std</span></span>
+<span id="cb14-25"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##   &lt;fct&gt;  &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb14-26"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1 female Biscoe       4588.     4319.     660.</span></span>
+<span id="cb14-27"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 2 female Dream        3450      3446.     270.</span></span>
+<span id="cb14-28"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 3 female Torgersen    3400      3396.     259.</span></span>
+<span id="cb14-29"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 4 male   Biscoe       5350      5105.     714.</span></span>
+<span id="cb14-30"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 5 male   Dream        3950      3987.     350.</span></span>
+<span id="cb14-31"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 6 male   Torgersen    4000      4035.     372.</span></span>
+<span id="cb14-32"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 7 &lt;NA&gt;   Biscoe       4688.     4588.     338.</span></span>
+<span id="cb14-33"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 8 &lt;NA&gt;   Dream        2975      2975       NA </span></span>
+<span id="cb14-34"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 9 &lt;NA&gt;   Torgersen    3588.     3681.     413.</span></span></code></pre></div>
+</div>
+<p>This is the benefit we get by <em>separating the data from the functionality</em>.</p>
+<ul>
+<li>When functions are pre-defined, we can pass whatever data whenever we want.</li>
+<li>It is easier to abstract over the data because we wrote modular functions instead of a bundled pipeline.</li>
+<li>We pay a little up-front cost to store the <code>dplyr</code> verb as a function, but we amortize the cost of repeated invocations of the same functionality. Lots of little functions may look silly in isolation, but they play important roles when composed with other functions.</li>
+<li>We greatly reduce the cost of changing key functionality; change the function definition in one place, and inherit the change everywhere the function is called.</li>
+</ul>
+</section>
+<section id="how-currr-works" class="level1">
+<h1>How <code>currr</code> works</h1>
+<p><code>currr</code> works by creating curryable <code>dplyr</code> verbs. For example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1">filtering <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">currify_verb</span>(filter)</span>
+<span id="cb15-2">mutating <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">currify_verb</span>(mutating)</span>
+<span id="cb15-3">summarizing <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">currify_verb</span>(summarize)</span>
+<span id="cb15-4">grouping <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">currify_verb</span>(group_by)</span>
+<span id="cb15-5">ungrouping <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">currify_verb</span>(ungroup)</span></code></pre></div>
+</div>
+<p>The implementation of <code>currify_verb</code> is, in turn…</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># curry a verb</span></span>
+<span id="cb16-2"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># returns a function (...) -&gt; (data -&gt; data) which curries the provided verb.</span></span>
+<span id="cb16-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># the innermost function assumes the data provided </span></span>
+<span id="cb16-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#    is the first arg to the fully specified verb call</span></span>
+<span id="cb16-5">currify_verb <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(verb) {</span>
+<span id="cb16-6">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(...) {</span>
+<span id="cb16-7">        intention <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(.data) {</span>
+<span id="cb16-8">            <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">return</span>(purrr<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">partial</span>(verb)(.data, ...))</span>
+<span id="cb16-9">        }</span>
+<span id="cb16-10">        memoise<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">memoise</span>(intention)</span>
+<span id="cb16-11">    }</span>
+<span id="cb16-12">}</span></code></pre></div>
+</div>
+<p>The outermost function <code>currify_verb</code> takes a <code>verb</code> and returns a new function of args <code>...</code>. The args are then used to return <em>another function</em> of <code>.data</code>, enclosing both the verb and the args in the environment of the innermost function. I call the innermost function an <code>intention</code>, because it declares an intent to evaluate a verb without actually evaluating it (yet).</p>
+<p>Another notable detail is that we return not the <code>intention</code> object but a memoized <code>intention</code> using the <a href="https://memoise.r-lib.org/">memoise</a> package. <em>Memoization</em> associates a function value with the arguments that created that value, and caches the result. This way, if a function is ever called again with the same arguments as before, we return the cached value associated with those arguments instead of recomputing the value anew.</p>
+<p>Memoization is commonly used in functional programming because we want to express values as the result of functions. If data have to pass through intermediate states, we want that state to be handled inside of functions instead of sitting in the open in main environment of the program. Contrast this to <code>dplyr</code>, where we would avoid recomputation by storing a copy of our data in some intermediate state that we can use as a midway point to branch out from. Memoization lets us get all the efficiency of intermediate data without polluting our program environment with stateful data that we don’t care about. Instead, we are only responsible for defining and composing the functionality that we want to invoke to transform our raw data. Now that’s functional programming!</p>
+<p>The only other thing to note is how we implement function composition:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">%.%</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(g, f) <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(...) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">g</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">f</span>(...))</span>
+<span id="cb17-2"><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">%;%</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(f, g) <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(...) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">g</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">f</span>(...))</span></code></pre></div>
+</div>
+<p>In R, we can define our own binary operations as functions of two arguments. Function composition is associative, so in the case of these binary operators, it is sufficient to define composition on just two arguments and let infix notation take care of the rest. This is similar to the way <code>+</code> is a function of two variables, yet we can still write <code>a + b + c</code> without parentheses. Associativity tells us the grouping doesn’t matter. Now that’s also functional programming!</p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p> If <code>add(1, 2)</code> returns <code>3</code>, then <code>curry(add, 1)</code> creates a new function that adds an argument to <code>1</code>.↩︎</p></li>
+<li id="fn2"><p> You can read more about function composition in <a href="https://mikedecr.netlify.app/blog/composition/">this other post</a> as well.↩︎</p></li>
+<li id="fn3"><p> There is also <code>purrr::compose</code>, which takes a vector of functions and an optional <code>.dir</code> argument to switch the direction of composition. Take your pick.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>code</category>
+  <category>r</category>
+  <guid>https://mikedecr.netlify.app/blog/currr/index.html</guid>
+  <pubDate>Tue, 03 Oct 2023 05:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Function composition</title>
   <dc:creator>Michael DeCrescenzo</dc:creator>
@@ -452,17 +1534,6 @@ font-style: italic;">## [1] "3"</span></span></code></pre></div>
 
 
 
-<!-- # New outline: -->
-<!---->
-<!-- - tldr: -->
-<!--     - here's what I want to do -->
-<!--     - here is why I can't do it. -->
-<!--     - here is the solution. -->
-<!---->
-<!-- - Motivation: there is something missing about the Tidyverse. -->
-<!-- - Problem: tidy evaluation -->
-<!-- - Fix: eval magic -->
-<!-- - Applications -->
 <p>It is hard to introduce what this post is about. I will try.</p>
 <p>This post proposes a delayed evaluation, function-forward interface for Tidyverse data manipulation, focusing primarily on <code>dplyr</code> verbs. Instead of writing <code>data |&gt; verb(args)</code>, it should be easier to write <code>verb(args)</code> as its own expression, save it ahead of time, and later evaluate it on <code>data</code>.</p>
 <p>This post provides some less-than-ideal code to implement such an interface. It is surely incomplete. But the interface is interesting and appealing at least to me, a nostalgic R user with a new love of functional programming.</p>
