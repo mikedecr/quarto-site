@@ -15,11 +15,10 @@ website:
         file: about.qmd
       - text: "Blog"
         file: blog.qmd
-      - icon: github
-        href: https://github.com/mikedecr
-      # gets the listings content in blog.qmd (feed: true)
       - text: "RSS"
         href: blog.xml
+      - text: "Github"
+        href: https://github.com/mikedecr
       - text: "Bsky"
         href: https://bsky.app/profile/mikedecr.bsky.social
   # social / sharing
