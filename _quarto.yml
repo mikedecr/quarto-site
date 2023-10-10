@@ -17,11 +17,11 @@ website:
         file: blog.qmd
       - icon: github
         href: https://github.com/mikedecr
-      - icon: twitter
-        href: https://twitter.com/mikedecr
       # gets the listings content in blog.qmd (feed: true)
       - text: "RSS"
         href: blog.xml
+      - text: "Bsky"
+        href: https://bsky.app/profile/mikedecr.bsky.social
   # social / sharing
   twitter-card:
     image: "/submodules/imgs/img/ID_telles_1452x1452.png"
