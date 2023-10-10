@@ -387,10 +387,10 @@ background-color: null;
 font-style: italic;">## }</span></span>
 <span id="cb5-7"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: italic;">## &lt;bytecode: 0x123dda7b8&gt;</span></span>
+font-style: italic;">## &lt;bytecode: 0x13cd86920&gt;</span></span>
 <span id="cb5-8"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: italic;">## &lt;environment: 0x113cdbb68&gt;</span></span></code></pre></div>
+font-style: italic;">## &lt;environment: 0x12c97eac8&gt;</span></span></code></pre></div>
 </div>
 <p>And instead of getting a data frame back, I get a <em>new function</em>. The new function maps me from dataframe to dataframe. I can pass that dataframe later on, though. I don’t have to do it right now.</p>
 <p>Another way to say this is that I have partially applied the argument <code>sex %in% c("male", "female")</code> to the <code>filter</code> function. That is, I created a version of the <code>filter</code> function with that boolean condition pre-specified. When I call that function later, it will invoke the boolean expression without needing me to pass it again.</p>
@@ -659,7 +659,7 @@ background-color: null;
 font-style: inherit;">|&gt;</span></span>
 <span id="cb12-2">    <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">group_by</span>(sex, island) <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">group_by</span>(sex) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">|&gt;</span></span>
 <span id="cb12-3">    <span class="fu" style="color: #4758AB;
@@ -700,40 +700,22 @@ font-style: inherit;">"drop"</span></span>
 <span id="cb12-8">    )</span>
 <span id="cb12-9"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: italic;">## # A tibble: 9 × 5</span></span>
+font-style: italic;">## # A tibble: 3 × 4</span></span>
 <span id="cb12-10"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: italic;">##   sex    island    mass_med mass_mean mass_std</span></span>
+font-style: italic;">##   sex    mass_med mass_mean mass_std</span></span>
 <span id="cb12-11"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: italic;">##   &lt;fct&gt;  &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+font-style: italic;">##   &lt;fct&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
 <span id="cb12-12"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: italic;">## 1 female Biscoe       4588.     4319.     660.</span></span>
+font-style: italic;">## 1 female     3650     3862.     666.</span></span>
 <span id="cb12-13"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: italic;">## 2 female Dream        3450      3446.     270.</span></span>
+font-style: italic;">## 2 male       4300     4546.     788.</span></span>
 <span id="cb12-14"><span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: italic;">## 3 female Torgersen    3400      3396.     259.</span></span>
-<span id="cb12-15"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## 4 male   Biscoe       5350      5105.     714.</span></span>
-<span id="cb12-16"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## 5 male   Dream        3950      3987.     350.</span></span>
-<span id="cb12-17"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## 6 male   Torgersen    4000      4035.     372.</span></span>
-<span id="cb12-18"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## 7 &lt;NA&gt;   Biscoe       4688.     4588.     338.</span></span>
-<span id="cb12-19"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## 8 &lt;NA&gt;   Dream        2975      2975       NA </span></span>
-<span id="cb12-20"><span class="do" style="color: #5E5E5E;
-background-color: null;
-font-style: italic;">## 9 &lt;NA&gt;   Torgersen    3588.     3681.     413.</span></span></code></pre></div>
+font-style: italic;">## 3 &lt;NA&gt;       4100     4006.     679.</span></span></code></pre></div>
 </div>
 <p>And if I also wanted it grouped by sex <em>and</em> island, summarize yet again.</p>
 <div class="cell">
