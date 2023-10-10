@@ -4,7 +4,7 @@ listing:
   contents: blog
   type: table # default, grid, table
   categories: unnumbered
-  fields: [date, title]
+  fields: [title, date]
   sort: "date desc"
   sort-ui: false
   filter-ui: false
