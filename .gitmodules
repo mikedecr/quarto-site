@@ -31,3 +31,6 @@
 [submodule "blog/currr"]
 	path = blog/currr
 	url = git@github.com:mikedecr/post_currr.git
+[submodule "scum_memo"]
+	path = blog/memo_scum
+	url = git@github.com:mikedecr/post_memo_scum.git
