@@ -48,7 +48,7 @@
 <h2 class="anchored" data-anchor-id="scraping-the-s.c.u.m.-data">Scraping the S.C.U.M. data</h2>
 <p>We have to write some code. I am not an experienced web-scraper, but my gut feeling has always been that because websites can be idiosyncratic and prone to change, that any code you write to scrape data from the website might take on similar ugliness. So I wanted to design something that would make this as smooth as I could.</p>
 <p>When we start our journey, the website is a black box. I know what I want, but I don’t know how to get it. So our first decision is that our API should be declarative (the interface describes the desired results) rather than imperative (the interface describes the process).</p>
-<p>What do I want, exactly? Every movie has four component S.C.U.M. scores and some other metadata (movie title, year, which actor played James Bond). So I want a way to map a movie to a tuple (or “record”) of values. I want a function that would take me to each individual value…</p>
+<p>What do I want, exactly? Every movie has four component S.C.U.M. scores and some other metadata (movie title, year, which actor played James Bond). So I want a way to map a movie to a tuple (or “record”) of values. I want a set of functions that take me to each of these individual values…</p>
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -79,7 +79,7 @@ A[Movie] --&gt; B["(Title, Year, Actor, SCUM scores)"]
 </div>
 </div>
 </div>
-<p>And of course, I should be a be able to generate an list of all movies from the website in order to compute this tuple of values for each movie.</p>
+<p>And of course, I should be a be able to generate a list of all movies from the website in order to compute this tuple of values for each movie.</p>
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -101,8 +101,8 @@ D --&gt; G["(Title, Year, Actor, SCUM scores)"]
 <p>To make this slightly more tangible, the <a href="https://www.killjamesbond.com/">website</a> contains an <a href="https://www.killjamesbond.com/scum-rankings">index page</a> that links out to each individual movie. And if you navigate to the page for a <a href="https://www.killjamesbond.com/dr-no">specific movie</a>, you see all the data you want to get. So I can basically think of the problem like this:</p>
 <ul>
 <li>Starting with the global site url, I can generate a sequence of film urls.</li>
-<li>I write a function (call it <code>get_movie_data</code>) that takes a film url and generates a tuple or a “record” of SCUM scores and other metadata.</li>
-<li>Map this <code>get_movie_data</code> over the sequence of film urls.</li>
+<li>I write a function (call it <code>get_movie_data</code>) that takes a film url and generates a record of SCUM scores and other metadata.</li>
+<li>Map the <code>get_movie_data</code> function over the sequence of film urls.</li>
 </ul>
 <p>In lispy pseudocode it’s merely this…</p>
 <pre><code>(map get_movie_data 
