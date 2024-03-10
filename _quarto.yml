@@ -32,7 +32,8 @@ website:
 format:
   html:
     theme: 
-      light: [litera-tweaks.scss, fonts.scss]
-      dark: [vapor, fonts.scss]
+      # cosmo is good, simplex, spacelab
+      light: [cosmo, fonts.scss]
+      # dark: [darkly, fonts.scss]
     # css: styles.css
 
