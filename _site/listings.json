@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/blog/memo_scum/index.html",
       "/blog/currr/index.html",
       "/blog/composition/index.html",
       "/blog/delayplyr/index.html",
