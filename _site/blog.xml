@@ -9,7 +9,7 @@
 <link>https://mikedecr.netlify.app/blog.html</link>
 <atom:link href="https://mikedecr.netlify.app/blog.xml" rel="self" type="application/rss+xml"/>
 <description>political scientist turned high-frequency tradist</description>
-<generator>quarto-1.4.547</generator>
+<generator>quarto-1.4.550</generator>
 <lastBuildDate>Sat, 09 Mar 2024 06:00:00 GMT</lastBuildDate>
 <item>
   <title>Scraping the ‘S.C.U.M.’ data from ‘Kill James Bond’</title>
@@ -25,8 +25,8 @@
 <p>To perform the scraping, we design a functional interface that lets us easily generate sequences of data and map functions over those sequences.</p>
 <p>Along the way, we employ a functional optimization concept called <strong>memoization</strong>. Memoization, crudely, is when when a function “caches its own return value” to make repeated calls more efficient. Think of it like a function that remembers every argument it ever saw and every value it ever computed. If that sounds fuzzy, we explain it with more detail below.</p>
 <p>This is also my first significant attempt at web scraping, so it was a useful exercise even if I did not write the smoothest thing in the world.</p>
-<section id="a-kill-james-bond-and-the-s.c.u.m.-scores" class="level2">
-<h2 class="anchored" data-anchor-id="a-kill-james-bond-and-the-s.c.u.m.-scores">A <em>Kill James Bond</em> and the S.C.U.M. scores</h2>
+<section id="kill-james-bond-and-the-s.c.u.m.-scores" class="level2">
+<h2 class="anchored" data-anchor-id="kill-james-bond-and-the-s.c.u.m.-scores"><em>Kill James Bond</em> and the S.C.U.M. scores</h2>
 <p>First, some background on the data.</p>
 <p><em>Kill James Bond</em> is a comedic film review podcast where the hosts marathon the James Bond movie franchise “in an attempt to give 007 the socialist, feminist comeuppance he so richly deserves.” I don’t know how if “socialist” is the word I would use, but it is a culturally left-leaning critique of how the films depict gender, race, and government-sanctioned violence. It is pretty funny and often genuinely insightful about film and storytelling broadly.</p>
 <section id="s.c.u.m.-scores" class="level3">

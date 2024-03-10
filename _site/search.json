@@ -63,11 +63,11 @@
     "text": "This post describes the process for scraping “S.C.U.M.” score data from the Kill James Bond podcast website.\nTo perform the scraping, we design a functional interface that lets us easily generate sequences of data and map functions over those sequences.\nAlong the way, we employ a functional optimization concept called memoization. Memoization, crudely, is when when a function “caches its own return value” to make repeated calls more efficient. Think of it like a function that remembers every argument it ever saw and every value it ever computed. If that sounds fuzzy, we explain it with more detail below.\nThis is also my first significant attempt at web scraping, so it was a useful exercise even if I did not write the smoothest thing in the world."
   },
   {
-    "objectID": "blog/memo_scum/index.html#a-kill-james-bond-and-the-s.c.u.m.-scores",
-    "href": "blog/memo_scum/index.html#a-kill-james-bond-and-the-s.c.u.m.-scores",
+    "objectID": "blog/memo_scum/index.html#kill-james-bond-and-the-s.c.u.m.-scores",
+    "href": "blog/memo_scum/index.html#kill-james-bond-and-the-s.c.u.m.-scores",
     "title": "Scraping the ‘S.C.U.M.’ data from ‘Kill James Bond’",
-    "section": "A Kill James Bond and the S.C.U.M. scores",
-    "text": "A Kill James Bond and the S.C.U.M. scores\nFirst, some background on the data.\nKill James Bond is a comedic film review podcast where the hosts marathon the James Bond movie franchise “in an attempt to give 007 the socialist, feminist comeuppance he so richly deserves.” I don’t know how if “socialist” is the word I would use, but it is a culturally left-leaning critique of how the films depict gender, race, and government-sanctioned violence. It is pretty funny and often genuinely insightful about film and storytelling broadly.\n\nS.C.U.M. scores\n\n“We have a science-based system on this podcast.”\n\nAt the end of each episode, the hosts rank each movie on a scale of 11 to 72 across four dimensions:\n\nSmarm\nCultural insensitivity\nUnprovoked violence\nMisogyny\n\nor “S.C.U.M.”. These four scores are summed to create a total scum score for the movie.3"
+    "section": "Kill James Bond and the S.C.U.M. scores",
+    "text": "Kill James Bond and the S.C.U.M. scores\nFirst, some background on the data.\nKill James Bond is a comedic film review podcast where the hosts marathon the James Bond movie franchise “in an attempt to give 007 the socialist, feminist comeuppance he so richly deserves.” I don’t know how if “socialist” is the word I would use, but it is a culturally left-leaning critique of how the films depict gender, race, and government-sanctioned violence. It is pretty funny and often genuinely insightful about film and storytelling broadly.\n\nS.C.U.M. scores\n\n“We have a science-based system on this podcast.”\n\nAt the end of each episode, the hosts rank each movie on a scale of 11 to 72 across four dimensions:\n\nSmarm\nCultural insensitivity\nUnprovoked violence\nMisogyny\n\nor “S.C.U.M.”. These four scores are summed to create a total scum score for the movie.3"
   },
   {
     "objectID": "blog/memo_scum/index.html#scraping-the-s.c.u.m.-data",
