@@ -1732,13 +1732,7 @@ font-style: inherit;">as_labeller</span>(ordered_levels)</span>
 <span id="cb22-21">     ) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb22-22">     <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># geom_line(color = "gray") +</span></span>
-<span id="cb22-23">     <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># geom_point(aes(color = actor)) +</span></span>
-<span id="cb22-24">     <span class="fu" style="color: #4758AB;
+<span id="cb22-22">     <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_col</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1751,7 +1745,7 @@ background-color: null;
 font-style: inherit;">"dodge"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb22-25">     <span class="fu" style="color: #4758AB;
+<span id="cb22-23">     <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -1768,7 +1762,7 @@ background-color: null;
 font-style: inherit;">"Score"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb22-26">     <span class="fu" style="color: #4758AB;
+<span id="cb22-24">     <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -1781,14 +1775,14 @@ background-color: null;
 font-style: inherit;">9</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb22-27">     <span class="fu" style="color: #4758AB;
+<span id="cb22-25">     <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">panel.grid.minor.y =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">element_blank</span>())</span>
-<span id="cb22-28">    )()</span></code></pre></div>
+<span id="cb22-26">    )()</span></code></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
