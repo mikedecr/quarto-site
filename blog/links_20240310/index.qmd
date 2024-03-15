@@ -1,0 +1,55 @@
+---
+author: Michael DeCrescenzo
+categories: [code, r]
+title: "Links: March 15, 2024"
+subtitle: Polymorphism, partial application, Twilight
+# subtitle: Lazyverse
+# excerpt
+date: "2024-03-12"
+draft: false
+---
+
+
+## Links about polymorphism
+
+Polymorphism in programming is one of my endless fascinations.
+[Wikipedia says](https://en.wikipedia.org/wiki/Polymorphism_(computer_science)) polymorphism is the "use of a single symbol to represent multiple different types" or the "provision of a single interface to entities of different types".
+For example, in Python, classes have methods, and many classes have methods that are named the same as methods in other classes.
+If I have some object `x` with a `.sort()` method, then the place in my program that depends on the `.sort()` functionality maybe doesn't care what class `x` is, only that it can be sorted with `.sort()`.
+Any type that implements `.sort()` could be used where that method is called.
+But polymorphism isn't only a thing in object-oriented methods-on-classes languages.
+Many languages implement "generic" functions that support multiple types without binding methods onto classes.
+
+Links:
+
+- [The Only Time You Should Use Polymorphism](https://youtu.be/YaSMkzmc_sA), by Christopher Okhravi.
+Focuses on OOP scenarios where classes have some inheritance relationship to one another and need to implement the same method.
+The distinction is between whether polymorphism is being used to specialize a function on _data_ (do I have this value or that value) or on _behavior_ (do I need to _do_ this or _do_ that).
+- [Clojure's Solutions to the Expression Problem](https://www.youtube.com/watch?v=t6ktSfInNhU) by Chris Houser.
+An entirely different take on polymorphism in language with _extremely_ flexible generic function support in the base language.
+If you are Python person, Clojure's "multimethods" are an entirely different beast.
+Generic functions can be declared anywhere and dispatch on _any function of the arguments_, not just their type.
+This means that you can dispatch on functions of multiple arguments at once (true "multiple dispatch") instead of only one argument (which is effectively all you can do in Python when a class owns a method).
+And you can define methods anywhere, not just under a class definition.
+So anybody can overload an implementation for any reason in any location.
+- [I don't think people appreciate the tradeoffs they're making with algebraic data types](https://cohost.org/prophet/post/4979906-i-don-t-think-people), by online alias [@prophet](https://twitter.com/welltypedwitch).
+This one is more advanced (Haskell is used).
+Basically, when you declare that a function is defined on a "sum" type (a.k.a. "union" type), you hurt yourself any time you want to add more things to that type, because you may need to write a _lot_ of new functions to support the new member of the union type.
+In the worst case, you have M functions that need to be defined on N member types.
+What you want to avoid (in all polymorphism problems, really), is either writing M new methods each time you add a new member type, or writing N versions of the same functionality each time you want to add a function.
+
+
+## Links about the Julia language
+
+- [Partial function application in Julia](https://juliazoid.com/partial-function-application-in-julia-85c3d5b8fe54), by Bogumił Kamiński.
+Some Julia functions have this special behavior where, if you pass them an incomplete set of arguments, you get a new function of the unspecified arguments.
+So they have built-in partial application to support various common use cases.
+This totally whips, and I wish more languages did that.
+
+
+## Links about "the Culture"
+
+- [Twilight](https://www.youtube.com/watch?v=bqloPw5wp48), by Contrapoints.
+About the criticism and meta-criticism surrounding the Twilight saga's portrayal of romance and fantasy.
+It's 3 hours long, and I haven't read the Twilight books, but I was not deterred.
+
