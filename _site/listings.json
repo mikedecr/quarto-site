@@ -2,6 +2,8 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/blog/closure_scaler/index.html",
+      "/blog/links_20240310/index.html",
       "/blog/memo_scum/index.html",
       "/blog/currr/index.html",
       "/blog/composition/index.html",

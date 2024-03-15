@@ -9,8 +9,49 @@
 <link>https://mikedecr.netlify.app/blog.html</link>
 <atom:link href="https://mikedecr.netlify.app/blog.xml" rel="self" type="application/rss+xml"/>
 <description>political scientist turned high-frequency tradist</description>
-<generator>quarto-1.4.550</generator>
-<lastBuildDate>Sat, 09 Mar 2024 06:00:00 GMT</lastBuildDate>
+<generator>quarto-1.4.547</generator>
+<lastBuildDate>Tue, 12 Mar 2024 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Links: March 15, 2024</title>
+  <dc:creator>Michael DeCrescenzo</dc:creator>
+  <link>https://mikedecr.netlify.app/blog/links_20240310/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="links-about-polymorphism" class="level2">
+<h2 class="anchored" data-anchor-id="links-about-polymorphism">Links about polymorphism</h2>
+<p>Polymorphism in programming is one of my endless fascinations. <a href="https://en.wikipedia.org/wiki/Polymorphism_(computer_science)">Wikipedia says</a> polymorphism is the “use of a single symbol to represent multiple different types” or the “provision of a single interface to entities of different types”. For example, in Python, classes have methods, and many classes have methods that are named the same as methods in other classes. If I have some object <code>x</code> with a <code>.sort()</code> method, then the place in my program that depends on the <code>.sort()</code> functionality maybe doesn’t care what class <code>x</code> is, only that it can be sorted with <code>.sort()</code>. Any type that implements <code>.sort()</code> could be used where that method is called. But polymorphism isn’t only a thing in object-oriented methods-on-classes languages. Many languages implement “generic” functions that support multiple types without binding methods onto classes.</p>
+<p>Links:</p>
+<ul>
+<li><a href="https://youtu.be/YaSMkzmc_sA">The Only Time You Should Use Polymorphism</a>, by Christopher Okhravi. Focuses on OOP scenarios where classes have some inheritance relationship to one another and need to implement the same method. The distinction is between whether polymorphism is being used to specialize a function on <em>data</em> (do I have this value or that value) or on <em>behavior</em> (do I need to <em>do</em> this or <em>do</em> that).</li>
+<li><a href="https://www.youtube.com/watch?v=t6ktSfInNhU">Clojure’s Solutions to the Expression Problem</a> by Chris Houser. An entirely different take on polymorphism in language with <em>extremely</em> flexible generic function support in the base language. If you are Python person, Clojure’s “multimethods” are an entirely different beast. Generic functions can be declared anywhere and dispatch on <em>any function of the arguments</em>, not just their type. This means that you can dispatch on functions of multiple arguments at once (true “multiple dispatch”) instead of only one argument (which is effectively all you can do in Python when a class owns a method). And you can define methods anywhere, not just under a class definition. So anybody can overload an implementation for any reason in any location.</li>
+<li><a href="https://cohost.org/prophet/post/4979906-i-don-t-think-people">I don’t think people appreciate the tradeoffs they’re making with algebraic data types</a>, by online alias <a href="https://twitter.com/welltypedwitch"><span class="citation" data-cites="prophet">@prophet</span></a>. This one is more advanced (Haskell is used). Basically, when you declare that a function is defined on a “sum” type (a.k.a. “union” type), you hurt yourself any time you want to add more things to that type, because you may need to write a <em>lot</em> of new functions to support the new member of the union type. In the worst case, you have M functions that need to be defined on N member types. What you want to avoid (in all polymorphism problems, really), is either writing M new methods each time you add a new member type, or writing N versions of the same functionality each time you want to add a function.</li>
+</ul>
+</section>
+<section id="links-about-the-julia-language" class="level2">
+<h2 class="anchored" data-anchor-id="links-about-the-julia-language">Links about the Julia language</h2>
+<ul>
+<li><a href="https://juliazoid.com/partial-function-application-in-julia-85c3d5b8fe54">Partial function application in Julia</a>, by Bogumił Kamiński. Some Julia functions have this special behavior where, if you pass them an incomplete set of arguments, you get a new function of the unspecified arguments. So they have built-in partial application to support various common use cases. This totally whips, and I wish more languages did that.</li>
+</ul>
+</section>
+<section id="links-about-the-culture" class="level2">
+<h2 class="anchored" data-anchor-id="links-about-the-culture">Links about “the Culture”</h2>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=bqloPw5wp48">Twilight</a>, by Contrapoints. About the criticism and meta-criticism surrounding the Twilight saga’s portrayal of romance and fantasy. It’s 3 hours long, and I haven’t read the Twilight books, but I was not deterred.</li>
+</ul>
+
+
+</section>
+
+ ]]></description>
+  <category>code</category>
+  <category>r</category>
+  <guid>https://mikedecr.netlify.app/blog/links_20240310/</guid>
+  <pubDate>Tue, 12 Mar 2024 05:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Scraping the ‘S.C.U.M.’ data from ‘Kill James Bond’</title>
   <dc:creator>Michael DeCrescenzo</dc:creator>
