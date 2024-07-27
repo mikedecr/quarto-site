@@ -9,8 +9,135 @@
 <link>https://mikedecr.netlify.app/blog.html</link>
 <atom:link href="https://mikedecr.netlify.app/blog.xml" rel="self" type="application/rss+xml"/>
 <description>political scientist turned high-frequency tradist</description>
-<generator>quarto-1.4.547</generator>
-<lastBuildDate>Tue, 12 Mar 2024 05:00:00 GMT</lastBuildDate>
+<generator>quarto-1.4.550</generator>
+<lastBuildDate>Sat, 22 Jun 2024 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Bayesian modeling and three “pillars” of causal inference</title>
+  <dc:creator>Michael DeCrescenzo</dc:creator>
+  <link>https://mikedecr.netlify.app/blog/bayes-3-pillars/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="some-background" class="level2">
+<h2 class="anchored" data-anchor-id="some-background">Some background</h2>
+<p>My Ph.D.&nbsp;thesis contained some attempts to “do causal inference” with Bayesian modeling. It was interesting stuff, but the experience was disorienting. At the time, my field (political science) had very few cases where somebody did causal estimation with a Bayesian model. It had even fewer examples of anybody discussing “what it meant” to combine these things, if it meant anything at all.</p>
+<p>I had neither the brains nor the self-sacrificial dedication to launch an academic career with this work. But I was writing a dissertation, and you try to push on a few things in a dissertation. Causal inference and Bayesian modeling are both <em>big things</em> that occupy a lot of brain space as you try to grok them. So I was kicking some ideas around.</p>
+<p>This post will summarize some of those ideas from the dissertation. I have repeatedly tried and failed to write it.</p>
+</section>
+<section id="the-basic-outline" class="level2">
+<h2 class="anchored" data-anchor-id="the-basic-outline">The basic outline</h2>
+<p>I will make two broad points</p>
+<ol type="1">
+<li>You don’t have to be a Bayesian, but it makes sense to at least <em>legalize</em> Bayesian modeling for ordinary causal inference applications.</li>
+<li>If you apply a Bayesian lens to the project of causal inference, you see interesting theoretical ideas that have been under-explored.</li>
+</ol>
+<p>We will talk about the first point briefly and spend more time on the second.<sup>1</sup></p>
+</section>
+<section id="legalize-it" class="level2">
+<h2 class="anchored" data-anchor-id="legalize-it">1. Legalize it</h2>
+<p>Causal inference in social science, like most quantitative work in social science, doesn’t provide much space for “everyday” Bayesian estimation. A common mindset seems to be,</p>
+<blockquote class="blockquote">
+<p>If the priors don’t change much, don’t bother me with them. If the priors change things a lot, it must be black magic, so don’t bother me with them.</p>
+</blockquote>
+<p>Bayesian modeling in political science is is tolerated in roughly two cases. First, whenever a model is just <em>too difficult</em> to estimate without MCMC or structured parameters. And second, in the world of measurement modeling,<sup>2</sup> where the typical political scientist doesn’t know what the heck is happening anyway, so they don’t care if the model is Bayesian. So Bayes is sometimes allowed, but in <em>remarkable</em> situations.</p>
+<p>This was a little annoying to me. I wanted to use Bayesian models for unremarkable situations, too, because Bayesian modeling has several benefits even when the situation is unremarkable:</p>
+<ul>
+<li>Priors can structure a parameter space to downweight or simply disallow unreasonable parameters.</li>
+<li>Regularization is usually good, and priors give you that.</li>
+<li>Priors are often a more intuitive interface for regularization than penalty terms in a loss function.<sup>3</sup></li>
+<li>Posterior samples make it dead-simple to describe uncertainty in any post-estimation quantity you wish.<sup>4</sup></li>
+</ul>
+<p>I do not believe that Bayesian modeling is the only way to truth and light. What I believe is that if you combine noisy data with credulous, unpenalized models, then what you get is overfit estimates and unreliable inferences, Bayesian or otherwise. A Bayesian model is a <em>pragmatic</em> tool for structuring what inferences you are likely to draw from finite data. I am making a pragmatic argument, not a religious one.</p>
+<p>I will say it a different way. Many observational causal models require good estimates of nuisance terms such as propensity scores, covariate adjustments, pre-trends, and the list goes on. Many of these nuisance terms require you to make more and more statistical adjustments without growing your data. <em>Why</em>, oh why, should you make these adjustments by just throwing everything into the OLS machine and trusting whatever you get out of it? This is one area where machine learnists have something to offer: better predictions by disciplining model complexity with regularization. Maybe what I should be saying is that regularization should be legalized in political science.</p>
+</section>
+<section id="the-pillars-of-causal-inference-and-their-bayesian-interpretation" class="level2">
+<h2 class="anchored" data-anchor-id="the-pillars-of-causal-inference-and-their-bayesian-interpretation">2. The “pillars” of causal inference and their Bayesian interpretation</h2>
+<p>This is the real meat. I will make the argument that causal inference is distinct from “plain” statistical estimation in a few key ways. For shorthand, I will refer to these as “pillars” of causal inference. I will introduce these pillars, then I will discuss how taking a Bayesian view leads us to reinterpret these pillars in ways that, if we follow where they lead us, would teach us a lot of about causal inference and quantitative empiricism broadly.</p>
+<section id="pillar-a-the-causal-model" class="level3">
+<h3 class="anchored" data-anchor-id="pillar-a-the-causal-model">Pillar A: the causal model</h3>
+<p>Let’s call a “causal model” the omniscient view of a causal system from mathematical first principles. The dominant way to do this in social science is the “potential outcomes” model attributed chiefly to Don Rubin. You can denote an outcome variable <img src="https://latex.codecogs.com/png.latex?Y"> that is affected by some causal variable <img src="https://latex.codecogs.com/png.latex?A">, which we will say is a binary-valued treatment for now. For an individual unit <img src="https://latex.codecogs.com/png.latex?i">, if <img src="https://latex.codecogs.com/png.latex?A_%7Bi%7D"> were <img src="https://latex.codecogs.com/png.latex?0"> or <img src="https://latex.codecogs.com/png.latex?1">, we would denote <img src="https://latex.codecogs.com/png.latex?i">’s potential outcomes as <img src="https://latex.codecogs.com/png.latex?Y_%7Bi%7D(A_%7Bi%7D%20=%201)"> or <img src="https://latex.codecogs.com/png.latex?Y_%7Bi%7D(A_%7Bi%7D%20=%200)">, the outcome value they would realize if they were treated (1) or not (0). If we could somehow observe both of these potential outcomes, we could say that one way to measure the “effect” of <img src="https://latex.codecogs.com/png.latex?A"> on unit <img src="https://latex.codecogs.com/png.latex?i"> is to take the difference <img src="https://latex.codecogs.com/png.latex?Y_%7Bi%7D(A_%7Bi%7D%20=%201)%20-%20Y_%7Bi%7D(A_%7Bi%7D%20=%200)"> and call this term the <em>individual treatment effect</em> <img src="https://latex.codecogs.com/png.latex?%5Ctau_%7Bi%7D">.</p>
+<p>This is the simplest causal model we could think of. The researcher could define other types of effects that would be defined in different ways. This is how we get “conditional” treatment effects, “local” treatment effects, and so on.</p>
+</section>
+<section id="pillar-b-causal-identificiation" class="level3">
+<h3 class="anchored" data-anchor-id="pillar-b-causal-identificiation">Pillar B: causal identificiation</h3>
+<p>The causal model from Pillar A is a perfectly omniscient description of the causal system, but it is only a hypothetical device. Of course, we can only ever observe unit <img src="https://latex.codecogs.com/png.latex?i"> receive a single value of <img src="https://latex.codecogs.com/png.latex?i">, so <img src="https://latex.codecogs.com/png.latex?%5Ctau_%7Bi%7D"> cannot be measured. What we can do instead is layer on additional assumptions that let us say something about the outcomes we can’t observe, given the outcomes we can observe. These are called identification assumptions.</p>
+<p>Think of it in terms of data in groups. I don’t observe unit <img src="https://latex.codecogs.com/png.latex?i"> in both <img src="https://latex.codecogs.com/png.latex?A=1"> and <img src="https://latex.codecogs.com/png.latex?A=0">, but I can observe a group of <img src="https://latex.codecogs.com/png.latex?A=1"> units and a group of <img src="https://latex.codecogs.com/png.latex?A=0"> units. Identifications assumptions are the requirements to make inferences about <em>expected individual differences</em>, <img src="https://latex.codecogs.com/png.latex?E%5B%7B%5Ctau%7D_%7Bi%7D%5D%20=%20E%5BY_%7Bi%7D(A=1)%20-%20Y_%7Bi%7D(A=0)%5D">, which we can’t observe, based on differences of group expectations, <img src="https://latex.codecogs.com/png.latex?%5Cbar%7B%5Ctau%7D%20=%20E%5BY_%7Bi%7D(A=%201)%5D%20-%20E%5BY_%7Bi%7D(A=0)%5D"> which we can observe. With these assumptions in hand, we could refer to the unobservable treatment effect <img src="https://latex.codecogs.com/png.latex?E%5B%5Ctau_%7Bi%7D%5D"> as a <em>causal estimand</em>.</p>
+<p>Remember, causal estimands are still entities in the causal model. They are not quantities that we can observe. They are quantities that we seek to estimate with data, whose validity is only subject to assumptions that we make with pinpoint precision.</p>
+</section>
+<section id="pillar-c-statistical-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="pillar-c-statistical-estimation">Pillar C: statistical estimation</h3>
+<p>Identification assumptions usually describe minimally sufficient conditions for <em>nonparametric estimators</em> of causal estimands. I say “nonparametric” because these estimators are usually differences in group means for <img src="https://latex.codecogs.com/png.latex?A=1"> and <img src="https://latex.codecogs.com/png.latex?A=0">; we don’t need to know the distribution of the individual unit outcomes <img src="https://latex.codecogs.com/png.latex?Y_%7Bi%7D"> around those means to estimate this average group difference.</p>
+<p>This is the launching off point for cauasal estimation approaches that you see in social sciences. They are mostly based on OLS, because OLS is often the closest thing we can do to calculating simple mean differences at scale. OLS will also be our first enemy when we Go Full Bayesian.</p>
+</section>
+<section id="pillar-c-now-bayesian-bayesian-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="pillar-c-now-bayesian-bayesian-estimation">Pillar C, now Bayesian: Bayesian estimation</h3>
+<p>We have to take these pillars out of order in order to introduce the Bayesian stuff gradually.</p>
+<p>In statistics, there are many ways to estimate means and conditional means. Causal inference practitioners try to minimize their assumptions, so they typically stick to the basics. If they have to estimate means in groups, they typically split the data into groups and calculate the arithmetic mean.</p>
+<p>This is an easy place for Bayesian models to appear. We don’t need any new ideology to do this, I will assert. We only need to stick to basic statistical realities: no estimate of any estimand is exact. You can estimate those group differences in more ways than the OLS-equivalent ones. And I would argue that if statistical efficiency and overfitting are concerns to you, you should be free to use non-OLS approaches. These need not even be Bayesian, but of course, you can interpret many penalized estimation approaches and machine learning methods as ways to encode certain, specific priors.</p>
+<p>This “mere estimation” pillar is mostly where Bayesian models have appeared in political and social science so far: Ratkovic and Tingley’s <a href="https://www.princeton.edu/~ratkovic/public/sparsereg.pdf">Lasso Plus</a>, Ornstein and Duck-Mayr using <a href="https://joeornstein.github.io/publications/gprd.pdf">Gaussian Processes for regression discontinuity</a>, Green and Kern using <a href="https://academic.oup.com/poq/article-abstract/76/3/491/1893905?login=false">Bayesian regression trees for heterogeneous treatment effects</a>, and Horiuchi, Imai, and Taniguchi modeling <a href="https://imai.fas.harvard.edu/research/files/manifesto.pdf">noncompliance and nonresponse using a full probability model</a>.<sup>5</sup> In economics, Rachael Meager’s <a href="https://pubs.aeaweb.org/doi/pdfplus/10.1257/app.20170299">hierarchical meta-analyses of experimental results</a> is a bit more substantively Bayesian, because modeling like this requires an explicit, substantive prior that relates individual experiments to the generalized treatment effect.</p>
+</section>
+<section id="bayesian-pillar-a-priors-on-potential-outcomes" class="level3">
+<h3 class="anchored" data-anchor-id="bayesian-pillar-a-priors-on-potential-outcomes">Bayesian Pillar A: Priors on potential outcomes</h3>
+<p>Don Rubin himself has been writing about the Bayesian interpretation of his own potential outcomes model <a href="https://projecteuclid.org/journals/annals-of-statistics/volume-6/issue-1/Bayesian-Inference-for-Causal-Effects-The-Role-of-Randomization/10.1214/aos/1176344064.full">since the 1970s</a>, lest you think the Bayesian interpretation is some kind of mis-fit.<sup>6</sup> Under this model, potential outcomes, treatment status, covariates, and the treatment effects are all random variables in the same probability model. When we construct a model such as this, and condition it on the data, a few things fall out.</p>
+<ul>
+<li>You get a posterior distribution for the treatment effect. This lets you say that the treatment effect is “probably” within some region with a valid intra-model meaning of “probably”. This is much more interesting than rejecting a null hypothesis that isn’t believable in the first place.</li>
+<li>It implies a direct missing data model for unobserved potential outcomes. You can generate posterior samples of counterfactual data and model the distribution of <em>individual treatment effects</em>. They are still not observable, and the routine is subject to distributional assumptions (it is Bayesian after all), but this is the juice that you can squeeze out.<sup>7</sup></li>
+<li>The Bayesian model becomes a missing data model for unobserved counterfactuals. Posterior distributions over potential outcomes, which imply <em>prior distributions over potential outcomes</em>.</li>
+</ul>
+<p>This last point is a departure from the “pinpoint” potential outcomes model introduced above. In that model, we have potential <img src="https://latex.codecogs.com/png.latex?Y_%7Bi%7D"> values for <img src="https://latex.codecogs.com/png.latex?A%20%5Cin%20(0,%201)"> but that’s it. In the Bayesian model, these outcomes are implicitly weighted by the priors of all other parameters in the model. Before you observe any data, you could turn the crank on your model, generate prior samples for all potential outcomes, and immediately eyeball if they match the intuitions that you have about your data as a researcher. <em>Normal Bayesian stuff</em> that you can always do, now in the domain of causal modeling!</p>
+<p>One political science example where authors go full-speed into Bayesian counterfactual simulation is <a href="https://www.cambridge.org/core/journals/political-analysis/article/bayesian-alternative-to-synthetic-control-for-comparative-case-studies/C23BD67E4BBBB8C88ADAEAE169696A45">Pang, Liu, and Xu (2021)</a>.</p>
+</section>
+<section id="bayesian-pillar-b-fuzzy-identification-assumptions" class="level3">
+<h3 class="anchored" data-anchor-id="bayesian-pillar-b-fuzzy-identification-assumptions">Bayesian Pillar B: fuzzy identification assumptions</h3>
+<p>In the typical causal model, you make an identification assumption, and that’s that. In the real world, these assumptions are probably wrong, but we might have some idea of <em>how</em> wrong they might be. Which is to say, if you can conceive of a parameter that represents how your treatment effect estimate is contaminated by a violated assumption, and you have a reasonable beliefs about the plausible values that this parameter could take, then you can average your causal estimates over a reasonable prior for that parameter.</p>
+<p>We have seen this in non-Bayesian causal inference already under the name “sensitivity analysis”. For example, this <a href="https://imai.fas.harvard.edu/research/files/BaronKenny.pdf">Imai, Keele, and Tingley paper</a> about causal mediation introduces a <em>sensitivity parameter</em> that represents some unmodeled confounding, so that you can entertain how it affects your causal estimates.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://mikedecr.netlify.app/blog/bayes-3-pillars/sensitivity.png" class="img-fluid figure-img"></p>
+<figcaption>from Imai, Keele, and Tingley’s paper</figcaption>
+</figure>
+</div>
+<p>The Bayesian view wants the same thing. But if we don’t specify a prior on <img src="https://latex.codecogs.com/png.latex?%5Crho">, then we can’t measure how it affects the <em>plausibility</em> of our treatment effect estimates. The Bayesian approach gives you the technology to get you there.</p>
+<p>We can see a germ of this idea in political science, in the third paper of <a href="https://academiccommons.columbia.edu/doi/10.7916/d8-2x8p-6e09">Thomas Leavitt’s dissertation from 2021</a>. This paper builds up a notion of design uncertainty in a difference-in-differences framework that implies <em>a prior distribution over pre-trends</em>, of which parallel trends is only a special case. We then see how treatment effect estimates are affected by different methods for specifying these pre-trend priors. Yeah! This is <em>cool stuff</em>! But it makes you think also: how many papers have we read where we condition on ideal assumptions and then march happily on our way?</p>
+<p>This idea of priors for identification assumptions is, in some ways, a mirror image to the click-baity idea from Gerber, Green, and Kaplan’s <a href="https://www.cambridge.org/core/books/abs/problems-and-methods-in-the-study-of-politics/illusion-of-learning-from-observational-research/F000E4EB24FAAC541AE5385619ED51FA">Illusion of Learning from Observational Research</a>. They say that every estimated treatment effect is the combination of a true effect, bias from the research design, and some statistical uncertainty. Experimental methods shrink your prior about the bias term, allowing you to update your prior about the size of the true effect when you encounter the estimated effect. When you use observational methods, your priors about the bias are vaguer, and</p>
+<blockquote class="blockquote">
+<p>If one is entirely uncertain about the biases of observational research, the accumulation of observational findings sheds no light on the causal parameter of interest.</p>
+</blockquote>
+<p>I hope it is obvious to you, intelligent reader, that a scenario where you are <em>entirely uncertain about the bias</em> is unrealistic and contrived. I could just as easily make a cynical argument that</p>
+<ul>
+<li>There is a continuous distribution of possible violations to your identification assumptions.</li>
+<li>under this continuous distribution, the probability mass where your assumptions hold perfectly is 0.</li>
+<li>therefore when you conduct any experiment, your study teaches you about only 0% of possible realities.</li>
+</ul>
+<p>That argument is symbolically correct in the same way that the “illusion of learning” is correct. You can think about it for half-a-second, realize that it’s more like a nudge in a certain direction than a factual statement about what we actually learn from research, and move on with your life.</p>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>I hope I have convinced you that there is plenty of work to do here. I won’t be the one to do it. I will be off in the private sector not worrying about this anymore. But I’m glad it is off my chest.</p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p> My dissertation also talks about some pragmatic advice for thinking about priors in causal situations and some examples where I replicated causal studies with informative priors. I am skipping that for now. Maybe we will return to that stuff in a future blog post.↩︎</p></li>
+<li id="fn2"><p> For example, Bayesian item-response models are a common tool for estimating left–right political ideology as a latent variable.↩︎</p></li>
+<li id="fn3"><p> I know what a prior standard deviation is. How would you interpret a ridge parameter <em>except</em> in terms of prior standard deviation?↩︎</p></li>
+<li id="fn4"><p> The <code>CLARIFY</code> paper by Tomz, Wittenberg, and King has been cited thousands of times, which proves the point. You can program your own CLARIFY routine in like 7 lines of R code.↩︎</p></li>
+<li id="fn5"><p> We first saw Bayesian methods used for this sort of thing in the 70s! By no one other than <a href="https://projecteuclid.org/journals/annals-of-statistics/volume-6/issue-1/Bayesian-Inference-for-Causal-Effects-The-Role-of-Randomization/10.1214/aos/1176344064.full">Don Rubin himself</a>.↩︎</p></li>
+<li id="fn6"><p> In 2005 <a href="https://www.jstor.org/stable/27590541">Rubin wrote in the context of causal inference</a> that “a posterior distribution with clearly stated prior distributions is the most natural way to summarize evidence for a scientific question. Combining this summary with the costs of decisions then also becomes natural”. Rubin says “ABIYLFOYP”.↩︎</p></li>
+<li id="fn7"><p> I will go out on a limb and offer a benign view of distributional assumptions. So-called “nonparametric” mean-difference causal estimates are the same thing you get if you minimize certain loss functions that correspond to well-known probability distributions. The sample mean is a quadratic loss minimizer, which is the same thing as a Gaussian likelihood, so, a thin-tailed model. Make all the nonparametric gestures that you want; you are still using an estimator that is jerked around by noisy data.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <guid>https://mikedecr.netlify.app/blog/bayes-3-pillars/</guid>
+  <pubDate>Sat, 22 Jun 2024 05:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Links: March 15, 2024</title>
   <dc:creator>Michael DeCrescenzo</dc:creator>
