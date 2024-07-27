@@ -70,7 +70,6 @@ I wanted to use Bayesian models for unremarkable situations, too, because Bayesi
 ]
 - Posterior samples make it dead-simple to describe uncertainty in any post-estimation quantity you wish.^[
     The `CLARIFY` paper by Tomz, Wittenberg, and King has been cited thousands of times, which proves the point.
-    You can program your own CLARIFY routine in like 7 lines of R code.
 ]
 
 I do not believe that Bayesian modeling is the only way to truth and light.
