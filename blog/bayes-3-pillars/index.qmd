@@ -107,7 +107,7 @@ This is how we get "conditional" treatment effects, "local" treatment effects, a
 ### Pillar B: causal identificiation
 
 The causal model from Pillar A is a perfectly omniscient description of the causal system, but it is only a hypothetical device.
-Of course, we can only ever observe unit $i$ receive a single value of $i$, so $\tau_{i}$ cannot be measured.
+Of course, we can only ever observe unit $i$ receive a single value of $A$, so $\tau_{i}$ cannot be measured.
 What we can do instead is layer on additional assumptions that let us say something about the outcomes we can't observe, given the outcomes we can observe.
 These are called identification assumptions.
 
