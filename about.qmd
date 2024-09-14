@@ -5,7 +5,7 @@ about:
   template: solana
 ---
 
-#### **--- work ---**
+#### **::: work :::**
 
 I work in low-latency trading as a **quantitative researcher**.
 I use mathematical models, statistics, and novel computational tools to build trading strategies that go very fast.
@@ -17,7 +17,7 @@ I work with market microstructure, which in plain English means,
 I will not be blogging about this, however.
 Sorry!
 
-#### **--- background ---**
+#### **::: background :::**
 
 I have a Ph.D. in political science from the University of Wisconsin–Madison,
 where I was a graduate affiliate of the [Elections Research Center](https://elections.wisc.edu).
@@ -29,7 +29,7 @@ I am interested in programming languages as a general topic and functional progr
 My language frontier includes Haskell, Hy, and Racket.
 
 
-#### **--- this site ---**
+#### **::: this site :::**
 
 Visit [Github](https://github.com/mikedecr/quarto-site) for all source code.
 [Blog posts](https://github.com/mikedecr/quarto-site/tree/main/blog) typically live in separate repositories.
