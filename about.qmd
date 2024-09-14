@@ -31,7 +31,8 @@ My language frontier includes Haskell, Hy, and Racket.
 
 #### **--- this site ---**
 
-The source code for the site is [on Github](https://github.com/mikedecr/quarto-site).
-The blog posts are all separate repositories for your cloning and forking needs; find them [here](https://github.com/mikedecr/quarto-site/tree/main/blog).
-The site is built with [Quarto](https://github.com/mikedecr/quarto-site), a multilingual publishing system backed by Pandoc, and hosted on Netlify.
+Visit [Github](https://github.com/mikedecr/quarto-site) for all source code.
+[Blog posts](https://github.com/mikedecr/quarto-site/tree/main/blog) typically live in separate repositories.
+
+The site is built with [Quarto](https://github.com/mikedecr/quarto-site), a literate publishing system backed by Pandoc, and hosted on Netlify.
 
