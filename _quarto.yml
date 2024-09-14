@@ -34,6 +34,4 @@ format:
     theme: 
       # cosmo is good, simplex, spacelab
       light: [cosmo, fonts.scss]
-      # dark: [darkly, fonts.scss]
-    # css: styles.css
 

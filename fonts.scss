@@ -1,26 +1,32 @@
 /*-- scss:defaults --*/
   
 // import google fonts
-@import url('https://fonts.googleapis.com/css2?family=Karla:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Karla:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Varta:ital,wght@0,400;0,700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@500;700&display=swap');
 
 // use Atkinson Hyperlegible font if available
-$font-family-sans-serif:  "Varta", "Karla", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
-$font-family-monospace:  "Inconsolata", "Fira Code", monospace;
+$font-family-sans-serif: "Karla", "Varta", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
+$font-family-monospace: "Inconsolata", "Fira Code", monospace;
 
-// in case a theme is serif by default: revert to san-serif
-header, h1, h2, h3, h4, h5, div, p, table, ul, ol, margin-sidebar {
-  // font-family: $font-family-sans-serif;
+// top title, sidebar text? anything else?
+div {
   font-family: $font-family-monospace;
 }
 
+
+header, h1, h2, h3, h4, h5, margin-sidebar {
+  font-family: $font-family-sans-serif;
+}
+
+p, table, ul, ol {
+    font-family: $font-family-sans-serif;
+}
+
 p {
-    font-size: 20
+    font-size: 20;
 }
 
 h1, h2, h3, h4, h5 {
-    font-weight: 700
+    font-weight: 700;
 }
-
-
