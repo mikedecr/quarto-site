@@ -11,21 +11,19 @@ website:
   favicon: submodules/imgs/img/favicon_telles.png
   navbar:
     right:
+      - text: "Home"
+        file: index.qmd
       - text: "About"
         file: about
       - text: "Blog"
         file: blog
       - text: "RSS"
-        href: blog.xml
-      - text: "Github"
-        href: https://github.com/mikedecr
-      - text: "Bsky"
-        href: https://bsky.app/profile/mikedecr.bsky.social
+        href: blog/index.xml
   # social / sharing
   twitter-card:
     image: "/submodules/imgs/img/ID_telles_1452x1452.png"
-    # creator: "@mikedecr"
-    # card-style: summary_large_image
+    creator: "@mikedecr"
+    card-style: summary_large_image
   open-graph:
     image: submodules/imgs/img/ID_telles_1452x1452.png
 
