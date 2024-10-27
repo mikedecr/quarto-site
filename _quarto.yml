@@ -28,8 +28,12 @@ website:
 format:
   html:
     theme: 
-      # cosmo, simplex, spacelab
-      light: [cosmo, _assets/fonts.scss]
+      light: 
+        - cosmo
+        - _assets/fonts.scss
+      dark: 
+        - solar
+        - _assets/fonts.scss
 
 # can this go higher in the site hierarchy?
 highlight-style: nord
