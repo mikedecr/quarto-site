@@ -1,23 +1,5 @@
 [
   {
-    "listing": "/blog.html",
-    "items": [
-      "/blog/bayes-3-pillars/index.html",
-      "/blog/links_20240310/index.html",
-      "/blog/memo_scum/index.html",
-      "/blog/currr/index.html",
-      "/blog/composition/index.html",
-      "/blog/delayplyr/index.html",
-      "/blog/partial_fns_ggplot/index.html",
-      "/blog/mandelbrot_iterative_recursive/index.html",
-      "/blog/latex_colors/index.html",
-      "/blog/fp_basics/index.html",
-      "/blog/usable_repos/index.html",
-      "/blog/modular_blog/index.html",
-      "/blog/nonflat_implied_priors/index.html"
-    ]
-  },
-  {
     "listing": "/blog/index.html",
     "items": [
       "/blog/bayes-3-pillars/index.html",
