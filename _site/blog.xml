@@ -9,7 +9,7 @@
 <link>https://mikedecr.netlify.app/blog.html</link>
 <atom:link href="https://mikedecr.netlify.app/blog.xml" rel="self" type="application/rss+xml"/>
 <description>political scientist turned high-frequency tradist</description>
-<generator>quarto-1.4.550</generator>
+<generator>quarto-1.5.57</generator>
 <lastBuildDate>Sat, 22 Jun 2024 05:00:00 GMT</lastBuildDate>
 <item>
   <title>Bayesian modeling and three “pillars” of causal inference</title>
@@ -309,6 +309,7 @@ font-style: inherit;">library</span>(stringr)</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(home) {</span>
 <span id="cb3-6">    film_index_url <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -362,6 +363,7 @@ font-style: inherit;">Map</span>(href_slug, grid_nodes)</span>
 background-color: null;
 font-style: inherit;">sapply</span>(slugs, <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(s) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">append_url</span>(home, s))</span>
@@ -378,6 +380,7 @@ font-style: inherit;"># this is just a safe way to modify urls</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url, path) {</span>
 <span id="cb3-23">    <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -395,6 +398,7 @@ font-style: inherit;"># extract the href field from an &lt;a&gt; anchor</span></
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(obj) {</span>
 <span id="cb3-28">    obj <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -531,12 +535,14 @@ font-style: inherit;"># I always think this helper function is unreasonably usef
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(x, ...) x[[...]]</span>
 <span id="cb5-3"></span>
 <span id="cb5-4">get_movie_title <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url) {</span>
 <span id="cb5-5">    url <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -567,6 +573,7 @@ font-style: inherit;">trimws</span>()</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url) {</span>
 <span id="cb5-13">    url <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -623,6 +630,7 @@ font-style: inherit;">trimws</span>()</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url) {</span>
 <span id="cb5-25">    url <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -681,6 +689,7 @@ font-style: inherit;">parse_number</span>()</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url) {</span>
 <span id="cb5-37">    url <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -720,6 +729,7 @@ font-style: inherit;">parse_number</span>()</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url) {</span>
 <span id="cb5-46">    names <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -794,6 +804,7 @@ font-style: inherit;">setNames</span>(values, names)</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url, name) {</span>
 <span id="cb5-62">    <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -959,6 +970,7 @@ font-style: italic;">##   0.386   0.054   4.697</span></span></code></pre></div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><span class="kw" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">def</span> double(x):</span>
 <span id="cb8-2">    <span class="bu" style="color: null;
 background-color: null;
@@ -973,6 +985,7 @@ background-color: null;
 font-style: inherit;">"</span>)</span>
 <span id="cb8-3">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">return</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
@@ -1013,22 +1026,27 @@ font-style: inherit;">## 8</span></span></code></pre></div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><span class="kw" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">def</span> memoize(func):</span>
 <span id="cb10-2">    already_evaluated <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> {}</span>
 <span id="cb10-3">    <span class="kw" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">def</span> _memoized_fn(<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">*</span>args):</span>
 <span id="cb10-4">        <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span> args <span class="kw" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">in</span> already_evaluated:</span>
 <span id="cb10-5">            <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">return</span> already_evaluated[args]</span>
 <span id="cb10-6">        computed_value <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -1040,9 +1058,11 @@ background-color: null;
 font-style: inherit;">=</span> computed_value</span>
 <span id="cb10-8">        <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">return</span> computed_value</span>
 <span id="cb10-9">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">return</span> _memoized_fn</span></code></pre></div>
 </div>
 <p><code>memoize</code> creates a lookup table called <code>already_evaluated</code> that associates an argument to a computed value every time the function sees a new argument. So the memoized function is a <em>closure</em> that encloses the lookup table.</p>
@@ -1103,6 +1123,7 @@ font-style: inherit;">memoize</span>(read_html)</span></code></pre></div>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url) {</span>
 <span id="cb15-2">    url <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1133,6 +1154,7 @@ font-style: inherit;">trimws</span>()</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url) {</span>
 <span id="cb15-10">    url <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1189,6 +1211,7 @@ font-style: inherit;">trimws</span>()</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url) {</span>
 <span id="cb15-22">    url <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1247,6 +1270,7 @@ font-style: inherit;">parse_number</span>()</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url) {</span>
 <span id="cb15-34">    url <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -1286,6 +1310,7 @@ font-style: inherit;">parse_number</span>()</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url) {</span>
 <span id="cb15-43">    names <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -1375,6 +1400,7 @@ font-style: inherit;"># use the memoized fn internally</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url, name) {</span>
 <span id="cb15-64">    <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1459,6 +1485,7 @@ font-style: italic;">##   0.171   0.016   0.531</span></span></code></pre></div>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url) {</span>
 <span id="cb18-2">    values <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -1865,6 +1892,7 @@ background-color: null;
 font-style: inherit;">|&gt;</span></span>
 <span id="cb22-15">    (<span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(d)</span>
 <span id="cb22-16">     <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1978,6 +2006,7 @@ font-style: inherit;">element_blank</span>())</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(url) {</span>
 <span id="cb17-2">    compute_all_values <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -2518,6 +2547,7 @@ font-style: italic;">## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(...) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">f</span>(...) <span class="sc" style="color: #5E5E5E;
@@ -3007,14 +3037,17 @@ font-style: inherit;">::</span>select)</span></code></pre></div>
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(verb) {</span>
 <span id="cb16-2">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(...) {</span>
 <span id="cb16-3">        intention <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(.data) {</span>
 <span id="cb16-4">            <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3046,8 +3079,10 @@ font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(g, f) <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(...) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">g</span>(<span class="fu" style="color: #4758AB;
@@ -3198,6 +3233,7 @@ font-style: italic;">## [1] 3</span></span></code></pre></div>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(x) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">length</span>(<span class="fu" style="color: #4758AB;
@@ -3230,9 +3266,11 @@ font-style: italic;">## [1] 3</span></span></code></pre></div>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(g, f) {</span>
 <span id="cb7-2">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(...) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">g</span>(<span class="fu" style="color: #4758AB;
@@ -3278,9 +3316,11 @@ font-style: inherit;"># note the order of g and f</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(f, g) {</span>
 <span id="cb10-3">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(...) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">g</span>(<span class="fu" style="color: #4758AB;
@@ -3381,6 +3421,7 @@ font-style: italic;">## [1] 3</span></span></code></pre></div>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(...) {</span>
 <span id="cb13-2">    fns <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -3650,6 +3691,7 @@ font-style: inherit;"># clunkier</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(d) {</span>
 <span id="cb5-3">    condition <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -3790,6 +3832,7 @@ font-style: inherit;"># args -&gt; function(.data, args)</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(...) {</span>
 <span id="cb8-3">    args <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -3800,6 +3843,7 @@ background-color: null;
 font-style: inherit;">enquos</span>(...)</span>
 <span id="cb8-4">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(.data) rlang<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
@@ -3896,9 +3940,11 @@ font-style: inherit;"># verb -&gt; (function(...) -&gt; function(.data))</span><
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(verb) {</span>
 <span id="cb11-3">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(...) {</span>
 <span id="cb11-4">        args <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -3909,6 +3955,7 @@ background-color: null;
 font-style: inherit;">enquos</span>(...)</span>
 <span id="cb11-5">        <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(.data) rlang<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
@@ -4196,8 +4243,10 @@ font-style: inherit;"># (g, f) -&gt; (g . f)</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(g, f) <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(...) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">g</span>(<span class="fu" style="color: #4758AB;
@@ -4220,6 +4269,7 @@ font-style: inherit;"># (f, g) -&gt; (g . f)</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(f, g) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">compose</span>(g, f)</span>
@@ -4526,6 +4576,7 @@ font-style: italic;">## [1] 0.6</span></span></code></pre></div>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(x) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">mean</span>(x, <span class="at" style="color: #657422;
@@ -4544,6 +4595,7 @@ font-style: inherit;">TRUE</span>)</span></code></pre></div>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(f, ...) {</span>
 <span id="cb6-2">    fixed <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -4554,6 +4606,7 @@ font-style: inherit;">list</span>(...)</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(...) {</span>
 <span id="cb6-4">        all_args <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -5054,9 +5107,11 @@ font-style: inherit;"># take in a function f and return a "lifted" function that
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(f) {</span>
 <span id="cb18-3">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(lst) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">lapply</span>(lst, f)</span>
@@ -5165,9 +5220,11 @@ font-style: inherit;"># power must be an integer &gt;= 0</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(x, power) { </span>
 <span id="cb1-3">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span> (power <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
@@ -5179,6 +5236,7 @@ background-color: null;
 font-style: inherit;">1</span>) }</span>
 <span id="cb1-4">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span> (power <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
@@ -5194,8 +5252,10 @@ background-color: null;
 font-style: inherit;">=</span> x</span>
 <span id="cb1-7">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2</span><span class="sc" style="color: #5E5E5E;
@@ -5218,9 +5278,11 @@ font-style: inherit;">return</span>(result)</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(x, power) {</span>
 <span id="cb2-2">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span> (power <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
@@ -5232,6 +5294,7 @@ background-color: null;
 font-style: inherit;">1</span>) }</span>
 <span id="cb2-3">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span> (power <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
@@ -5320,9 +5383,11 @@ font-style: italic;">## [1] TRUE</span></span></code></pre></div>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(coord, iterations) {</span>
 <span id="cb4-2">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span> (iterations <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span> <span class="dv" style="color: #AD0000;
@@ -6101,9 +6166,11 @@ font-style: inherit;"># returns the new function: f . g</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(f, g) {</span>
 <span id="cb4-3">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(...) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">f</span>(<span class="fu" style="color: #4758AB;
@@ -6171,6 +6238,7 @@ font-style: inherit;"># pass vector fns = c(f1, f2, ..., fn)</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(fns) {</span>
 <span id="cb6-3">    <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -6328,6 +6396,7 @@ font-style: italic;">## 1  20.1  6.19  231.  147.  3.60  3.22  17.8 0.438 0.406 
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(l, f) {</span>
 <span id="cb12-2">    <span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -6350,8 +6419,10 @@ background-color: null;
 font-style: inherit;"># assign f(x) for each x in l</span></span>
 <span id="cb12-5">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">for</span> (x <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">in</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">seq_along</span>(l)) {</span>
@@ -6372,9 +6443,11 @@ font-style: inherit;">return</span>(v)</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(f) {</span>
 <span id="cb13-2">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(x) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">apply_on_elements</span>(x, f)</span>
@@ -6516,6 +6589,7 @@ font-style: inherit;"># 2a. reimplement *-apply()</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(l, f) {</span>
 <span id="cb17-8">    v <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -6532,8 +6606,10 @@ background-color: null;
 font-style: inherit;">length</span>(l))</span>
 <span id="cb17-9">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">for</span> (x <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">in</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">seq_along</span>(l)) {</span>
@@ -6554,9 +6630,11 @@ font-style: inherit;"># 2b. partial apply</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(f) {</span>
 <span id="cb17-16">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(x) <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">apply_on_elements</span>(x, f)</span>
@@ -6710,6 +6788,7 @@ font-style: italic;">## 6  15    8     301   335   3.54  3.57  14.6   0   1     
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(fns) {</span>
 <span id="cb19-2">    <span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -7211,6 +7290,7 @@ font-style: inherit;"># helpful theme functions</span></span>
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>() {</span>
 <span id="cb3-3">    <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -7229,6 +7309,7 @@ font-style: inherit;">element_blank</span>())</span>
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>() {</span>
 <span id="cb3-7">    <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -7259,6 +7340,7 @@ font-style: inherit;">6</span></span>
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(x) { mu <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> sigma <span class="sc" style="color: #5E5E5E;
