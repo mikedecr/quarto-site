@@ -1,6 +1,6 @@
 ---
 title: ""
-image: submodules/imgs/img/ID_telles_1452x1452.png
+image: /submodules/imgs/img/ID_telles_1452x1452.png
 about:
   template: solana
 ---

@@ -1,7 +1,6 @@
 ---
 title: "Blog Posts"
 listing:
-  contents: blog
   type: table # default, grid, table
   categories: unnumbered
   fields: [title, date]

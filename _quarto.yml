@@ -12,9 +12,9 @@ website:
   navbar:
     right:
       - text: "About"
-        file: about.qmd
+        file: about
       - text: "Blog"
-        file: blog.qmd
+        file: blog
       - text: "RSS"
         href: blog.xml
       - text: "Github"
