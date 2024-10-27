@@ -13,8 +13,6 @@ website:
     right:
       - text: "Home"
         file: index.qmd
-      - text: "About"
-        file: about
       - text: "Blog"
         file: blog
       - text: "RSS"
