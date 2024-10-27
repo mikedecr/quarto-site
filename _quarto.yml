@@ -32,6 +32,6 @@ website:
 format:
   html:
     theme: 
-      # cosmo is good, simplex, spacelab
-      light: [cosmo, fonts.scss]
+      # cosmo, simplex, spacelab
+      light: [cosmo, _assets/fonts.scss]
 
