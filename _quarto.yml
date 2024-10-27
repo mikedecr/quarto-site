@@ -35,3 +35,5 @@ format:
       # cosmo, simplex, spacelab
       light: [cosmo, _assets/fonts.scss]
 
+# can this go higher in the site hierarchy?
+highlight-style: nord
