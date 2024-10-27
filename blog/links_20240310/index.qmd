@@ -3,8 +3,6 @@ author: Michael DeCrescenzo
 categories: [code, r]
 title: "Links: March 15, 2024"
 subtitle: Polymorphism, partial application, Twilight
-# subtitle: Lazyverse
-# excerpt
 date: "2024-03-12"
 draft: false
 ---

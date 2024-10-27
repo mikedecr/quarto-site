@@ -18,5 +18,3 @@ about:
 I used to be a political scientist. <br>
 Now I do statistics and software development in high-frequency / low-latency trading.
 
-
-

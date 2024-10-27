@@ -7,32 +7,30 @@ about:
 
 ### -- work --
 
-I work in low-latency trading as a **quantitative researcher**.
+I work as a **quantitative researcher** at a low-latency trading firm.
 I use mathematical models, statistics, and novel computational tools to build trading strategies that go very fast.
-I work with market microstructure, which in plain English means, 
+I work with market **microstructure**, which in plain English means, 
 
 > Modern financial markets are rule-based systems built on software and hardware in physical computers.
 > The designs and capabilities of these systems have meaningful consequences for fast and effective trading.
 
-I will not be blogging about this, however.
+This work is quite secretive, though, so I will not be blogging about it.
 Sorry!
+
 
 ### -- background --
 
-I have a Ph.D. in political science from the University of Wisconsin–Madison,
-where I was a graduate affiliate of the [Elections Research Center](https://elections.wisc.edu).
-My graduate work focused on Bayesian and causal methods for studying elections, public opinion, and political ideology in the United States.
-My dissertation built new Bayesian models to measure latent political ideology in congressional districts.
+I have a Ph.D. in political science from the University of Wisconsin–Madison, where I was a graduate affiliate of the [Elections Research Center](https://elections.wisc.edu).
+My graduate work focused on Bayesian measurement models and causal methods for studying elections, public opinion, and political ideology in the United States.
 
 I write a lot of Python, Julia, and R, for work and for fun.
 I am interested in programming languages as a general topic and functional programming in particular.
-My language frontier includes Haskell, Hy, and Racket.
 
 
 ### -- this site --
 
-Visit [Github](https://github.com/mikedecr/quarto-site) for all source code.
-[Blog posts](https://github.com/mikedecr/quarto-site/tree/main/blog) typically live in separate repositories.
+All source code lives on [GitHub](https://github.com/mikedecr/quarto-site).
+[Blog posts](https://github.com/mikedecr/quarto-site/tree/main/blog) typically live in standalone Git repositories that are added to the site as submodules.
 
-The site is built with [Quarto](https://github.com/mikedecr/quarto-site), a literate publishing system backed by Pandoc, and hosted on Netlify.
+The site is built with [Quarto](https://github.com/mikedecr/quarto-site), a literate publishing system backed by [Pandoc](https://pandoc.org/), and hosted on [Netlify](https://www.netlify.com/).
 
