@@ -15,5 +15,5 @@ My research focused on Bayesian measurement models and causal methods for studyi
 
 ---
 
-You can find me elsewhere on [GitHub](https://www.github.com/mikedecr), [Bluesky](https://bsky.app/profile/mikedecr.bsky.social), and (for now) [Twitter](https://twitter.com/mikedecr).
+You can find me elsewhere on [GitHub](https://www.github.com/mikedecr) and [Bluesky](https://bsky.app/profile/mikedecr.bsky.social).
 
