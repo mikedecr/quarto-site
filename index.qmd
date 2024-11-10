@@ -1,4 +1,5 @@
 ---
+title: Michael DeCrescenzo
 image: submodules/imgs/img/ID_telles_1452x1452.png
 about:
   template: solana
@@ -15,5 +16,9 @@ My research focused on Bayesian measurement models and causal methods for studyi
 
 ---
 
-You can find me elsewhere on [GitHub](https://www.github.com/mikedecr) and [Bluesky](https://bsky.app/profile/mikedecr.bsky.social).
+You can find me elsewhere on 
+
+- [GitHub](https://www.github.com/mikedecr)
+- [Bluesky](https://bsky.app/profile/mikedecr.bsky.social)
+- [Substack](https://substack.com/@mikedecr) (sparse though it is)
 
